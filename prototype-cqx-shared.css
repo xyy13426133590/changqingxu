@@ -1,0 +1,122 @@
+* { -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+.font-logo { font-family: 'Great Vibes', cursive; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.gradient-bg { background: linear-gradient(180deg, #c4b5fd 0%, #a5b4fc 50%, #93c5fd 100%); }
+.glass { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); }
+.page { display: none; }
+.page.active { display: flex; flex-direction: column; animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.btn-press:active { transform: scale(0.96); }
+.match-badge { background: linear-gradient(135deg, #8B5CF6, #EC4899); }
+.vip-badge { background: linear-gradient(135deg, #F59E0B, #F97316); }
+.zodiac-glow { box-shadow: 0 0 15px rgba(251, 191, 36, 0.5); }
+.school-suggest-item:hover { background: rgba(139, 92, 246, 0.12); }
+
+@keyframes breathe-scale {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.25); }
+    50% { transform: scale(1.03); box-shadow: 0 0 20px 4px rgba(236, 72, 153, 0.15); }
+}
+@keyframes breathe-opacity {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.88; }
+}
+@keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+@keyframes shimmer-soft {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+.anim-avatar { animation: breathe-scale 3.2s ease-in-out infinite; }
+
+/* 完善资料页主头像：圆形水波纹 + 呼吸（勿在方形容器上用 box-shadow 动效，否则会透出方框） */
+.cqx-avatar-with-ripples {
+    position: relative;
+    width: 7.5rem;
+    height: 7.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cqx-avatar-with-ripples::before,
+.cqx-avatar-with-ripples::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6rem;
+    height: 6rem;
+    margin-left: -3rem;
+    margin-top: -3rem;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 0 0 1px rgba(167, 139, 250, 0.4), 0 0 18px rgba(236, 72, 153, 0.15);
+    pointer-events: none;
+    animation: cqx-avatar-ripple 2.8s ease-out infinite;
+}
+.cqx-avatar-with-ripples::after {
+    animation-delay: 1.4s;
+    border-color: rgba(196, 181, 253, 0.45);
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.25);
+}
+@keyframes cqx-avatar-ripple {
+    0% { transform: scale(0.92); opacity: 0.75; }
+    100% { transform: scale(1.42); opacity: 0; }
+}
+.cqx-avatar-with-ripples .cqx-avatar-photo {
+    position: relative;
+    z-index: 1;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 9999px;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+    animation: cqx-avatar-photo-breathe 3.2s ease-in-out infinite;
+}
+@keyframes cqx-avatar-photo-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+.cqx-avatar-with-ripples .cqx-avatar-cam {
+    position: absolute;
+    z-index: 2;
+    right: 0.35rem;
+    bottom: 0.35rem;
+}
+.anim-card { animation: breathe-opacity 4s ease-in-out infinite; }
+.anim-float-slow { animation: float-y 4.5s ease-in-out infinite; }
+.anim-stagger > *:nth-child(1) { animation-delay: 0s; }
+.anim-stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.anim-stagger > *:nth-child(3) { animation-delay: 0.16s; }
+.anim-stagger > *:nth-child(4) { animation-delay: 0.24s; }
+.anim-stagger > *:nth-child(5) { animation-delay: 0.32s; }
+.anim-stagger > *:nth-child(6) { animation-delay: 0.4s; }
+.anim-stagger > *:nth-child(7) { animation-delay: 0.48s; }
+.anim-stagger > *:nth-child(8) { animation-delay: 0.56s; }
+.anim-stagger > *:nth-child(9) { animation-delay: 0.64s; }
+.anim-stagger > *:nth-child(10) { animation-delay: 0.72s; }
+.anim-stagger > * { animation: float-y 3.5s ease-in-out infinite; }
+.glass-hero-shimmer {
+    background: linear-gradient(120deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.55) 40%, rgba(255,255,255,0.35) 80%);
+    background-size: 200% 200%;
+    animation: shimmer-soft 8s ease infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    .anim-avatar, .anim-card, .anim-float-slow, .glass-hero-shimmer, .anim-stagger > * {
+        animation: none !important;
+    }
+    .cqx-avatar-with-ripples::before,
+    .cqx-avatar-with-ripples::after,
+    .cqx-avatar-with-ripples .cqx-avatar-photo {
+        animation: none !important;
+    }
+}
+.chat-bubble-me { background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; border-radius: 1rem 1rem 0.25rem 1rem; }
+.chat-bubble-them { background: rgba(255,255,255,0.85); color: #1f2937; border-radius: 1rem 1rem 1rem 0.25rem; }
+.risk-pulse { animation: breathe-opacity 2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .risk-pulse { animation: none; } }

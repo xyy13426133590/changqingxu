@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>长情许 - 真实婚恋交友</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B5CF6',
+                        secondary: '#EC4899',
+                        accent: '#6366F1',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        .font-logo { font-family: 'Great Vibes', cursive; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 淡紫蓝渐变背景 */
+        .gradient-bg {
+            background: linear-gradient(180deg, #c4b5fd 0%, #a5b4fc 50%, #93c5fd 100%);
+        }
+        
+        /* 玻璃拟态 */
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        
+        /* 页面切换 */
+        .page { display: none; animation: fadeIn 0.3s ease-out; }
+        .page.active { display: flex; flex-direction: column; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 卡片滑动 */
+        .swipe-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .swipe-card.swiping-left { transform: translateX(-120%) rotate(-20deg); opacity: 0; }
+        .swipe-card.swiping-right { transform: translateX(120%) rotate(20deg); opacity: 0; }
+        
+        .btn-press { transition: all 0.2s; }
+        .btn-press:active { transform: scale(0.96); opacity: 0.8; }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* 生肖标签发光 */
+        .zodiac-glow { box-shadow: 0 0 15px rgba(251, 191, 36, 0.5); }
+        
+        /* 匹配度标签 */
+        .match-badge {
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+        }
+        
+        /* VIP徽章 */
+        .vip-badge {
+            background: linear-gradient(135deg, #F59E0B, #F97316);
+        }
+        
+        /* 输入框 */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+        
+        /* 脉冲动画 */
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(139, 92, 246, 0.5);
+            animation: pulse-ring 2s ease-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-md mx-auto min-h-screen gradient-bg relative overflow-hidden">
+        
+        <!-- 背景装饰 -->
+        <div class="fixed inset-0 pointer-events-none">
+            <div class="absolute -top-20 -right-20 w-60 h-60 bg-purple-300/30 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/3 -left-10 w-40 h-40 bg-blue-300/30 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 right-10 w-50 h-50 bg-pink-300/30 rounded-full blur-3xl"></div>
+        </div>
+
+        <!-- ==================== 页面1: 启动页 - 完整安全提示 ==================== -->
+        <div id="page-splash" class="page active h-screen flex flex-col relative z-10">
+            <!-- 状态栏 -->
+            <div class="flex items-center justify-between px-6 py-3 text-gray-700 text-sm">
+                <span>9:41</span>
+                <div class="flex items-center gap-1">
+                    <i class="fas fa-signal text-xs"></i>
+                    <i class="fas fa-wifi text-xs"></i>
+                    <i class="fas fa-battery-full text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- Logo区域 -->
+            <div class="flex-1 flex flex-col items-center justify-center">
+                <div class="relative w-48 h-48 mb-6">
+                    <!-- 光晕 -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-400/40 to-pink-400/40 rounded-full blur-2xl animate-pulse"></div>
+                    <!-- 主Logo -->
+                    <div class="relative w-full h-full glass rounded-full flex flex-col items-center justify-center">
+                        <i class="fas fa-heart text-4xl text-purple-500 mb-2"></i>
+                        <span class="font-logo text-4xl text-gray-800">长情许</span>
+                    </div>
+                </div>
+                <p class="text-gray-600 text-sm">真实身份 · 真诚交友</p>
+                <p class="text-gray-400 text-xs mt-1">CHANG QING XU</p>
+            </div>
+            
+            <!-- 安全提示卡片 -->
+            <div class="px-5 pb-8">
+                <div class="glass rounded-3xl p-5">
+                    <!-- 防骗提示 -->
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-800">安全交友提醒</div>
+                            <div class="text-xs text-gray-500">⚠️ 请仔细阅读以下提示</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 未成年人禁止 -->
+                    <div class="bg-red-50 rounded-xl p-3 mb-3 border border-red-100">
+                        <p class="text-red-600 text-sm font-medium">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            本小程序仅限18周岁以上成年人使用，未成年人禁止注册、禁止使用。
+                        </p>
+                    </div>
+                    
+                    <!-- 防骗要点 -->
+                    <ul class="space-y-2 text-sm text-gray-600 mb-4">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-purple-500 text-xs mt-1"></i>
+                            <span>所有用户需完成实名认证和人脸识别</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-purple-500 text-xs mt-1"></i>
+                            <span>请勿轻信涉及金钱、投资、借贷的请求</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-purple-500 text-xs mt-1"></i>
+                            <span>首次见面选择公共场所，告知亲友行踪</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-purple-500 text-xs mt-1"></i>
+                            <span>发现可疑行为请立即举报，违者封号</span>
+                        </li>
+                    </ul>
+                    
+                    <!-- 民俗配对免责声明 -->
+                    <div class="bg-purple-50 rounded-xl p-3 mb-4 border border-purple-100">
+                        <p class="text-xs text-purple-600 leading-relaxed">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            本平台属相、生肖三合六合匹配功能，仅为中华传统民俗文化参考，仅供娱乐交友使用，不代表任何形式的算命、占卜、运势预测，不作为婚恋选择、人生决策唯一依据。
+                        </p>
+                    </div>
+                    
+                    <!-- 进入按钮 -->
+                    <button onclick="showPage('page-login')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-4 rounded-2xl shadow-lg btn-press">
+                        我已了解，进入应用
+                    </button>
+                    
+                    <p class="text-center text-xs text-gray-400 mt-3">
+                        进入即表示同意《用户协议》和《隐私政策》
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 页面2: 登录页 ==================== -->
+        <div id="page-login" class="page h-screen flex flex-col relative z-10">
+            <div class="flex items-center px-6 py-4">
+                <button onclick="showPage('page-splash')" class="w-10 h-10 glass rounded-full flex items-center justify-center btn-press">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center px-6">
+                <div class="w-20 h-20 glass rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-heart text-3xl text-purple-500"></i>
+                </div>
+                <h1 class="font-logo text-4xl text-gray-800 mb-2">长情许</h1>
+                <p class="text-gray-500 text-sm mb-12">遇见对的人，许下长情</p>
+                
+                <!-- 微信登录 -->
+                <button onclick="showPage('page-id-verify')" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-4 rounded-2xl shadow-lg mb-4 flex items-center justify-center gap-3 btn-press">
+                    <i class="fab fa-weixin text-xl"></i>
+                    <span>微信一键登录</span>
+                </button>
+                
+                <!-- 手机号登录 -->
+                <button onclick="showPage('page-phone-login')" class="w-full glass text-gray-700 font-medium py-4 rounded-2xl mb-4 flex items-center justify-center gap-2 btn-press">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>手机号登录</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 页面3: 手机号登录 ==================== -->
+        <div id="page-phone-login" class="page h-screen flex flex-col relative z-10">
+            <div class="flex items-center px-6 py-4">
+                <button onclick="showPage('page-login')" class="w-10 h-10 glass rounded-full flex items-center justify-center btn-press">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+                <span class="flex-1 text-center font-semibold text-gray-800 mr-10">手机号登录</span>
+            </div>
+            
+            <div class="flex-1 px-6 pt-8">
+                <div class="space-y-4">
+                    <div class="glass-input rounded-2xl px-5 py-4 flex items-center">
+                        <span class="text-gray-500 mr-3">+86</span>
+                        <input type="tel" placeholder="请输入手机号码" class="bg-transparent outline-none flex-1 text-gray-800">
+                    </div>
+                    
+                    <div class="glass-input rounded-2xl px-5 py-4 flex items-center">
+                        <input type="text" placeholder="请输入验证码" class="bg-transparent outline-none flex-1 text-gray-800">
+                        <button class="text-purple-600 font-medium text-sm whitespace-nowrap">获取验证码</button>
+                    </div>
+                </div>
+                
+                <button onclick="showPage('page-id-verify')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-4 rounded-2xl shadow-lg mt-8 btn-press">
+                    登录
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 页面4: 实名认证 - 身份信息 ==================== -->
+        <div id="page-id-verify" class="page h-screen flex flex-col relative z-10">
+            <div class="flex items-center px-6 py-4">
+                <span class="flex-1 text-center font-semibold text-gray-800">实名认证</span>
+            </div>
+            
+            <div class="flex-1 min-h-0 px-6 overflow-y-auto no-scrollbar pb-24">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-3">
+                        <i class="fas fa-id-card text-blue-500 text-2xl"></i>
+                    </div>
+                    <h2 class="text-lg font-semibold text-gray-800">填写身份信息</h2>
+                    <p class="text-sm text-gray-500 mt-1">请填写与本人一致的真实姓名与身份证号码</p>
+                </div>
+                
+                <!-- 姓名和身份证号输入 -->
+                <div class="glass rounded-2xl p-4 mb-4 space-y-3">
+                    <div>
+                        <label class="text-sm text-gray-600 mb-1 block">真实姓名</label>
+                        <input type="text" placeholder="请输入真实姓名" class="w-full glass-input rounded-xl px-4 py-3 outline-none text-gray-800">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 mb-1 block">身份证号码</label>
+                        <input type="text" placeholder="请输入18位身份证号" class="w-full glass-input rounded-xl px-4 py-3 outline-none text-gray-800">
+                    </div>
+                </div>
+                
+                <!-- 未成年人拦截提示（示例） -->
+                <div class="hidden bg-red-50 rounded-xl p-4 mb-4 border border-red-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-exclamation-triangle text-red-500"></i>
+                        <span class="font-semibold text-red-600">无法注册</span>
+                    </div>
+                    <p class="text-sm text-red-600">
+                        根据身份证信息，您未满18周岁。本小程序仅限成年人使用，感谢您的理解。
+                    </p>
+                </div>
+                
+                <button onclick="showPage('page-face-verify')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-4 rounded-2xl shadow-lg btn-press">
+                    下一步：人脸识别
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 页面5: 人脸识别 ==================== -->
+        <div id="page-face-verify" class="page h-screen flex flex-col relative z-10">
+            <div class="flex items-center px-6 py-4">
+                <button onclick="showPage('page-id-verify')" class="w-10 h-10 glass rounded-full flex items-center justify-center btn-press">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+                <span class="flex-1 text-center font-semibold text-gray-800 mr-10">人脸识别</span>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center px-6">
+                <!-- 人脸扫描框 -->
+                <div class="relative w-64 h-64 mb-8">
+                    <!-- 扫描线动画 -->
+                    <div class="absolute inset-0 rounded-full border-4 border-purple-300/50"></div>
+                    <div class="absolute inset-2 rounded-full border-2 border-dashed border-purple-400/50 animate-spin" style="animation-duration: 10s;"></div>
+                    
+                    <!-- 摄像头预览区域 -->
+                    <div class="absolute inset-4 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-user text-6xl text-gray-400"></i>
+                        
+                        <!-- 扫描线 -->
+                        <div class="absolute inset-x-0 h-0.5 bg-purple-500/50 animate-pulse" style="top: 50%;"></div>
+                    </div>
+                    
+                    <!-- 角落标记 -->
+                    <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-purple-500 rounded-tl-3xl"></div>
+                    <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-purple-500 rounded-tr-3xl"></div>
+                    <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-purple-500 rounded-bl-3xl"></div>
+                    <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-purple-500 rounded-br-3xl"></div>
+                </div>
+                
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">请正对手机</h3>
+                <p class="text-gray-500 text-center mb-8">请按照提示完成以下动作：<br>张嘴 → 摇头 → 眨眼</p>
+                
+                <!-- 动作提示 -->
+                <div class="flex gap-4 mb-8">
+                    <div class="w-16 h-16 glass rounded-2xl flex flex-col items-center justify-center">
+                        <i class="fas fa-smile text-purple-500 text-xl mb-1"></i>
+                        <span class="text-xs text-gray-600">张嘴</span>
+                    </div>
+                    <div class="w-16 h-16 glass rounded-2xl flex flex-col items-center justify-center opacity-50">
+                        <i class="fas fa-head-side text-purple-500 text-xl mb-1"></i>
+                        <span class="text-xs text-gray-600">摇头</span>
+                    </div>
+                    <div class="w-16 h-16 glass rounded-2xl flex flex-col items-center justify-center opacity-50">
+                        <i class="fas fa-eye text-purple-500 text-xl mb-1"></i>
+                        <span class="text-xs text-gray-600">眨眼</span>
+                    </div>
+                </div>
+                
+                <button onclick="showPage('page-avatar-upload')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-4 rounded-2xl shadow-lg btn-press">
+                    开始识别
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 页面6: 头像上传（AI审核） ==================== -->
+        <div id="page-avatar-upload" class="page h-screen flex flex-col relative z-10">
+            <div class="flex items-center px-6 py-4">
+                <button onclick="showPage('page-face-verify')" class="w-10 h-10 glass rounded-full flex items-center justify-center btn-press">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+                <span class="flex-1 text-center font-semibold text-gray-800 mr-10">上传头像</span>
+            </div>
+            
+            <div class="flex-1 min-h-0 px-6 overflow-y-auto no-scrollbar pb-24">
+                <div class="text-center mb-6">
+                    <p class="text-sm text-gray-600">请上传本人真实照片，需通过AI审核</p>
+                </div>
+                
+                <!-- 头像上传区域 -->
+                <div class="flex justify-center mb-6">
+                    <div class="relative w-32 h-32">
+                        <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center border-4 border-dashed border-gray-300">
+                            <i class="fas fa-camera text-3xl text-gray-400"></i>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center pulse-ring">
+                            <i class="fas fa-plus text-white"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 照片墙（最多6张） -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="font-semibold text-gray-800">照片墙</span>
+                        <span class="text-sm text-gray-500">最多6张，长按拖拽排序</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <i class="fas fa-plus text-gray-400"></i>
+                        </div>
+                        <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <i class="fas fa-plus text-gray-400"></i>
+                        </div>
+                        <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <i class="fas fa-plus text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI审核提示 -->
+                <div class="glass rounded-xl p-4 mb-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-robot text-purple-500"></i>
+                        <span class="font-medium text-gray-800">AI智能审核</span>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>✓ 必须为本人真实照片</li>
+                        <li>✓ 禁止涉黄、暴力内容</li>
+                        <li>✓ 禁止二维码、广告</li>
+                        <li>✓ 禁止非人物照片</li>
+                    </ul>
+                </div>
+                
+                <button onclick="showPage('page-profile-edit')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-4 rounded-2xl shadow-lg btn-press">
+                    下一步：完善资料
+                </button>
+            </div>
+        </div>
+
+        <!-- 由于文件长度限制，我将创建额外的页面文件... -->
+        
+    </div>
+
+    <script>
+        // 页面切换
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        // 初始化
+        showPage('page-splash');
+    </script>
+</body>
+</html>

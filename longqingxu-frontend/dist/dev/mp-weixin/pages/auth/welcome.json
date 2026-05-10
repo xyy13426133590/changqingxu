@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "安全提示",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "auth-safety-tips": "../../components/AuthSafetyTips"
+  }
+}

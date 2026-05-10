@@ -1,0 +1,8 @@
+.page-container.data-v-b246703a {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.placeholder.data-v-b246703a {
+  width: 72rpx;
+}

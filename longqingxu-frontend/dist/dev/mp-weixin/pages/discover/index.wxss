@@ -1,0 +1,5 @@
+.page-container.data-v-20534a7c {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

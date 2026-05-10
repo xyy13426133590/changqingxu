@@ -1,0 +1,113 @@
+.auth-page.data-v-3d5ab0d5 {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.glass-row.data-v-3d5ab0d5 {
+  margin: 24rpx 32rpx 0;
+  padding: 20rpx 24rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1rpx solid rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px);
+}
+.auth-nav-back.data-v-3d5ab0d5 {
+  font-size: 44rpx;
+  color: #4b5563;
+  font-weight: 300;
+  width: 72rpx;
+}
+.auth-nav-title.data-v-3d5ab0d5 {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1f2937;
+}
+.auth-nav-placeholder.data-v-3d5ab0d5 {
+  width: 72rpx;
+}
+.auth-scroll.data-v-3d5ab0d5 {
+  flex: 1;
+  min-height: 0;
+  padding: 0 32rpx 48rpx;
+}
+.auth-hero.data-v-3d5ab0d5 {
+  text-align: center;
+  padding: 40rpx 0 32rpx;
+}
+.auth-hero-title.data-v-3d5ab0d5 {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1f2937;
+  display: block;
+}
+.auth-sub.data-v-3d5ab0d5 {
+  font-size: 26rpx;
+  color: #6b7280;
+  margin-top: 12rpx;
+  display: block;
+}
+.auth-card.data-v-3d5ab0d5 {
+  margin-bottom: 32rpx;
+}
+.auth-agree.data-v-3d5ab0d5 {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+.auth-check.data-v-3d5ab0d5 {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 8rpx;
+  border: 2rpx solid #c4b5fd;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4rpx;
+}
+.auth-check text.data-v-3d5ab0d5 {
+  font-size: 22rpx;
+  color: #7c3aed;
+  font-weight: 700;
+}
+.auth-check.on.data-v-3d5ab0d5 {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: #8b5cf6;
+}
+.auth-agree-text.data-v-3d5ab0d5 {
+  flex: 1;
+  font-size: 22rpx;
+  color: #6b7280;
+  line-height: 1.45;
+}
+.auth-submit.data-v-3d5ab0d5 {
+  margin-top: 28rpx;
+  padding: 28rpx 0;
+  border-radius: 32rpx;
+  text-align: center;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  box-shadow: 0 8rpx 28rpx rgba(139, 92, 246, 0.35);
+}
+.auth-submit text.data-v-3d5ab0d5 {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #fff;
+}
+.auth-submit.disabled.data-v-3d5ab0d5 {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.auth-bottom-link.data-v-3d5ab0d5 {
+  text-align: center;
+  font-size: 26rpx;
+  color: #6b7280;
+}
+.auth-bottom-link .auth-link.data-v-3d5ab0d5 {
+  color: #7c3aed;
+  margin-left: 8rpx;
+  font-weight: 600;
+}

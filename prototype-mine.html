@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>长情许 - 我的</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="prototype-cqx-shared.css">
+</head>
+<body class="bg-gray-100" data-cqx="mine">
+    <div class="max-w-md mx-auto min-h-screen gradient-bg relative flex flex-col">
+        <div class="fixed inset-0 pointer-events-none max-w-md mx-auto">
+            <div class="absolute -top-20 -right-20 w-60 h-60 bg-purple-300/30 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/3 -left-10 w-40 h-40 bg-blue-300/30 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="flex-1 min-h-0 flex flex-col relative z-10">
+            <div id="page-profile" class="page active flex-1 min-h-0 flex flex-col">
+                <div class="px-6 pt-8 pb-6 text-center shrink-0">
+                    <div class="inline-block relative">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" alt="" class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg anim-avatar">
+                    </div>
+                    <h2 class="mt-3 text-lg font-bold text-gray-800 anim-float-slow" style="animation-duration:5s">我</h2>
+                    <p class="text-sm text-gray-500">完善资料，提升匹配</p>
+                </div>
+                <div class="flex-1 min-h-0 px-5 space-y-3 overflow-y-auto no-scrollbar pb-4">
+                    <button type="button" onclick="showPage('page-profile-edit')" class="w-full glass rounded-2xl p-4 flex items-center justify-between text-left anim-card btn-press">
+                        <span class="font-medium text-gray-800"><i class="fas fa-user-edit text-purple-500 mr-2"></i>编辑资料</span>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                    <button type="button" onclick="showPage('page-my-card')" class="w-full glass rounded-2xl p-4 flex items-center justify-between text-left anim-card btn-press">
+                        <span class="font-medium text-gray-800"><i class="fas fa-id-card text-amber-500 mr-2"></i>我的资料卡</span>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                    <button type="button" onclick="showPage('page-vip')" class="w-full glass rounded-2xl p-4 flex items-center justify-between text-left btn-press">
+                        <span class="font-medium text-gray-800"><i class="fas fa-crown text-orange-500 mr-2"></i>会员中心</span>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                    <a href="prototype-discover.html" class="block w-full glass rounded-2xl p-4 flex items-center justify-between text-left btn-press">
+                        <span class="font-medium text-gray-800"><i class="fas fa-compass text-purple-500 mr-2"></i>去发现</span>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </a>
+                </div>
+                <div class="shrink-0 px-6 pb-2">
+                    <a href="prototype-discover.html" class="block w-full py-3 text-sm text-gray-500 text-center">返回首页</a>
+                </div>
+            </div>
+
+            <div id="page-profile-edit" class="page flex-1 min-h-0 flex flex-col">
+                <div class="flex items-center px-6 py-4 shrink-0">
+                    <button type="button" onclick="showPage('page-profile')" class="w-10 h-10 glass rounded-full flex items-center justify-center btn-press">
+                        <i class="fas fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <span class="flex-1 text-center font-semibold text-gray-800 mr-10">完善资料</span>
+                </div>
+
+                <div class="flex-1 min-h-0 px-6 overflow-y-auto no-scrollbar pb-24">
+                    <div class="flex justify-center mb-6">
+                        <div class="cqx-avatar-with-ripples">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" class="cqx-avatar-photo" alt="">
+                            <div class="cqx-avatar-cam w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                                <i class="fas fa-camera text-white text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-2xl p-4 mb-4 space-y-3">
+                        <h3 class="font-semibold text-gray-800 mb-3">基础信息</h3>
+                        <input type="text" placeholder="昵称（2-16字符）" class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                        <div class="flex gap-3">
+                            <select class="flex-1 bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                                <option>性别</option>
+                                <option>男</option>
+                                <option>女</option>
+                            </select>
+                            <input type="date" class="flex-1 bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                        </div>
+                        <div class="flex gap-3">
+                            <input type="number" placeholder="身高(cm)" class="flex-1 bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                            <input type="number" placeholder="体重(kg，可选)" class="flex-1 bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                        </div>
+                        <select class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                            <option>籍贯（省市区）</option>
+                        </select>
+                        <select class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                            <option>现居地（省市区）</option>
+                        </select>
+                    </div>
+
+                    <div class="glass rounded-2xl p-4 mb-4">
+                        <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-star text-yellow-500"></i>
+                            生辰信息（自动生成）
+                        </h3>
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <div class="bg-white/40 rounded-xl p-3 text-center">
+                                <div class="text-2xl mb-1">🐰</div>
+                                <div class="text-xs text-gray-600">生肖兔</div>
+                            </div>
+                            <div class="bg-white/40 rounded-xl p-3 text-center">
+                                <div class="text-xl mb-1">♎</div>
+                                <div class="text-xs text-gray-600">天秤座</div>
+                            </div>
+                            <div class="bg-white/40 rounded-xl p-3 text-center">
+                                <div class="text-lg font-bold font-mono tracking-wider text-purple-600 mb-1">INFP</div>
+                                <div class="text-xs text-gray-600">MBTI</div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 bg-white/30 rounded-lg p-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            以上信息基于生日自动生成，仅供娱乐交友使用，不代表命理测算
+                        </p>
+                        <select class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800 mt-3">
+                            <option>日元（暂不填写）</option>
+                            <option>甲木 🌲</option>
+                            <option>乙木 🌿</option>
+                            <option>丙火 🔥</option>
+                            <option>丁火 🕯️</option>
+                            <option>戊土 ⛰️</option>
+                            <option>己土 🌾</option>
+                            <option>庚金 ⚔️</option>
+                            <option>辛金 💎</option>
+                            <option>壬水 🌊</option>
+                            <option>癸水 💧</option>
+                        </select>
+                    </div>
+
+                    <div class="glass rounded-2xl p-4 mb-4 space-y-3">
+                        <h3 class="font-semibold text-gray-800">教育与职业</h3>
+                        <select class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                            <option>学历</option>
+                            <option>大专及以下</option>
+                            <option>本科</option>
+                            <option>硕士及以上</option>
+                        </select>
+                        <div class="relative">
+                            <p class="text-xs text-red-600 mb-1.5 leading-snug">
+                                支持模糊搜索匹配院校；若为 985 / 211 院校将自动展示对应标签，否则不展示。
+                            </p>
+                            <div class="flex flex-wrap items-center gap-2 mb-1 min-h-[22px]" id="school-tier-tags" aria-live="polite"></div>
+                            <input type="text" id="school-input" autocomplete="off" placeholder="毕业院校（可选），输入如「清华」「北工大」" class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800 border border-transparent focus:border-purple-400/50">
+                            <div id="school-suggestions" class="hidden absolute left-0 right-0 top-full mt-1 z-30 max-h-48 overflow-y-auto rounded-xl bg-white/95 shadow-lg border border-purple-100 no-scrollbar"></div>
+                        </div>
+                        <select class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                            <option>职业</option>
+                            <option>IT互联网</option>
+                            <option>金融</option>
+                            <option>教育</option>
+                            <option>医疗</option>
+                            <option>制造业</option>
+                        </select>
+                        <select class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                            <option>职级（可选）</option>
+                            <option>一线 / 执行</option>
+                            <option>骨干 / 资深</option>
+                            <option>主管 / 组长</option>
+                            <option>经理 / 中级管理</option>
+                            <option>总监及以上 / 高管</option>
+                            <option>创始人 / 合伙人</option>
+                            <option>自由职业 / 其他</option>
+                        </select>
+                        <input type="text" placeholder="公司/单位（可选）" class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                        <select class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800">
+                            <option>年收入</option>
+                            <option>5万及以下</option>
+                            <option>5万-10万</option>
+                            <option>10万-20万</option>
+                            <option>20万-30万</option>
+                            <option>30万-50万</option>
+                            <option>50万以上</option>
+                        </select>
+                    </div>
+
+                    <div class="glass rounded-2xl p-4 mb-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">兴趣爱好</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1.5 bg-purple-500 text-white rounded-full text-sm">旅行</span>
+                            <span class="px-3 py-1.5 bg-white/50 text-gray-700 rounded-full text-sm">美食</span>
+                            <span class="px-3 py-1.5 bg-purple-500 text-white rounded-full text-sm">摄影</span>
+                            <span class="px-3 py-1.5 bg-white/50 text-gray-700 rounded-full text-sm">运动</span>
+                            <span class="px-3 py-1.5 bg-white/50 text-gray-700 rounded-full text-sm">阅读</span>
+                            <span class="px-3 py-1.5 bg-white/50 text-gray-700 rounded-full text-sm">音乐</span>
+                            <span class="px-3 py-1.5 bg-white/50 text-gray-700 rounded-full text-sm">电影</span>
+                            <span class="px-3 py-1.5 bg-white/50 text-gray-700 rounded-full text-sm">+ 添加</span>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-2xl p-4 mb-6">
+                        <h3 class="font-semibold text-gray-800 mb-3">自我介绍</h3>
+                        <textarea placeholder="介绍一下自己吧（200字以内）" class="w-full bg-white/50 rounded-xl px-4 py-3 outline-none text-gray-800 h-24 resize-none"></textarea>
+                        <div class="text-right text-xs text-gray-400 mt-1">0/200</div>
+                    </div>
+
+                    <a href="prototype-discover.html" class="block w-full text-center bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-4 rounded-2xl shadow-lg mb-6 btn-press">
+                        保存并进入首页
+                    </a>
+                </div>
+            </div>
+
+            <div id="page-my-card" class="page flex-1 min-h-0 flex flex-col">
+                <div class="flex items-center px-6 py-4 shrink-0">
+                    <button type="button" onclick="showPage('page-profile')" class="w-10 h-10 glass rounded-full flex items-center justify-center btn-press">
+                        <i class="fas fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <span class="flex-1 text-center font-semibold text-gray-800 mr-10">我的资料卡</span>
+                </div>
+                <div class="flex-1 min-h-0 px-6 overflow-y-auto no-scrollbar pb-28">
+                    <div class="glass rounded-3xl p-6 mb-4 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20 pointer-events-none"></div>
+                        <div class="relative">
+                            <div class="text-center mb-4">
+                                <div class="font-logo text-3xl text-purple-600 mb-1">长情许</div>
+                                <div class="text-sm text-gray-600">在本小程序内沟通，更安全</div>
+                            </div>
+                            <div class="border-t border-dashed border-gray-300 my-4"></div>
+                            <div class="flex items-center gap-4 mb-4">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" class="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg" alt="头像">
+                                <div class="min-w-0 flex-1 text-left">
+                                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                        <span class="font-bold text-gray-800">小雨</span>
+                                        <span class="text-gray-400 text-sm">26岁</span>
+                                        <span class="text-xs font-mono font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded">INFP</span>
+                                    </div>
+                                    <div class="text-sm text-gray-600">🐰 兔 · ♎ 天秤座</div>
+                                    <div class="text-sm text-gray-600">📍 北京 · 本科 · 产品经理</div>
+                                    <div class="text-sm text-gray-600">💰 年收入 20万-30万</div>
+                                </div>
+                            </div>
+                            <div class="bg-white/50 rounded-xl p-3 mb-4">
+                                <p class="text-sm text-gray-700 leading-relaxed">喜欢旅行、摄影、烘焙，期待遇见有趣的你～</p>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-xs text-gray-500 mb-2">兴趣爱好</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">旅行</span>
+                                    <span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">摄影</span>
+                                    <span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">烘焙</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs"><i class="fas fa-check-circle mr-1"></i>真实身份已认证</span>
+                                <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs">仅站内聊天，不跳转外链</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-center text-gray-500 px-2 leading-relaxed">与意向用户请使用「开始聊天」进入消息页；勿引导至第三方平台或转账。</p>
+                </div>
+                <div class="shrink-0 glass border-t border-white/30 px-5 py-4 flex items-center gap-3">
+                    <button type="button" onclick="showPage('page-profile')" class="w-12 h-12 shrink-0 rounded-full border-2 border-gray-300 bg-white/60 flex items-center justify-center text-gray-500 btn-press" title="关闭"><i class="fas fa-times text-lg"></i></button>
+                    <a href="prototype-messages.html" class="flex-1 text-center bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 btn-press">
+                        <i class="fas fa-comment-dots"></i> 开始聊天
+                    </a>
+                </div>
+            </div>
+
+            <div id="page-vip" class="page flex-1 min-h-0 flex flex-col overflow-hidden">
+                <div class="flex items-center px-6 py-4 shrink-0">
+                    <button type="button" onclick="showPage('page-profile')" class="w-10 h-10 glass rounded-full flex items-center justify-center btn-press">
+                        <i class="fas fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <span class="flex-1 text-center font-bold text-gray-800 mr-10">会员中心</span>
+                </div>
+                <div class="flex-1 min-h-0 overflow-y-auto no-scrollbar pb-32">
+                    <div class="px-6 mb-5">
+                        <div class="bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 rounded-3xl p-6 text-white shadow-lg">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-crown text-3xl text-orange-500"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">月度 VIP</h3>
+                                    <p class="text-white/80 text-sm">有效期至 2026-06-01（示意）</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-center text-sm">
+                                <div><div class="text-2xl font-bold">∞</div><div class="text-white/80 text-xs">无限打招呼</div></div>
+                                <div><div class="text-2xl font-bold">32</div><div class="text-white/80 text-xs">查看联系方式</div></div>
+                                <div><div class="text-2xl font-bold">128</div><div class="text-white/80 text-xs">被查看次数</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 mb-5">
+                        <h3 class="font-bold text-gray-800 mb-3">选择套餐</h3>
+                        <div class="glass rounded-2xl p-4 mb-3 border-2 border-orange-300 relative">
+                            <div class="absolute -top-2.5 left-4 bg-gradient-to-r from-orange-400 to-pink-400 text-white px-3 py-0.5 rounded-full text-xs">最受欢迎</div>
+                            <div class="flex items-center justify-between pt-2">
+                                <div>
+                                    <div class="font-bold text-gray-800 text-lg">月度 VIP</div>
+                                    <div class="text-sm text-gray-500">30 天全部权益</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-orange-500">¥68</div>
+                                    <div class="text-xs text-gray-400 line-through">¥88</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 mt-3 flex-wrap">
+                                <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs">无限打招呼</span>
+                                <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs">查看联系方式</span>
+                            </div>
+                        </div>
+                        <div class="glass rounded-2xl p-4 mb-3 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-gray-800 text-lg">季度 VIP</div>
+                                <div class="text-sm text-gray-500">90 天全部权益</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-orange-500">¥168</div>
+                                <div class="text-xs text-green-600">省 ¥36</div>
+                            </div>
+                        </div>
+                        <div class="glass rounded-2xl p-4 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-gray-800 text-lg">年度 VIP</div>
+                                <div class="text-sm text-gray-500">365 天全部权益</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-orange-500">¥498</div>
+                                <div class="text-xs text-green-600">省 ¥318</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3">会员权益</h3>
+                        <div class="glass rounded-2xl p-4 space-y-3 text-sm">
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 bg-orange-100 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-comment-dots text-orange-500"></i></div>
+                                <div><div class="font-semibold text-gray-800">无限打招呼</div><div class="text-gray-500">不再受每日次数限制</div></div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 bg-orange-100 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-phone text-orange-500"></i></div>
+                                <div><div class="font-semibold text-gray-800">查看联系方式</div><div class="text-gray-500">获取对方微信号或手机号</div></div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 bg-orange-100 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-fire text-orange-500"></i></div>
+                                <div><div class="font-semibold text-gray-800">优先推荐</div><div class="text-gray-500">资料获得更多曝光</div></div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 bg-orange-100 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-eye text-orange-500"></i></div>
+                                <div><div class="font-semibold text-gray-800">访客记录</div><div class="text-gray-500">查看谁浏览过你的资料</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 mb-4">
+                        <button type="button" onclick="showGreetingLimit()" class="w-full text-sm text-purple-600 py-2 underline-offset-2">什么是「每日打招呼限制」？</button>
+                    </div>
+                </div>
+                <div class="shrink-0 glass px-6 py-4 border-t border-white/30">
+                    <button type="button" class="w-full bg-gradient-to-r from-orange-400 to-pink-500 text-white font-bold py-4 rounded-2xl shadow-lg btn-press">立即开通 ¥68/月（示意）</button>
+                    <p class="text-center text-xs text-gray-500 mt-2">开通即表示同意《会员服务协议》</p>
+                </div>
+            </div>
+
+            <div id="page-vip-popup" class="page flex-1 min-h-0 relative z-[70]">
+                <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+                <div class="absolute inset-x-5 top-[22%] max-w-md mx-auto">
+                    <div class="glass rounded-3xl p-6 shadow-xl">
+                        <div class="text-center mb-5">
+                            <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-crown text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">VIP 会员专享</h3>
+                            <p class="text-gray-600 text-sm">查看联系方式需开通 VIP</p>
+                        </div>
+                        <div class="space-y-2.5 mb-5 text-sm text-gray-700">
+                            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i><span>无限次打招呼</span></div>
+                            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i><span>查看对方微信号 / 手机号</span></div>
+                            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i><span>优先推荐展示</span></div>
+                        </div>
+                        <button type="button" onclick="showPage('page-vip')" class="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold py-4 rounded-2xl shadow-lg mb-3 btn-press">立即开通 ¥68/月</button>
+                        <button type="button" onclick="showPage('page-profile')" class="w-full glass text-gray-600 py-3 rounded-2xl btn-press">暂不开通</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-greeting-limit" class="page flex-1 min-h-0 relative z-[70]">
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                <div class="absolute inset-x-5 top-[30%] max-w-md mx-auto">
+                    <div class="glass rounded-3xl p-6 text-center shadow-xl">
+                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-info-circle text-blue-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">今日打招呼次数已用完</h3>
+                        <p class="text-gray-600 text-sm mb-4 leading-relaxed">普通会员每日限 3 次打招呼。明天可继续，或开通 VIP 无限打招呼。</p>
+                        <div class="flex gap-3">
+                            <button type="button" onclick="showPage('page-profile')" class="flex-1 glass text-gray-600 py-3 rounded-xl btn-press">知道了</button>
+                            <button type="button" onclick="showPage('page-vip')" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-medium btn-press">开通 VIP</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav id="app-tabbar" class="shrink-0 glass px-6 py-4 flex items-center justify-between rounded-t-3xl z-20">
+            <a href="prototype-discover.html" class="flex flex-col items-center gap-1 text-gray-400 btn-press">
+                <i class="fas fa-compass text-xl"></i><span class="text-xs">发现</span>
+            </a>
+            <a href="prototype-filter.html" class="flex flex-col items-center gap-1 text-gray-400 btn-press">
+                <i class="fas fa-filter text-xl"></i><span class="text-xs">筛选</span>
+            </a>
+            <a href="prototype-messages.html" class="flex flex-col items-center gap-1 text-gray-400 btn-press">
+                <i class="fas fa-comment-dots text-xl"></i><span class="text-xs">消息</span>
+            </a>
+            <span class="flex flex-col items-center gap-1 text-purple-600">
+                <i class="fas fa-user text-xl"></i><span class="text-xs">我的</span>
+            </span>
+        </nav>
+    </div>
+    <script src="prototype-cqx-shared.js"></script>
+</body>
+</html>

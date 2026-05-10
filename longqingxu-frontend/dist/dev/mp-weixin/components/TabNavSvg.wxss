@@ -1,0 +1,21 @@
+.tab-nav-svg.data-v-04c9902c {
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tab-nav-svg .tab-emoji.data-v-04c9902c {
+  font-size: 44rpx;
+  line-height: 1;
+}
+.tab-nav-svg .svg-root.data-v-04c9902c {
+  width: 48rpx;
+  height: 48rpx;
+  display: block;
+}
+.tab-nav-svg.inactive.data-v-04c9902c {
+  opacity: 0.72;
+  filter: saturate(0.75);
+}

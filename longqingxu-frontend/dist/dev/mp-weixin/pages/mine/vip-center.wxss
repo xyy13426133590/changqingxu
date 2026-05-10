@@ -1,0 +1,8 @@
+.page-container.data-v-4e921a14 {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.back-btn.data-v-4e921a14 {
+  margin-right: 72rpx;
+}

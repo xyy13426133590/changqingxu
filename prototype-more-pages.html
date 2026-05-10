@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>长情许 - 补充功能</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg { background: linear-gradient(180deg, #c4b5fd 0%, #a5b4fc 50%, #93c5fd 100%); }
+        .glass { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .page { display: none; }
+        .page.active { display: flex; flex-direction: column; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .match-badge { background: linear-gradient(135deg, #8B5CF6, #EC4899); }
+        .vip-badge { background: linear-gradient(135deg, #F59E0B, #F97316); }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-md mx-auto min-h-screen gradient-bg relative">
+
+        <!-- ==================== 页面10: 用户详情页 - 完整功能 ==================== -->
+        <div id="page-detail" class="page active h-screen overflow-y-auto no-scrollbar relative z-10 pb-24">
+            <!-- 顶部 -->
+            <div class="sticky top-0 z-50 flex items-center justify-between px-6 py-4 glass">
+                <button onclick="showPage('page-home')" class="w-10 h-10 bg-white/30 rounded-full flex items-center justify-center">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+                <div class="flex gap-3">
+                    <button class="w-10 h-10 bg-white/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-share-alt text-gray-600"></i>
+                    </button>
+                    <button onclick="showPage('page-report')" class="w-10 h-10 bg-white/30 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-500"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 照片画廊 -->
+            <div class="relative h-96">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop" class="w-full h-full object-cover">
+                
+                <!-- 指示器 -->
+                <div class="absolute top-4 left-4 right-4 flex gap-1">
+                    <div class="h-1 flex-1 bg-white rounded-full"></div>
+                    <div class="h-1 flex-1 bg-white/50 rounded-full"></div>
+                    <div class="h-1 flex-1 bg-white/50 rounded-full"></div>
+                </div>
+                
+                <!-- 渐变遮罩 -->
+                <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-purple-100/90 to-transparent"></div>
+            </div>
+            
+            <!-- 用户信息 -->
+            <div class="px-6 -mt-8 relative z-10">
+                <div class="glass rounded-3xl p-5 mb-4">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                                小雨
+                                <i class="fas fa-venus text-pink-500"></i>
+                            </h2>
+                            <p class="text-gray-500 text-sm mt-1">26岁 · 北京朝阳区 · 162cm</p>
+                        </div>
+                        <div class="match-badge text-white px-4 py-3 rounded-2xl text-center">
+                            <div class="text-xs opacity-90">生肖三合</div>
+                            <div class="font-bold">志趣相投</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 认证标识 -->
+                    <div class="flex gap-2 mb-4">
+                        <div class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs flex items-center gap-1">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>实名认证</span>
+                        </div>
+                        <div class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs flex items-center gap-1">
+                            <i class="fas fa-check-double"></i>
+                            <span>人脸认证</span>
+                        </div>
+                        <div class="vip-badge text-white px-3 py-1 rounded-full text-xs flex items-center gap-1">
+                            <i class="fas fa-crown"></i>
+                            <span>VIP</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 生辰信息卡片 -->
+                <div class="glass rounded-2xl p-4 mb-4">
+                    <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-star text-yellow-500"></i>
+                        生辰信息（趣味参考）
+                    </h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-white/40 rounded-xl p-3 text-center">
+                            <div class="text-2xl mb-1">🐰</div>
+                            <div class="text-xs text-gray-600">生肖兔</div>
+                        </div>
+                        <div class="bg-white/40 rounded-xl p-3 text-center">
+                            <div class="text-xl mb-1">♎</div>
+                            <div class="text-xs text-gray-600">天秤座</div>
+                        </div>
+                        <div class="bg-white/40 rounded-xl p-3 text-center">
+                            <div class="text-lg font-bold font-mono tracking-wider text-purple-600 mb-1">INFP</div>
+                            <div class="text-xs text-gray-600">MBTI</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3 bg-white/30 rounded-lg p-2">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        以上信息基于生日自动生成，仅供娱乐交友使用，不代表命理测算
+                    </p>
+                </div>
+                
+                <!-- 基本信息 -->
+                <div class="glass rounded-2xl p-4 mb-4">
+                    <h3 class="font-semibold text-gray-800 mb-3">基本信息</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white/40 rounded-xl p-3">
+                            <div class="text-xs text-gray-500 mb-1">学历</div>
+                            <div class="text-gray-800 font-medium">本科</div>
+                        </div>
+                        <div class="bg-white/40 rounded-xl p-3">
+                            <div class="text-xs text-gray-500 mb-1">职业</div>
+                            <div class="text-gray-800 font-medium">产品经理</div>
+                        </div>
+                        <div class="bg-white/40 rounded-xl p-3">
+                            <div class="text-xs text-gray-500 mb-1">年收入</div>
+                            <div class="text-gray-800 font-medium">20万-30万</div>
+                        </div>
+                        <div class="bg-white/40 rounded-xl p-3">
+                            <div class="text-xs text-gray-500 mb-1">籍贯</div>
+                            <div class="text-gray-800 font-medium">浙江杭州</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 兴趣爱好 -->
+                <div class="glass rounded-2xl p-4 mb-4">
+                    <h3 class="font-semibold text-gray-800 mb-3">兴趣爱好</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-sm">📷 摄影</span>
+                        <span class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm">✈️ 旅行</span>
+                        <span class="px-3 py-1.5 bg-pink-100 text-pink-700 rounded-full text-sm">🎬 电影</span>
+                        <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm">📚 阅读</span>
+                        <span class="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm">🍰 烘焙</span>
+                    </div>
+                </div>
+                
+                <!-- 自我介绍 -->
+                <div class="glass rounded-2xl p-4 mb-24">
+                    <h3 class="font-semibold text-gray-800 mb-3">自我介绍</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        95年属兔的杭州姑娘，在北京做产品经理。性格温和细腻，喜欢小动物，养了一只英短蓝猫。周末喜欢去咖啡厅看书，或者去郊外拍照。期待遇见成熟稳重、有责任心的你，一起建立一个温暖的小家～
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 底部操作栏 -->
+            <div class="fixed bottom-0 left-0 right-0 glass px-5 py-4 flex items-center gap-3 max-w-md mx-auto">
+                <button class="w-12 h-12 glass rounded-full flex items-center justify-center">
+                    <i class="fas fa-times text-gray-400 text-lg"></i>
+                </button>
+                
+                <!-- 打招呼按钮（普通会员每日限3次） -->
+                <button onclick="showGreetingLimit()" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-full font-medium shadow-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>打招呼 (今日剩余3次)</span>
+                </button>
+                
+                <!-- 查看联系方式（VIP专属） -->
+                <button onclick="showVIPPopup()" class="flex-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-3 rounded-full font-medium shadow-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-phone"></i>
+                    <span>查看联系方式</span>
+                </button>
+                
+                <button class="w-12 h-12 glass rounded-full flex items-center justify-center">
+                    <i class="fas fa-gift text-yellow-500 text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 页面11: VIP查看联系方式弹窗 ==================== -->
+        <div id="page-vip-popup" class="page h-screen relative z-50">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+            <div class="absolute inset-x-6 top-1/4">
+                <div class="glass rounded-3xl p-6">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-crown text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">VIP会员专享</h3>
+                        <p class="text-gray-600 text-sm">查看联系方式需要开通VIP会员</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm text-gray-700">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>无限次打招呼</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-700">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>查看对方微信号/手机号</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-700">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>优先推荐展示</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-700">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>查看访客记录</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showPage('page-vip')" class="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold py-4 rounded-2xl shadow-lg mb-3">
+                        立即开通 ¥68/月
+                    </button>
+                    <button onclick="showPage('page-detail')" class="w-full glass text-gray-600 py-3 rounded-2xl">
+                        暂不开通
+                    </button>
+                    
+                    <!-- 安全提醒 -->
+                    <p class="text-xs text-gray-500 mt-4 text-center">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        首次联系建议先通过平台打招呼，确认身份后再添加微信
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 页面12: 资料卡（站内沟通，不引导第三方） ==================== -->
+        <div id="page-card" class="page h-screen flex flex-col relative z-10">
+            <div class="flex items-center px-6 py-4 shrink-0">
+                <button onclick="showPage('page-profile')" class="w-10 h-10 glass rounded-full flex items-center justify-center">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+                <span class="flex-1 text-center font-semibold text-gray-800 mr-10">我的资料卡</span>
+            </div>
+            
+            <div class="flex-1 min-h-0 px-6 overflow-y-auto no-scrollbar pb-28">
+                <div class="glass rounded-3xl p-6 mb-4 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20 pointer-events-none"></div>
+                    <div class="relative">
+                        <div class="text-center mb-4">
+                            <div class="font-logo text-3xl text-purple-600 mb-1">长情许</div>
+                            <div class="text-sm text-gray-600">在本小程序内沟通，更安全</div>
+                        </div>
+                        <div class="border-t border-dashed border-gray-300 my-4"></div>
+                        
+                        <!-- 用户自己的信息展示 -->
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" class="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg" alt="头像">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span class="font-bold text-gray-800">阿杰</span>
+                                    <span class="text-gray-400">28岁</span>
+                                    <span class="text-xs font-mono font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded">ENTJ</span>
+                                </div>
+                                <div class="text-sm text-gray-600">🐯 属虎 · ♉ 金牛座</div>
+                                <div class="text-sm text-gray-600">📍 现居上海 · 籍贯浙江</div>
+                                <div class="text-sm text-gray-600">🎓 本科 · IT工程师</div>
+                                <div class="text-sm text-gray-600">💰 年收入30万-50万</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white/50 rounded-xl p-3 mb-4">
+                            <p class="text-sm text-gray-700 leading-relaxed">喜欢健身、摄影、旅行，期待遇见志同道合的你～</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p class="text-xs text-gray-500 mb-2">兴趣爱好</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">健身</span>
+                                <span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">摄影</span>
+                                <span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">旅行</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <div class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i>
+                                <span>真实身份已认证</span>
+                            </div>
+                            <div class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs">
+                                仅站内聊天与打招呼，不跳转外链
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="text-xs text-center text-gray-500 px-2">
+                    与意向用户沟通请使用下方「开始聊天」进入小程序消息，避免引导至第三方平台。
+                </p>
+            </div>
+            
+            <!-- 底部：关闭 + 站内开始聊天 -->
+            <div class="shrink-0 glass border-t border-white/30 px-5 py-4 flex items-center gap-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <button type="button" onclick="showPage('page-profile')" class="w-12 h-12 shrink-0 rounded-full border-2 border-gray-300 bg-white/60 flex items-center justify-center text-gray-500 hover:bg-white/90 transition-colors" title="关闭" aria-label="关闭">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+                <button type="button" onclick="showPage('page-inapp-chat')" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-comment-dots"></i>
+                    开始聊天
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 站内聊天（示意，不离开小程序） ==================== -->
+        <div id="page-inapp-chat" class="page h-screen flex flex-col relative z-10">
+            <div class="flex items-center px-4 py-3 glass shrink-0 border-b border-white/20">
+                <button type="button" onclick="showPage('page-card')" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-600 hover:bg-white/40">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="flex-1 text-center pr-10">
+                    <div class="font-semibold text-gray-800">站内聊天</div>
+                    <div class="text-xs text-gray-500">长情许 · 消息</div>
+                </div>
+            </div>
+            <div class="flex-1 min-h-0 px-4 py-4 space-y-3 overflow-y-auto no-scrollbar">
+                <div class="flex gap-2">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop" class="w-9 h-9 rounded-full object-cover shrink-0" alt="">
+                    <div class="glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[80%]">
+                        <p class="text-sm text-gray-700">你好，看了你的资料想认识一下～</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[80%]">
+                        <p class="text-sm">嗨，欢迎从资料卡进来聊天</p>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop" class="w-9 h-9 rounded-full object-cover shrink-0" alt="">
+                </div>
+                <p class="text-center text-xs text-gray-400 pt-2">以上为示意，正式版为小程序原生会话</p>
+            </div>
+            <div class="shrink-0 glass border-t border-white/30 px-4 py-3 flex items-center gap-2">
+                <input type="text" readonly placeholder="在小程序内发送消息…" class="flex-1 bg-white/50 rounded-full px-4 py-3 text-sm text-gray-600 outline-none border border-white/40">
+                <button type="button" class="w-11 h-11 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center shrink-0" title="发送">
+                    <i class="fas fa-paper-plane text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 页面13: 举报功能 ==================== -->
+        <div id="page-report" class="page h-screen flex flex-col relative z-50">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <div class="absolute bottom-0 left-0 right-0 glass rounded-t-3xl p-6">
+                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
+                
+                <h3 class="text-xl font-bold text-gray-800 mb-6">举报用户</h3>
+                
+                <div class="space-y-3 mb-6">
+                    <label class="flex items-center gap-3 p-4 bg-white/40 rounded-xl cursor-pointer">
+                        <input type="radio" name="report" class="w-5 h-5 text-purple-500">
+                        <span class="text-gray-700">诈骗/虚假信息</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 bg-white/40 rounded-xl cursor-pointer">
+                        <input type="radio" name="report" class="w-5 h-5 text-purple-500">
+                        <span class="text-gray-700">骚扰/不文明行为</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 bg-white/40 rounded-xl cursor-pointer">
+                        <input type="radio" name="report" class="w-5 h-5 text-purple-500">
+                        <span class="text-gray-700">头像/资料不真实</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 bg-white/40 rounded-xl cursor-pointer">
+                        <input type="radio" name="report" class="w-5 h-5 text-purple-500">
+                        <span class="text-gray-700">涉黄/低俗内容</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 bg-white/40 rounded-xl cursor-pointer">
+                        <input type="radio" name="report" class="w-5 h-5 text-purple-500">
+                        <span class="text-gray-700">其他违规行为</span>
+                    </label>
+                </div>
+                
+                <textarea placeholder="请详细描述举报原因（选填）" class="w-full bg-white/40 rounded-xl px-4 py-3 h-24 resize-none outline-none text-gray-700 mb-4"></textarea>
+                
+                <div class="flex gap-3">
+                    <button onclick="showPage('page-detail')" class="flex-1 glass text-gray-600 py-4 rounded-2xl">
+                        取消
+                    </button>
+                    <button onclick="submitReport()" class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-4 rounded-2xl shadow-lg">
+                        提交举报
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 页面14: 会员中心 - 完整版 ==================== -->
+        <div id="page-vip" class="page h-screen flex flex-col relative z-10 overflow-y-auto no-scrollbar pb-24">
+            <!-- 头部 -->
+            <div class="px-6 py-4 flex items-center">
+                <button onclick="showPage('page-profile')" class="w-10 h-10 glass rounded-full flex items-center justify-center">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+                <span class="flex-1 text-center font-bold text-gray-800 mr-10">会员中心</span>
+            </div>
+            
+            <!-- VIP信息卡片 -->
+            <div class="px-6 mb-6">
+                <div class="bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 rounded-3xl p-6 text-white shadow-lg">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-crown text-3xl text-orange-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">月度 VIP</h3>
+                            <p class="text-white/80 text-sm">有效期至 2026-06-01</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-center">
+                        <div>
+                            <div class="text-2xl font-bold">∞</div>
+                            <div class="text-xs text-white/80">无限打招呼</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold">32</div>
+                            <div class="text-xs text-white/80">查看联系方式</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold">128</div>
+                            <div class="text-xs text-white/80">被查看次数</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 套餐选择 -->
+            <div class="px-6 mb-6">
+                <h3 class="font-bold text-gray-800 mb-4">选择套餐</h3>
+                
+                <!-- 月度VIP -->
+                <div class="glass rounded-2xl p-4 mb-3 border-2 border-orange-300 relative">
+                    <div class="absolute -top-3 left-4 bg-gradient-to-r from-orange-400 to-pink-400 text-white px-3 py-1 rounded-full text-xs">
+                        最受欢迎
+                    </div>
+                    <div class="flex items-center justify-between pt-2">
+                        <div>
+                            <div class="font-bold text-gray-800 text-lg">月度 VIP</div>
+                            <div class="text-sm text-gray-500">30天全部权益</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-orange-500">¥68</div>
+                            <div class="text-xs text-gray-400 line-through">¥88</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs">无限打招呼</span>
+                        <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs">查看联系方式</span>
+                    </div>
+                </div>
+                
+                <!-- 季度VIP -->
+                <div class="glass rounded-2xl p-4 mb-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-gray-800 text-lg">季度 VIP</div>
+                            <div class="text-sm text-gray-500">90天全部权益</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-orange-500">¥168</div>
+                            <div class="text-xs text-green-500">省 ¥36</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 年度VIP -->
+                <div class="glass rounded-2xl p-4 mb-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-gray-800 text-lg">年度 VIP</div>
+                            <div class="text-sm text-gray-500">365天全部权益</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-orange-500">¥498</div>
+                            <div class="text-xs text-green-500">省 ¥318</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 会员权益 -->
+            <div class="px-6 mb-6">
+                <h3 class="font-bold text-gray-800 mb-4">会员权益</h3>
+                <div class="glass rounded-2xl p-4 space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-comment-dots text-orange-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-800">无限打招呼</div>
+                            <div class="text-sm text-gray-500">不再受每日次数限制</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-phone text-orange-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-800">查看联系方式</div>
+                            <div class="text-sm text-gray-500">直接获取对方微信号或手机号</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-fire text-orange-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-800">优先推荐</div>
+                            <div class="text-sm text-gray-500">个人资料获得更多曝光</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-eye text-orange-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-800">访客记录</div>
+                            <div class="text-sm text-gray-500">查看谁浏览过你的资料</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 购买按钮 -->
+            <div class="fixed bottom-0 left-0 right-0 glass px-6 py-4 max-w-md mx-auto">
+                <button class="w-full bg-gradient-to-r from-orange-400 to-pink-500 text-white font-bold py-4 rounded-2xl shadow-lg">
+                    立即开通 ¥68/月
+                </button>
+                <p class="text-center text-xs text-gray-500 mt-2">
+                    开通即表示同意《会员服务协议》
+                </p>
+            </div>
+        </div>
+
+        <!-- ==================== 页面15: 打招呼限制提示 ==================== -->
+        <div id="page-greeting-limit" class="page h-screen flex flex-col relative z-50">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <div class="absolute inset-x-6 top-1/3">
+                <div class="glass rounded-3xl p-6 text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-info-circle text-blue-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">今日打招呼次数已用完</h3>
+                    <p class="text-gray-600 text-sm mb-4">
+                        普通会员每日限3次打招呼<br>
+                        您今日已使用3次，明天可继续
+                    </p>
+                    <div class="glass rounded-xl p-3 mb-4">
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-crown text-yellow-500 mr-1"></i>
+                            开通VIP会员，享受无限次打招呼
+                        </p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="showPage('page-detail')" class="flex-1 glass text-gray-600 py-3 rounded-xl">
+                            知道了
+                        </button>
+                        <button onclick="showPage('page-vip')" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl">
+                            开通VIP
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航占位页面 -->
+        <div id="page-profile" class="page h-screen flex items-center justify-center relative z-10">
+            <div class="text-center">
+                <p class="text-gray-600 mb-4">个人中心页面</p>
+                <button onclick="showPage('page-home')" class="glass px-6 py-3 rounded-xl">返回首页</button>
+            </div>
+        </div>
+        
+        <div id="page-messages" class="page h-screen flex items-center justify-center relative z-10">
+            <div class="text-center">
+                <p class="text-gray-600 mb-4">消息页面</p>
+                <button onclick="showPage('page-home')" class="glass px-6 py-3 rounded-xl">返回首页</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+        function showVIPPopup() {
+            showPage('page-vip-popup');
+        }
+        function showGreetingLimit() {
+            showPage('page-greeting-limit');
+        }
+        function submitReport() {
+            alert('举报已提交，我们会尽快处理');
+            showPage('page-detail');
+        }
+    </script>
+</body>
+</html>

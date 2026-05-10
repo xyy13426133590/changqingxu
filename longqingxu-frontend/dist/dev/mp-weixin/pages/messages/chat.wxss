@@ -1,0 +1,62 @@
+.page-container.data-v-4859ecaa {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.image-bubble.data-v-4859ecaa {
+  padding: 8rpx !important;
+  max-width: 400rpx;
+}
+.image-bubble .msg-image.data-v-4859ecaa {
+  max-width: 380rpx;
+  max-height: 400rpx;
+  border-radius: 16rpx;
+  display: block;
+}
+.voice-bubble.data-v-4859ecaa {
+  min-width: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+.voice-bubble .voice-content.data-v-4859ecaa {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.voice-bubble .voice-content .voice-icon.data-v-4859ecaa {
+  font-size: 32rpx;
+}
+.voice-bubble .voice-content .voice-duration.data-v-4859ecaa {
+  font-size: 26rpx;
+  color: #6b7280;
+}
+.voice-bubble .voice-wave-preview.data-v-4859ecaa {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+.voice-bubble .voice-wave-preview .voice-bar.data-v-4859ecaa {
+  width: 6rpx;
+  background: #8b5cf6;
+  border-radius: 3rpx;
+}
+.emoji-bubble.data-v-4859ecaa {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+.emoji-bubble .emoji-content.data-v-4859ecaa {
+  font-size: 80rpx;
+  line-height: 1;
+}
+.msg-status.data-v-4859ecaa {
+  position: absolute;
+  bottom: -24rpx;
+  right: 0;
+}
+.msg-status text.data-v-4859ecaa {
+  font-size: 18rpx;
+  color: #9ca3af;
+}

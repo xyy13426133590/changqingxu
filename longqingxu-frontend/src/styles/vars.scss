@@ -1,0 +1,60 @@
+// 长情许 - 主题变量
+
+// 主色调 - 紫色渐变
+$primary: #8B5CF6;
+$primary-light: #A78BFA;
+$primary-dark: #7C3AED;
+
+// 辅助色
+$secondary: #EC4899;
+$secondary-light: #F472B6;
+
+// 渐变色
+$gradient-start: #c4b5fd;
+$gradient-mid: #a5b4fc;
+$gradient-end: #93c5fd;
+
+// 功能色
+$success: #10B981;
+$warning: #F59E0B;
+$danger: #EF4444;
+$info: #3B82F6;
+
+// 文字色
+$text-primary: #1F2937;
+$text-secondary: #6B7280;
+$text-tertiary: #9CA3AF;
+$text-white: #FFFFFF;
+
+// 背景色
+$bg-primary: #F3F4F6;
+$bg-secondary: #FFFFFF;
+$bg-tertiary: #F9FAFB;
+
+// 边框色
+$border-color: rgba(255, 255, 255, 0.3);
+
+// 圆角
+$radius-sm: 8rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+$radius-xl: 32rpx;
+$radius-full: 9999rpx;
+
+// 阴影
+$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
+$shadow-glow: 0 0 20rpx rgba(139, 92, 246, 0.3);
+
+// 间距
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-md: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 48rpx;
+
+// 动画时长
+$duration-fast: 200ms;
+$duration-normal: 300ms;
+$duration-slow: 500ms;
