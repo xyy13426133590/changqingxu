@@ -1,54 +1,64 @@
 <template>
   <view class="page-container gradient-bg auth-page">
-    <view class="auth-nav glass-row" @click="goBack">
-      <text class="auth-nav-back">‹</text>
-      <text class="auth-nav-title">登录</text>
-      <view class="auth-nav-placeholder" />
-    </view>
-
-    <scroll-view class="auth-scroll" scroll-y show-scrollbar="false">
-      <view class="auth-hero">
-        <text class="auth-logo font-logo">长情许</text>
-        <text class="auth-sub">真实身份 · 真诚交友</text>
+    <!-- 流程一：仅微信登录 + 进入手机登录 -->
+    <template v-if="!phoneLoginExpanded">
+      <view class="auth-nav glass-row">
+        <text class="auth-nav-back btn-press" @tap.stop="goBack">‹</text>
+        <text class="auth-nav-title">登录</text>
+        <view class="auth-nav-placeholder" />
       </view>
 
-      <view class="wx-btn" :class="{ disabled: loading }" @click="onWeChatLogin">
-        <text class="wx-icon">💬</text>
-        <text>{{ loadingWx ? '登录中…' : '微信一键登录' }}</text>
-      </view>
-      <text class="wx-hint">演示环境模拟成功；正式版需配置微信开放平台与后端换票。</text>
-
-      <view class="divider">
-        <view class="divider-line" />
-        <text class="divider-text">手机号登录</text>
-        <view class="divider-line" />
-      </view>
-
-      <view class="mode-tabs">
-        <view
-          class="mode-tab"
-          :class="{ on: phoneMode === 'sms' }"
-          @click="phoneMode = 'sms'"
-        >
-          <text>验证码</text>
+      <scroll-view class="auth-scroll" scroll-y show-scrollbar="false" :enable-flex="true">
+        <view class="auth-hero">
+          <text class="auth-logo font-logo">长情许</text>
+          <text class="auth-sub">真实身份 · 真诚交友</text>
         </view>
-        <view
-          class="mode-tab"
-          :class="{ on: phoneMode === 'pwd' }"
-          @click="phoneMode = 'pwd'"
+
+        <button
+          type="default"
+          class="wx-btn btn-press"
+          :class="{ disabled: loadingWx }"
+          :disabled="loadingWx"
+          hover-class="wx-btn-hover"
+          @tap="onWeChatLogin"
         >
-          <text>密码</text>
-        </view>
+          <text class="wx-icon">💬</text>
+          <text>{{ loadingWx ? '登录中…' : '微信一键登录' }}</text>
+        </button>
+        <text class="wx-hint">演示环境模拟成功；正式版需配置微信开放平台与后端换票。</text>
+
+        <button
+          type="default"
+          class="phone-entry-btn btn-press"
+          :class="{ disabled: loadingWx }"
+          :disabled="loadingWx"
+          hover-class="phone-entry-hover"
+          @tap="openPhoneLogin"
+        >
+          <text class="phone-entry-icon">📱</text>
+          <text class="phone-entry-label">手机号登录</text>
+        </button>
+      </scroll-view>
+    </template>
+
+    <!-- 流程二：整页切换为手机登录，与微信区完全分离；左上角返回微信登录 -->
+    <template v-else>
+      <view class="auth-nav glass-row auth-nav-phone">
+        <text class="auth-nav-back btn-press" @click.stop="closePhoneLogin">‹</text>
+        <text class="auth-nav-title">验证码登录</text>
+        <view class="auth-nav-placeholder" />
       </view>
 
-      <view class="form-section profile-form-card auth-card">
-        <template v-if="phoneMode === 'sms'">
+      <scroll-view class="auth-scroll auth-scroll-phone" scroll-y show-scrollbar="false" :enable-flex="true">
+        <text class="phone-flow-lead">返回后仍可使用微信一键登录</text>
+
+        <view class="form-section profile-form-card auth-card">
           <view class="row-prefix">
             <text class="prefix">+86</text>
             <input
               v-model="phone"
               class="form-input flex1"
-              type="number"
+              type="digit"
               maxlength="11"
               placeholder="请输入手机号码"
             />
@@ -57,86 +67,63 @@
             <input
               v-model="smsCode"
               class="form-input flex1"
-              type="number"
+              type="digit"
               maxlength="6"
               placeholder="请输入验证码"
             />
-            <view
-              class="code-btn"
+            <button
+              type="default"
+              class="code-btn btn-press"
               :class="{ disabled: smsCooldown > 0 || smsSending }"
-              @click="onSendSms"
+              :disabled="smsCooldown > 0 || smsSending"
+              hover-class="code-btn-hover"
+              @tap.stop="onSendSms"
             >
               <text>{{ smsCooldown > 0 ? `${smsCooldown}s` : smsSending ? '发送中' : '获取验证码' }}</text>
-            </view>
+            </button>
           </view>
-          <text class="sms-tip">演示验证码：{{ demoSms }}（任意已发短信的手机号均可）</text>
-          <view class="auth-submit" :class="{ disabled: loadingSms }" @click="submitSms">
-            <text>{{ loadingSms ? '登录中…' : '验证并登录' }}</text>
-          </view>
-        </template>
+          <text class="sms-tip">演示验证码 {{ demoSms }}；填 11 位大陆手机号后可直接登录，也可先点获取验证码。</text>
+          <button
+            type="default"
+            class="auth-submit btn-press"
+            :class="{ disabled: loadingSms }"
+            :disabled="loadingSms"
+            hover-class="auth-submit-hover"
+            @tap="submitSms"
+          >
+            <text>{{ loadingSms ? '登录中…' : '登录' }}</text>
+          </button>
+        </view>
 
-        <template v-else>
-          <input
-            v-model="phone"
-            class="form-input"
-            type="number"
-            maxlength="11"
-            placeholder="手机号"
-          />
-          <input
-            v-model="password"
-            class="form-input"
-            password
-            placeholder="密码（6～32 位）"
-          />
-          <view class="auth-row-between">
-            <text class="auth-link" @click="goRegister">注册账号</text>
-            <text class="auth-link muted" @click="onForgot">忘记密码</text>
-          </view>
-          <view class="auth-submit" :class="{ disabled: loadingPwd }" @click="submitPwd">
-            <text>{{ loadingPwd ? '登录中…' : '登 录' }}</text>
-          </view>
-        </template>
-      </view>
+        <view class="auth-row-center btn-press" @tap="goRegister">
+          <text class="auth-link">没有账号？去注册</text>
+        </view>
 
-      <view v-if="phoneMode === 'sms'" class="auth-row-center">
-        <text class="auth-link" @click="goRegister">没有账号？去注册</text>
-      </view>
-
-      <view class="auth-footnote">
-        <text>密码演示：{{ demoPhone }} / {{ demoPwd }}。验证码请先点「获取验证码」，再填 {{ demoSms }}。</text>
-      </view>
-    </scroll-view>
+        <view class="auth-footnote">
+          <text>演示码 {{ demoSms }} 可直接登录；获取验证码用于走完整演示流程。</text>
+        </view>
+      </scroll-view>
+    </template>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue'
+import { onBackPress } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
-import {
-  validatePhone,
-  validatePassword,
-  LOGIN_ERR_ACCOUNT_NOT_FOUND,
-  sendSmsCode,
-  DEMO_TEST_PHONE,
-  DEMO_TEST_PASSWORD,
-  DEMO_SMS_CODE,
-} from '@/services/auth'
+import { validatePhone, sendSmsCode, DEMO_SMS_CODE } from '@/services/auth'
 
 const userStore = useUserStore()
 const phone = ref('')
-const password = ref('')
 const smsCode = ref('')
-const phoneMode = ref<'sms' | 'pwd'>('sms')
+/** false：仅微信登录页；true：整页切换为手机登录（与微信区互斥） */
+const phoneLoginExpanded = ref(false)
 
-const loadingPwd = ref(false)
 const loadingSms = ref(false)
 const loadingWx = ref(false)
 const smsSending = ref(false)
 const smsCooldown = ref(0)
 
-const demoPhone = DEMO_TEST_PHONE
-const demoPwd = DEMO_TEST_PASSWORD
 const demoSms = DEMO_SMS_CODE
 
 let smsTimer: ReturnType<typeof setInterval> | null = null
@@ -148,16 +135,30 @@ onUnmounted(() => {
   }
 })
 
+/** 手机登录子流程内按系统返回：先回到微信登录页，不直接退出页面 */
+onBackPress(() => {
+  if (phoneLoginExpanded.value) {
+    closePhoneLogin()
+    return true
+  }
+  return false
+})
+
 function goBack() {
   uni.navigateBack({ fail: () => uni.switchTab({ url: '/pages/mine/index' }) })
 }
 
-function goRegister() {
-  uni.navigateTo({ url: '/pages/auth/register' })
+function openPhoneLogin() {
+  if (loadingWx.value) return
+  phoneLoginExpanded.value = true
 }
 
-function onForgot() {
-  uni.showToast({ title: '演示版请使用验证码登录或重新注册', icon: 'none' })
+function closePhoneLogin() {
+  phoneLoginExpanded.value = false
+}
+
+function goRegister() {
+  uni.navigateTo({ url: '/pages/auth/register' })
 }
 
 function startSmsCooldown() {
@@ -176,30 +177,49 @@ async function onSendSms() {
   if (smsCooldown.value > 0 || smsSending.value) return
   const p = phone.value.trim()
   if (!validatePhone(p)) {
-    uni.showToast({ title: '请输入正确手机号', icon: 'none' })
+    uni.showToast({ title: '请输入11位大陆手机号（1开头）', icon: 'none', duration: 2200 })
     return
   }
   smsSending.value = true
+  uni.showLoading({ title: '发送中', mask: true })
   try {
     await sendSmsCode(p)
-    uni.showToast({ title: '验证码已记录（演示无真实短信）', icon: 'none' })
+    uni.hideLoading()
+    uni.showToast({ title: '演示环境：验证码已就绪', icon: 'success', duration: 1800 })
     startSmsCooldown()
   } catch (e: unknown) {
-    uni.showToast({ title: e instanceof Error ? e.message : '发送失败', icon: 'none' })
+    uni.hideLoading()
+    uni.showToast({
+      title: e instanceof Error ? e.message : '发送失败',
+      icon: 'none',
+      duration: 2200,
+    })
   } finally {
     smsSending.value = false
   }
 }
 
+function goDiscoverAfterAuth() {
+  uni.switchTab({
+    url: '/pages/discover/index',
+    fail: () => {
+      uni.reLaunch({ url: '/pages/discover/index' })
+    },
+  })
+}
+
 async function onWeChatLogin() {
   if (loadingWx.value) return
   loadingWx.value = true
+  uni.showLoading({ title: '登录中', mask: true })
   try {
     await userStore.loginByWeChat()
-    uni.showToast({ title: '登录成功', icon: 'success' })
-    setTimeout(() => uni.switchTab({ url: '/pages/discover/index' }), 400)
+    uni.hideLoading()
+    uni.showToast({ title: '登录成功', icon: 'success', duration: 1200 })
+    setTimeout(goDiscoverAfterAuth, 300)
   } catch (e: unknown) {
-    uni.showToast({ title: e instanceof Error ? e.message : '登录失败', icon: 'none' })
+    uni.hideLoading()
+    uni.showToast({ title: e instanceof Error ? e.message : '登录失败', icon: 'none', duration: 2200 })
   } finally {
     loadingWx.value = false
   }
@@ -210,62 +230,29 @@ async function submitSms() {
   const p = phone.value.trim()
   const c = smsCode.value.trim()
   if (!validatePhone(p)) {
-    uni.showToast({ title: '请输入正确手机号', icon: 'none' })
+    uni.showToast({ title: '请输入11位大陆手机号（1开头）', icon: 'none', duration: 2200 })
     return
   }
   if (!/^\d{4,6}$/.test(c)) {
-    uni.showToast({ title: '请输入验证码', icon: 'none' })
+    uni.showToast({ title: '请输入4～6位验证码', icon: 'none', duration: 2200 })
     return
   }
   loadingSms.value = true
+  uni.showLoading({ title: '登录中', mask: true })
   try {
     await userStore.loginBySms(p, c)
-    uni.showToast({ title: '登录成功', icon: 'success' })
-    setTimeout(() => uni.switchTab({ url: '/pages/discover/index' }), 400)
+    uni.hideLoading()
+    uni.showToast({ title: '登录成功', icon: 'success', duration: 1200 })
+    setTimeout(goDiscoverAfterAuth, 300)
   } catch (e: unknown) {
-    uni.showToast({ title: e instanceof Error ? e.message : '登录失败', icon: 'none' })
+    uni.hideLoading()
+    uni.showToast({
+      title: e instanceof Error ? e.message : '登录失败',
+      icon: 'none',
+      duration: 2200,
+    })
   } finally {
     loadingSms.value = false
-  }
-}
-
-async function submitPwd() {
-  if (loadingPwd.value) return
-  const p = phone.value.trim()
-  const pwd = password.value.trim()
-  if (!validatePhone(p)) {
-    uni.showToast({ title: '请输入正确手机号', icon: 'none' })
-    return
-  }
-  if (!validatePassword(pwd)) {
-    uni.showToast({ title: '密码为 6～32 位', icon: 'none' })
-    return
-  }
-  loadingPwd.value = true
-  try {
-    await userStore.loginByPhone(p, pwd)
-    uni.showToast({ title: '登录成功', icon: 'success' })
-    setTimeout(() => uni.switchTab({ url: '/pages/discover/index' }), 400)
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : '登录失败'
-    if (msg === LOGIN_ERR_ACCOUNT_NOT_FOUND) {
-      uni.showModal({
-        title: '提示',
-        content: '该手机号尚未注册，是否前往注册？',
-        confirmText: '去注册',
-        cancelText: '取消',
-        success: (res) => {
-          if (res.confirm) {
-            const q = encodeURIComponent(p)
-            uni.navigateTo({ url: `/pages/auth/register?phone=${q}` })
-          }
-        },
-      })
-      return
-    }
-    uni.showToast({ title: msg, icon: 'none' })
-  } finally {
-    loadingPwd.value = false
   }
 }
 </script>
@@ -273,8 +260,10 @@ async function submitPwd() {
 <style scoped lang="scss">
 .auth-page {
   min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 .glass-row {
@@ -312,6 +301,24 @@ async function submitPwd() {
   padding: 0 32rpx 48rpx;
 }
 
+.auth-scroll-phone {
+  padding-top: 8rpx;
+}
+
+.auth-nav-phone .auth-nav-back {
+  text-align: left;
+}
+
+.phone-flow-lead {
+  display: block;
+  font-size: 24rpx;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 28rpx;
+  padding: 0 16rpx;
+}
+
 .auth-hero {
   text-align: center;
   padding: 16rpx 0 32rpx;
@@ -331,16 +338,24 @@ async function submitPwd() {
   display: block;
 }
 
+/* 小程序内 view 点击在 scroll-view 里易失效，主操作改用 button 并重置默认样式 */
 .wx-btn {
+  width: 100%;
+  margin: 0 0 12rpx;
+  padding: 28rpx 0;
+  line-height: normal;
+  border: none;
+  border-radius: 32rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16rpx;
-  padding: 28rpx 0;
-  border-radius: 32rpx;
   background: linear-gradient(135deg, #22c55e, #16a34a);
   box-shadow: 0 8rpx 28rpx rgba(34, 197, 94, 0.35);
-  margin-bottom: 12rpx;
+
+  &::after {
+    border: none;
+  }
 
   text {
     font-size: 32rpx;
@@ -350,8 +365,11 @@ async function submitPwd() {
 
   &.disabled {
     opacity: 0.65;
-    pointer-events: none;
   }
+}
+
+.wx-btn-hover {
+  opacity: 0.92;
 }
 
 .wx-icon {
@@ -364,55 +382,44 @@ async function submitPwd() {
   color: #6b7280;
   text-align: center;
   line-height: 1.45;
-  margin-bottom: 28rpx;
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  margin-bottom: 24rpx;
-}
-
-.divider-line {
-  flex: 1;
-  height: 1rpx;
-  background: rgba(107, 114, 128, 0.25);
-}
-
-.divider-text {
-  font-size: 24rpx;
-  color: #6b7280;
-}
-
-.mode-tabs {
-  display: flex;
-  gap: 16rpx;
   margin-bottom: 20rpx;
 }
 
-.mode-tab {
-  flex: 1;
-  text-align: center;
-  padding: 20rpx 0;
-  border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1rpx solid rgba(255, 255, 255, 0.35);
+.phone-entry-btn {
+  width: 100%;
+  margin: 0 0 24rpx;
+  padding: 28rpx 0;
+  line-height: normal;
+  border: 1rpx solid rgba(255, 255, 255, 0.65);
+  border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4rpx 24rpx rgba(91, 33, 182, 0.08);
 
-  text {
-    font-size: 28rpx;
-    color: #6b7280;
+  &::after {
+    border: none;
   }
 
-  &.on {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.45);
-
-    text {
-      color: #5b21b6;
-      font-weight: 600;
-    }
+  &.disabled {
+    opacity: 0.55;
   }
+}
+
+.phone-entry-hover {
+  opacity: 0.92;
+}
+
+.phone-entry-icon {
+  font-size: 34rpx;
+}
+
+.phone-entry-label {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #4c1d95;
 }
 
 .auth-card {
@@ -455,10 +462,16 @@ async function submitPwd() {
 
 .code-btn {
   flex-shrink: 0;
+  margin: 0;
   padding: 20rpx 24rpx;
+  line-height: normal;
+  border: 1rpx solid rgba(124, 58, 237, 0.35);
   border-radius: 20rpx;
   background: rgba(124, 58, 237, 0.15);
-  border: 1rpx solid rgba(124, 58, 237, 0.35);
+
+  &::after {
+    border: none;
+  }
 
   text {
     font-size: 26rpx;
@@ -468,8 +481,11 @@ async function submitPwd() {
 
   &.disabled {
     opacity: 0.5;
-    pointer-events: none;
   }
+}
+
+.code-btn-hover {
+  opacity: 0.88;
 }
 
 .sms-tip {
@@ -478,13 +494,6 @@ async function submitPwd() {
   color: #7c3aed;
   margin-bottom: 24rpx;
   line-height: 1.4;
-}
-
-.auth-row-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 8rpx;
 }
 
 .auth-row-center {
@@ -504,12 +513,19 @@ async function submitPwd() {
 }
 
 .auth-submit {
-  margin-top: 32rpx;
+  width: 100%;
+  margin: 32rpx 0 0;
   padding: 28rpx 0;
+  line-height: normal;
+  border: none;
   border-radius: 32rpx;
   text-align: center;
   background: linear-gradient(135deg, #8b5cf6, #ec4899);
   box-shadow: 0 8rpx 28rpx rgba(139, 92, 246, 0.35);
+
+  &::after {
+    border: none;
+  }
 
   text {
     font-size: 32rpx;
@@ -519,8 +535,11 @@ async function submitPwd() {
 
   &.disabled {
     opacity: 0.65;
-    pointer-events: none;
   }
+}
+
+.auth-submit-hover {
+  opacity: 0.92;
 }
 
 .auth-footnote {

@@ -40,8 +40,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function setEducation(value) {
       discoverStore.setEducation(value);
     }
-    function toggleIncome(value) {
-      discoverStore.toggleIncome(value);
+    function setIncome(value) {
+      discoverStore.setIncomeFilter(value);
     }
     function goBack() {
       common_vendor.index.switchTab({ url: "/pages/discover/index" });
@@ -88,11 +88,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return {
             a: common_vendor.t(opt),
             b: opt,
-            c: filters.value.income.includes(opt) ? 1 : "",
-            d: common_vendor.o(($event) => toggleIncome(opt), opt)
+            c: filters.value.income === opt ? 1 : "",
+            d: common_vendor.o(($event) => setIncome(opt), opt)
           };
         }),
-        i: common_vendor.o(applyFilters, "5f"),
+        i: common_vendor.o(applyFilters, "8f"),
         j: common_vendor.p({
           active: "filter"
         })

@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const utils_avatar = require("../utils/avatar.js");
 var __defProp = Object.defineProperty;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
@@ -45,14 +44,20 @@ const INCOME_FILTER_OPTIONS = [
   "30万-50万",
   "50万以上"
 ];
-const DEFAULT_INCOME_SELECTION = ["10万-20万"];
+const DEFAULT_INCOME = "10万-20万";
 function normalizeIncomeFilter(income) {
   const valid = /* @__PURE__ */ new Set([...INCOME_FILTER_OPTIONS]);
-  if (!Array.isArray(income)) {
-    return [...DEFAULT_INCOME_SELECTION];
+  if (typeof income === "string" && valid.has(income)) {
+    return income;
   }
-  const picked = income.filter((x) => typeof x === "string" && valid.has(x));
-  return picked.length > 0 ? picked : [...DEFAULT_INCOME_SELECTION];
+  if (Array.isArray(income)) {
+    for (const x of income) {
+      if (typeof x === "string" && valid.has(x)) {
+        return x;
+      }
+    }
+  }
+  return DEFAULT_INCOME;
 }
 function makeUser(p) {
   return __spreadValues({
@@ -81,7 +86,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u1",
       nickname: "林溪",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop",
       location: "北京朝阳区",
       height: 162,
       zodiac: "兔",
@@ -97,7 +102,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u2",
       nickname: "苏晴",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop",
       location: "北京海淀区",
       height: 165,
       zodiac: "龙",
@@ -114,7 +119,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u3",
       nickname: "安然",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop",
       zodiac: "蛇",
       zodiacSign: "处女座",
       mbti: "ISFJ",
@@ -125,7 +130,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u4",
       nickname: "若瑶",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=500&fit=crop",
       zodiac: "马",
       zodiacSign: "射手座",
       mbti: "ESFP",
@@ -138,7 +143,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u5",
       nickname: "清越",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=500&fit=crop",
       zodiac: "羊",
       zodiacSign: "双鱼座",
       mbti: "INFJ",
@@ -149,7 +154,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u6",
       nickname: "知夏",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=500&fit=crop",
       zodiac: "猴",
       zodiacSign: "双子座",
       mbti: "ENTP",
@@ -161,7 +166,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u7",
       nickname: "晚星",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&h=500&fit=crop",
       zodiac: "鸡",
       zodiacSign: "狮子座",
       mbti: "ESTJ",
@@ -172,7 +177,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u8",
       nickname: "书言",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
       gender: "male",
       zodiac: "狗",
       zodiacSign: "水瓶座",
@@ -184,7 +189,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u9",
       nickname: "南乔",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop",
       zodiac: "猪",
       zodiacSign: "巨蟹座",
       mbti: "ISFP",
@@ -195,7 +200,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     makeUser({
       id: "u10",
       nickname: "时宜",
-      avatar: utils_avatar.avatarUrl(),
+      avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=500&fit=crop",
       zodiac: "鼠",
       zodiacSign: "摩羯座",
       mbti: "ISTJ",
@@ -211,7 +216,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     ageMax: 35,
     distance: "sameCity",
     education: DEFAULT_EDUCATION,
-    income: [...DEFAULT_INCOME_SELECTION]
+    income: DEFAULT_INCOME
   });
   const dailyRecommendations = common_vendor.ref([]);
   const currentUser = common_vendor.computed(() => users.value[currentIndex.value]);
@@ -243,16 +248,10 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
   function setEducation(value) {
     filters.value.education = value;
   }
-  function toggleIncome(value) {
-    const list = filters.value.income;
-    const index = list.indexOf(value);
-    if (index > -1) {
-      list.splice(index, 1);
-      if (list.length === 0) {
-        filters.value.income = [...DEFAULT_INCOME_SELECTION];
-      }
-    } else {
-      list.push(value);
+  function setIncomeFilter(value) {
+    const valid = /* @__PURE__ */ new Set([...INCOME_FILTER_OPTIONS]);
+    if (valid.has(value)) {
+      filters.value.income = value;
     }
   }
   function resetFilters() {
@@ -262,7 +261,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
       ageMax: 35,
       distance: "sameCity",
       education: DEFAULT_EDUCATION,
-      income: ["10万-20万"]
+      income: DEFAULT_INCOME
     };
   }
   function applyFilters() {
@@ -294,7 +293,7 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     updateFilters,
     setAgeRange,
     setEducation,
-    toggleIncome,
+    setIncomeFilter,
     resetFilters,
     applyFilters,
     generateDailyRecommendations,

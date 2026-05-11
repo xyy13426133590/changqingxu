@@ -92,8 +92,8 @@
             v-for="opt in incomeOptions"
             :key="opt"
             class="filter-tag"
-            :class="{ active: filters.income.includes(opt) }"
-            @click="toggleIncome(opt)"
+            :class="{ active: filters.income === opt }"
+            @click="setIncome(opt)"
           >
             {{ opt }}
           </view>
@@ -151,7 +151,7 @@ const distanceOptions = [
 // 学历选项（单选）
 const educationOptions: EducationFilterOption[] = ['大专及以下', '本科', '硕士及以上']
 
-// 年收入选项（与 store 一致，默认选中 10万-20万）
+// 年收入选项（单选，与 store 一致）
 const incomeOptions = [...INCOME_FILTER_OPTIONS]
 
 // 设置生肖配对
@@ -175,9 +175,8 @@ function setEducation(value: EducationFilterOption) {
   discoverStore.setEducation(value)
 }
 
-// 切换年收入选中状态
-function toggleIncome(value: string) {
-  discoverStore.toggleIncome(value)
+function setIncome(value: string) {
+  discoverStore.setIncomeFilter(value)
 }
 
 // 返回上一页

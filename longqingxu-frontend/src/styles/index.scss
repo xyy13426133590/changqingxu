@@ -522,18 +522,20 @@ cover-image {
   }
 }
 
-/* 2×2 布局：小程序对 grid/gap 兼容差，用 flex + 外边距 */
+/* 2×2 布局：列间距 20rpx、行间距 20rpx（不依赖 gap） */
 .filter-grid-2 {
   display: flex;
   flex-wrap: wrap;
-  margin: 0 -8rpx;
 }
 
 .filter-grid-2 > .filter-option {
   box-sizing: border-box;
-  width: 50%;
-  padding: 0 8rpx;
-  margin-bottom: 16rpx;
+  width: calc((100% - 20rpx) / 2);
+  margin-bottom: 20rpx;
+}
+
+.filter-grid-2 > .filter-option:nth-child(2n) {
+  margin-left: 20rpx;
 }
 
 /* 选项按钮 */
@@ -1210,7 +1212,7 @@ cover-image {
   flex: 1;
   margin: 0 32rpx;
   position: relative;
-  min-height: 800rpx;
+  min-height: 680rpx;
   perspective: 1400px;
   transform-style: preserve-3d;
 }
@@ -1336,14 +1338,20 @@ cover-image {
     transform-style: preserve-3d;
   }
 
+  /* 小程序：需 min-height 防 image 塌陷；略小更紧凑，仍高于原 260rpx 安全线 */
   .photo-area {
     position: relative;
     flex: 1 1 0;
-    min-height: 260rpx;
+    min-height: 320rpx;
 
     .user-photo {
+      position: absolute;
+      left: 0;
+      top: 0;
       width: 100%;
       height: 100%;
+      z-index: 0;
+      display: block;
     }
 
     .swipe-feedback {
@@ -1396,6 +1404,7 @@ cover-image {
       top: 20rpx;
       left: 20rpx;
       right: 20rpx;
+      z-index: 2;
       display: flex;
       gap: 8rpx;
 
@@ -1415,32 +1424,40 @@ cover-image {
       position: absolute;
       bottom: 20rpx;
       left: 20rpx;
+      z-index: 2;
       display: flex;
-      gap: 12rpx;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+
+      /* 比 .verify-badge + .vip 更稳：编译后若节点顺序/包裹变化仍生效 */
+      > view + view {
+        margin-left: 16rpx;
+      }
 
       .verify-badge {
         background: #3B82F6;
         color: #fff;
         padding: 8rpx 16rpx;
+        min-height: 44rpx;
         border-radius: 20rpx;
         display: inline-flex;
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        gap: 8rpx;
         line-height: 1;
+        box-sizing: border-box;
 
         .badge-icon {
-          font-size: 24rpx;
-          line-height: 1;
-          display: block;
+          font-size: 22rpx;
+          line-height: 1.15;
+          margin-right: 8rpx;
         }
 
         .badge-label {
           font-size: 22rpx;
           font-weight: 500;
-          line-height: 1;
-          display: block;
+          line-height: 1.15;
         }
       }
 
@@ -1448,25 +1465,25 @@ cover-image {
         background: linear-gradient(135deg, #F59E0B, #F97316);
         color: #fff;
         padding: 8rpx 16rpx;
+        min-height: 44rpx;
         border-radius: 20rpx;
         display: inline-flex;
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        gap: 8rpx;
         line-height: 1;
+        box-sizing: border-box;
 
         .badge-icon {
-          font-size: 24rpx;
-          line-height: 1;
-          display: block;
+          font-size: 22rpx;
+          line-height: 1.15;
+          margin-right: 8rpx;
         }
 
         .badge-label {
           font-size: 22rpx;
           font-weight: 500;
-          line-height: 1;
-          display: block;
+          line-height: 1.15;
         }
       }
     }
@@ -1475,6 +1492,7 @@ cover-image {
       position: absolute;
       top: 20rpx;
       right: 20rpx;
+      z-index: 2;
       width: 64rpx;
       height: 64rpx;
       background: rgba(255, 255, 255, 0.25);
@@ -1513,7 +1531,7 @@ cover-image {
   .info-area {
     flex: 0 0 auto;
     min-width: 0;
-    padding: 22rpx 28rpx 28rpx;
+    padding: 16rpx 24rpx 22rpx;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -1522,9 +1540,9 @@ cover-image {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 16rpx;
+      gap: 12rpx;
       min-width: 0;
-      margin-bottom: 12rpx;
+      margin-bottom: 8rpx;
 
       .user-basic {
         flex: 1;
@@ -1543,7 +1561,7 @@ cover-image {
         }
 
         .nickname {
-          font-size: 40rpx;
+          font-size: 38rpx;
           font-weight: 700;
           color: #1F2937;
           line-height: 1.15;
@@ -1571,42 +1589,42 @@ cover-image {
         flex-shrink: 0;
         align-self: center;
         background: linear-gradient(135deg, #8B5CF6, #EC4899);
-        padding: 12rpx 20rpx;
-        border-radius: 24rpx;
+        padding: 10rpx 16rpx;
+        border-radius: 20rpx;
         text-align: center;
-        min-width: 168rpx;
-        box-shadow: 0 8rpx 24rpx rgba(139, 92, 246, 0.35);
+        min-width: 156rpx;
+        box-shadow: 0 6rpx 20rpx rgba(139, 92, 246, 0.32);
 
         .match-line1 {
           display: block;
-          font-size: 22rpx;
+          font-size: 21rpx;
           color: rgba(255, 255, 255, 0.92);
           line-height: 1.35;
         }
 
         .match-line2 {
           display: block;
-          font-size: 28rpx;
+          font-size: 26rpx;
           font-weight: 700;
           color: #fff;
-          margin-top: 4rpx;
+          margin-top: 2rpx;
           line-height: 1.2;
         }
 
         .match-line3 {
           display: block;
-          font-size: 20rpx;
+          font-size: 19rpx;
           color: rgba(255, 255, 255, 0.88);
-          margin-top: 4rpx;
+          margin-top: 2rpx;
           line-height: 1.2;
         }
       }
     }
 
     .user-meta {
-      font-size: 26rpx;
+      font-size: 25rpx;
       color: #6B7280;
-      margin-bottom: 20rpx;
+      margin-bottom: 14rpx;
     }
 
     .tags-row {
@@ -1614,7 +1632,7 @@ cover-image {
       flex-wrap: wrap;
       width: 100%;
       min-width: 0;
-      margin-bottom: 20rpx;
+      margin-bottom: 14rpx;
       margin-left: -6rpx;
       margin-right: -6rpx;
       box-sizing: border-box;
@@ -1630,10 +1648,10 @@ cover-image {
     }
 
     .bio-text {
-      font-size: 26rpx;
+      font-size: 25rpx;
       color: #4B5563;
-      line-height: 1.6;
-      margin-bottom: 16rpx;
+      line-height: 1.55;
+      margin-bottom: 12rpx;
     }
 
     .hint-text {

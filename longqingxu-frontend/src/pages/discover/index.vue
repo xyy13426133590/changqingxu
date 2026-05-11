@@ -57,13 +57,19 @@
         @touchstart="handleTouchStart"
         @touchmove="handleTouchMove"
         @touchend="handleTouchEnd"
+        @tap="handleCardTap"
       >
         <!-- 喜欢/右滑：cx-heart「极光弧抛」；不喜欢/左滑：cx-pass「裂隙坍缩」 -->
         <transition :name="cardTransitionName" mode="out-in" :appear="false">
           <view v-if="currentUser" :key="currentUser.id" class="user-card-body">
         <!-- 照片区域 -->
         <view class="photo-area">
-          <image class="user-photo" :src="currentUser.avatar" mode="aspectFill" />
+          <image
+            class="user-photo"
+            :src="cardAvatarSrc"
+            mode="aspectFill"
+            @error="onCardAvatarError"
+          />
           
           <!-- 左滑右滑反馈层 -->
           <view class="swipe-feedback swipe-like" :style="{ opacity: likeOverlayOpacity }">
@@ -183,24 +189,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useDiscoverStore } from '@/stores/discover'
 import { useUserStore } from '@/stores/user'
 import { useMessagesStore } from '@/stores/messages'
 import TabBar from '@/components/TabBar.vue'
-import { avatarUrl } from '@/utils/avatar'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
 
-const headerAvatarFallback = avatarUrl(
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
-)
+/** 与发现页卡片同源：直连演示图（小程序需在后台配置 download 合法域名 images.unsplash.com，或开发工具勾选不校验） */
+const headerAvatarFallback =
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop'
 
 const discoverStore = useDiscoverStore()
 const userStore = useUserStore()
 const messagesStore = useMessagesStore()
 
+/** 卡片大图：与 currentUser 同步；加载失败时降级本地图（避免域名未配时整块空白） */
+const CARD_AVATAR_PLACEHOLDER = '/static/avatars/placeholder.png'
+const cardAvatarSrc = ref('')
+
 const currentUser = computed(() => discoverStore.currentUser)
+
+watch(
+  currentUser,
+  (u) => {
+    cardAvatarSrc.value = u?.avatar || CARD_AVATAR_PLACEHOLDER
+  },
+  { immediate: true },
+)
+
+function onCardAvatarError() {
+  if (!cardAvatarSrc.value.includes('placeholder')) {
+    cardAvatarSrc.value = CARD_AVATAR_PLACEHOLDER
+  }
+}
 const dailyUsers = computed(() => discoverStore.dailyRecommendations)
 
 /** 与 <transition :name> 对应：cx-heart 喜欢 | cx-pass 不喜欢 */
@@ -209,6 +232,8 @@ const cardTransitionName = ref<'cx-heart' | 'cx-pass'>('cx-heart')
 // 触摸滑动相关
 const touchStartX = ref(0)
 const touchStartY = ref(0)
+const touchEndX = ref(0)
+const touchEndY = ref(0)
 const translateX = ref(0)
 const translateY = ref(0)
 const rotate = ref(0)
@@ -278,13 +303,21 @@ function handleTouchStart(e: TouchEvent) {
 function handleTouchMove(e: TouchEvent) {
   const deltaX = e.touches[0].clientX - touchStartX.value
   const deltaY = e.touches[0].clientY - touchStartY.value
-  
+
   translateX.value = deltaX
   translateY.value = deltaY
   rotate.value = deltaX * 0.05
+
+  // 实时更新结束位置，用于判断点击
+  touchEndX.value = e.touches[0].clientX
+  touchEndY.value = e.touches[0].clientY
 }
 
-function handleTouchEnd() {
+function handleTouchEnd(e: TouchEvent) {
+  // 记录触摸结束位置，用于判断是点击还是滑动
+  touchEndX.value = e.changedTouches[0].clientX
+  touchEndY.value = e.changedTouches[0].clientY
+
   const threshold = 110
   isAnimating.value = true
 
@@ -312,10 +345,27 @@ function handleTouchEnd() {
   }
 }
 
+/** 点击卡片进入详情页（仅在没有发生滑动时触发） */
+function handleCardTap() {
+  // 计算滑动距离
+  const moveX = Math.abs(touchEndX.value - touchStartX.value)
+  const moveY = Math.abs(touchEndY.value - touchStartY.value)
+
+  // 如果移动距离很小（小于10px），认为是点击而非滑动
+  const TAP_THRESHOLD = 10
+  if (moveX < TAP_THRESHOLD && moveY < TAP_THRESHOLD && currentUser.value) {
+    navigateToUserDetail(currentUser.value.id)
+  }
+}
+
 function resetCard() {
   translateX.value = 0
   translateY.value = 0
   rotate.value = 0
+  touchStartX.value = 0
+  touchStartY.value = 0
+  touchEndX.value = 0
+  touchEndY.value = 0
   setTimeout(() => {
     isAnimating.value = false
   }, 40)

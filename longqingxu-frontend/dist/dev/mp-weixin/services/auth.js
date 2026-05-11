@@ -226,9 +226,6 @@ function authLoginWechatMock() {
   });
 }
 exports.DEMO_SMS_CODE = DEMO_SMS_CODE;
-exports.DEMO_TEST_PASSWORD = DEMO_TEST_PASSWORD;
-exports.DEMO_TEST_PHONE = DEMO_TEST_PHONE;
-exports.LOGIN_ERR_ACCOUNT_NOT_FOUND = LOGIN_ERR_ACCOUNT_NOT_FOUND;
 exports.authLogin = authLogin;
 exports.authLoginBySms = authLoginBySms;
 exports.authLoginWechatMock = authLoginWechatMock;

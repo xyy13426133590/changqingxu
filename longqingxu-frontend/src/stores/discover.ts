@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { avatarUrl } from '@/utils/avatar'
 
 // 用户卡片类型
 export interface UserCard {
@@ -75,17 +74,23 @@ export const INCOME_FILTER_OPTIONS = [
 
 export type IncomeFilterOption = (typeof INCOME_FILTER_OPTIONS)[number]
 
-/** 默认仅选中「10万-20万」 */
-const DEFAULT_INCOME_SELECTION: string[] = ['10万-20万']
+/** 年收入筛选默认「10万-20万」（单选） */
+const DEFAULT_INCOME: IncomeFilterOption = '10万-20万'
 
-/** 持久化恢复：过滤非法项；若为空则回到默认「10万-20万」 */
-function normalizeIncomeFilter(income: unknown): string[] {
+/** 持久化恢复：单选；兼容旧版多选数组取第一项合法值 */
+function normalizeIncomeFilter(income: unknown): IncomeFilterOption {
   const valid = new Set<string>([...INCOME_FILTER_OPTIONS])
-  if (!Array.isArray(income)) {
-    return [...DEFAULT_INCOME_SELECTION]
+  if (typeof income === 'string' && valid.has(income)) {
+    return income as IncomeFilterOption
   }
-  const picked = income.filter((x): x is string => typeof x === 'string' && valid.has(x))
-  return picked.length > 0 ? picked : [...DEFAULT_INCOME_SELECTION]
+  if (Array.isArray(income)) {
+    for (const x of income) {
+      if (typeof x === 'string' && valid.has(x)) {
+        return x as IncomeFilterOption
+      }
+    }
+  }
+  return DEFAULT_INCOME
 }
 
 // 筛选条件
@@ -95,7 +100,8 @@ export interface FilterCriteria {
   ageMax: number
   distance: 'sameCity' | 'sameProvince' | 'all'
   education: EducationFilterOption
-  income: string[]
+  /** 年收入（单选，文案与 INCOME_FILTER_OPTIONS 一致） */
+  income: IncomeFilterOption
 }
 
 function makeUser(p: Partial<UserCard> & Pick<UserCard, 'id' | 'nickname' | 'avatar'>): UserCard {
@@ -128,7 +134,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u1',
       nickname: '林溪',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop',
       location: '北京朝阳区',
       height: 162,
       zodiac: '兔',
@@ -144,7 +150,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u2',
       nickname: '苏晴',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop',
       location: '北京海淀区',
       height: 165,
       zodiac: '龙',
@@ -161,7 +167,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u3',
       nickname: '安然',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop',
       zodiac: '蛇',
       zodiacSign: '处女座',
       mbti: 'ISFJ',
@@ -172,7 +178,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u4',
       nickname: '若瑶',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=500&fit=crop',
       zodiac: '马',
       zodiacSign: '射手座',
       mbti: 'ESFP',
@@ -185,7 +191,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u5',
       nickname: '清越',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=500&fit=crop',
       zodiac: '羊',
       zodiacSign: '双鱼座',
       mbti: 'INFJ',
@@ -196,7 +202,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u6',
       nickname: '知夏',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=500&fit=crop',
       zodiac: '猴',
       zodiacSign: '双子座',
       mbti: 'ENTP',
@@ -208,7 +214,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u7',
       nickname: '晚星',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&h=500&fit=crop',
       zodiac: '鸡',
       zodiacSign: '狮子座',
       mbti: 'ESTJ',
@@ -219,7 +225,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u8',
       nickname: '书言',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop',
       gender: 'male',
       zodiac: '狗',
       zodiacSign: '水瓶座',
@@ -231,7 +237,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u9',
       nickname: '南乔',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop',
       zodiac: '猪',
       zodiacSign: '巨蟹座',
       mbti: 'ISFP',
@@ -242,7 +248,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     makeUser({
       id: 'u10',
       nickname: '时宜',
-      avatar: avatarUrl('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=500&fit=crop'),
+      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=500&fit=crop',
       zodiac: '鼠',
       zodiacSign: '摩羯座',
       mbti: 'ISTJ',
@@ -259,7 +265,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     ageMax: 35,
     distance: 'sameCity',
     education: DEFAULT_EDUCATION,
-    income: [...DEFAULT_INCOME_SELECTION],
+    income: DEFAULT_INCOME,
   })
   
   const dailyRecommendations = ref<UserCard[]>([])
@@ -307,16 +313,10 @@ export const useDiscoverStore = defineStore('discover', () => {
     filters.value.education = value
   }
 
-  function toggleIncome(value: string) {
-    const list = filters.value.income
-    const index = list.indexOf(value)
-    if (index > -1) {
-      list.splice(index, 1)
-      if (list.length === 0) {
-        filters.value.income = [...DEFAULT_INCOME_SELECTION]
-      }
-    } else {
-      list.push(value)
+  function setIncomeFilter(value: string) {
+    const valid = new Set<string>([...INCOME_FILTER_OPTIONS])
+    if (valid.has(value)) {
+      filters.value.income = value as IncomeFilterOption
     }
   }
 
@@ -327,7 +327,7 @@ export const useDiscoverStore = defineStore('discover', () => {
       ageMax: 35,
       distance: 'sameCity',
       education: DEFAULT_EDUCATION,
-      income: ['10万-20万'],
+      income: DEFAULT_INCOME,
     }
   }
 
@@ -364,7 +364,7 @@ export const useDiscoverStore = defineStore('discover', () => {
     updateFilters,
     setAgeRange,
     setEducation,
-    toggleIncome,
+    setIncomeFilter,
     resetFilters,
     applyFilters,
     generateDailyRecommendations,

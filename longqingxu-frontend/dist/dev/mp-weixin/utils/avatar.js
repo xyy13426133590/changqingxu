@@ -1,5 +1,6 @@
 "use strict";
-const MP_AVATAR_PLACEHOLDER = "/static/avatars/placeholder.png";
+const common_assets = require("../common/assets.js");
+const MP_AVATAR_PLACEHOLDER = common_assets.mpPlaceholder;
 function avatarUrl(remote) {
   return MP_AVATAR_PLACEHOLDER;
 }

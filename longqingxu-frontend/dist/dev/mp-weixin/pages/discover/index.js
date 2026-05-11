@@ -3,7 +3,6 @@ const common_vendor = require("../../common/vendor.js");
 const stores_discover = require("../../stores/discover.js");
 const stores_user = require("../../stores/user.js");
 const stores_messages = require("../../stores/messages.js");
-const utils_avatar = require("../../utils/avatar.js");
 const utils_tabbar = require("../../utils/tabbar.js");
 if (!Array) {
   const _component_transition = common_vendor.resolveComponent("transition");
@@ -13,18 +12,34 @@ if (!Math) {
   TabBar();
 }
 const TabBar = () => "../../components/TabBar.js";
+const headerAvatarFallback = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop";
+const CARD_AVATAR_PLACEHOLDER = "/static/avatars/placeholder.png";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
-    const headerAvatarFallback = utils_avatar.avatarUrl();
     const discoverStore = stores_discover.useDiscoverStore();
     const userStore = stores_user.useUserStore();
     const messagesStore = stores_messages.useMessagesStore();
+    const cardAvatarSrc = common_vendor.ref("");
     const currentUser = common_vendor.computed(() => discoverStore.currentUser);
+    common_vendor.watch(
+      currentUser,
+      (u) => {
+        cardAvatarSrc.value = (u == null ? void 0 : u.avatar) || CARD_AVATAR_PLACEHOLDER;
+      },
+      { immediate: true }
+    );
+    function onCardAvatarError() {
+      if (!cardAvatarSrc.value.includes("placeholder")) {
+        cardAvatarSrc.value = CARD_AVATAR_PLACEHOLDER;
+      }
+    }
     const dailyUsers = common_vendor.computed(() => discoverStore.dailyRecommendations);
     const cardTransitionName = common_vendor.ref("cx-heart");
     const touchStartX = common_vendor.ref(0);
     const touchStartY = common_vendor.ref(0);
+    const touchEndX = common_vendor.ref(0);
+    const touchEndY = common_vendor.ref(0);
     const translateX = common_vendor.ref(0);
     const translateY = common_vendor.ref(0);
     const rotate = common_vendor.ref(0);
@@ -101,8 +116,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       translateX.value = deltaX;
       translateY.value = deltaY;
       rotate.value = deltaX * 0.05;
+      touchEndX.value = e.touches[0].clientX;
+      touchEndY.value = e.touches[0].clientY;
     }
-    function handleTouchEnd() {
+    function handleTouchEnd(e) {
+      touchEndX.value = e.changedTouches[0].clientX;
+      touchEndY.value = e.changedTouches[0].clientY;
       const threshold = 110;
       isAnimating.value = true;
       if (translateX.value > threshold) {
@@ -128,10 +147,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }, 380);
       }
     }
+    function handleCardTap() {
+      const moveX = Math.abs(touchEndX.value - touchStartX.value);
+      const moveY = Math.abs(touchEndY.value - touchStartY.value);
+      const TAP_THRESHOLD = 10;
+      if (moveX < TAP_THRESHOLD && moveY < TAP_THRESHOLD && currentUser.value) {
+        navigateToUserDetail(currentUser.value.id);
+      }
+    }
     function resetCard() {
       translateX.value = 0;
       translateY.value = 0;
       rotate.value = 0;
+      touchStartX.value = 0;
+      touchStartY.value = 0;
+      touchEndX.value = 0;
+      touchEndY.value = 0;
       setTimeout(() => {
         isAnimating.value = false;
       }, 40);
@@ -183,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.unref(userStore).profile.avatar || common_vendor.unref(headerAvatarFallback),
+        a: common_vendor.unref(userStore).profile.avatar || headerAvatarFallback,
         b: common_vendor.o(navigateToFilter, "d8"),
         c: common_vendor.unref(messagesStore).totalUnread > 0
       }, common_vendor.unref(messagesStore).totalUnread > 0 ? {
@@ -202,51 +233,53 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, currentUser.value ? common_vendor.e({
         h: currentUser.value
       }, currentUser.value ? common_vendor.e({
-        i: currentUser.value.avatar,
-        j: likeOverlayOpacity.value,
-        k: passOverlayOpacity.value,
-        l: currentUser.value.isRealName
+        i: cardAvatarSrc.value,
+        j: common_vendor.o(onCardAvatarError, "b7"),
+        k: likeOverlayOpacity.value,
+        l: passOverlayOpacity.value,
+        m: currentUser.value.isRealName
       }, currentUser.value.isRealName ? {} : {}, {
-        m: currentUser.value.isVip
+        n: currentUser.value.isVip
       }, currentUser.value.isVip ? {} : {}, {
-        n: common_vendor.o(($event) => openReportFlow("home"), "51"),
-        o: common_vendor.t(currentUser.value.nickname),
-        p: common_vendor.t(currentUser.value.gender === "female" ? "♀" : "♂"),
-        q: common_vendor.n(currentUser.value.gender),
-        r: common_vendor.t(currentUser.value.matchReason),
-        s: common_vendor.t(currentUser.value.matchTagline),
-        t: common_vendor.t(currentUser.value.matchScore),
-        v: common_vendor.t(currentUser.value.age),
-        w: common_vendor.t(currentUser.value.location),
-        x: common_vendor.t(currentUser.value.height),
-        y: common_vendor.t(getZodiacEmoji(currentUser.value.zodiac)),
-        z: common_vendor.t(currentUser.value.zodiac),
-        A: common_vendor.t(getZodiacSignEmoji(currentUser.value.zodiacSign)),
-        B: common_vendor.t(currentUser.value.zodiacSign),
-        C: common_vendor.t(getRiyuanEmoji(currentUser.value.riyuan)),
-        D: common_vendor.t(currentUser.value.riyuan),
-        E: common_vendor.t(currentUser.value.mbti),
-        F: common_vendor.t(currentUser.value.education),
-        G: common_vendor.t(currentUser.value.occupation),
-        H: common_vendor.t(currentUser.value.income),
-        I: common_vendor.t(currentUser.value.bio),
-        J: common_vendor.t(currentUser.value.matchReason),
-        K: currentUser.value.id
+        o: common_vendor.o(($event) => openReportFlow("home"), "c4"),
+        p: common_vendor.t(currentUser.value.nickname),
+        q: common_vendor.t(currentUser.value.gender === "female" ? "♀" : "♂"),
+        r: common_vendor.n(currentUser.value.gender),
+        s: common_vendor.t(currentUser.value.matchReason),
+        t: common_vendor.t(currentUser.value.matchTagline),
+        v: common_vendor.t(currentUser.value.matchScore),
+        w: common_vendor.t(currentUser.value.age),
+        x: common_vendor.t(currentUser.value.location),
+        y: common_vendor.t(currentUser.value.height),
+        z: common_vendor.t(getZodiacEmoji(currentUser.value.zodiac)),
+        A: common_vendor.t(currentUser.value.zodiac),
+        B: common_vendor.t(getZodiacSignEmoji(currentUser.value.zodiacSign)),
+        C: common_vendor.t(currentUser.value.zodiacSign),
+        D: common_vendor.t(getRiyuanEmoji(currentUser.value.riyuan)),
+        E: common_vendor.t(currentUser.value.riyuan),
+        F: common_vendor.t(currentUser.value.mbti),
+        G: common_vendor.t(currentUser.value.education),
+        H: common_vendor.t(currentUser.value.occupation),
+        I: common_vendor.t(currentUser.value.income),
+        J: common_vendor.t(currentUser.value.bio),
+        K: common_vendor.t(currentUser.value.matchReason),
+        L: currentUser.value.id
       }) : {}, {
-        L: common_vendor.p({
+        M: common_vendor.p({
           name: cardTransitionName.value,
           mode: "out-in",
           appear: false
         }),
-        M: common_vendor.s(cardStyle.value),
-        N: common_vendor.o(handleTouchStart, "c9"),
-        O: common_vendor.o(handleTouchMove, "ac"),
-        P: common_vendor.o(handleTouchEnd, "a9")
+        N: common_vendor.s(cardStyle.value),
+        O: common_vendor.o(handleTouchStart, "c9"),
+        P: common_vendor.o(handleTouchMove, "ac"),
+        Q: common_vendor.o(handleTouchEnd, "a9"),
+        R: common_vendor.o(handleCardTap, "4f")
       }) : {}, {
-        Q: common_vendor.o(commitPass, "24"),
-        R: common_vendor.o(handleGreeting, "8e"),
-        S: common_vendor.o(commitLike, "96"),
-        T: common_vendor.p({
+        S: common_vendor.o(commitPass, "cd"),
+        T: common_vendor.o(handleGreeting, "d3"),
+        U: common_vendor.o(commitLike, "5c"),
+        V: common_vendor.p({
           active: "discover"
         })
       });
