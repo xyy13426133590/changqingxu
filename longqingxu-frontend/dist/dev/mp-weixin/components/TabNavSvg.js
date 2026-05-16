@@ -1,5 +1,16 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+if (!Array) {
+  const _easycom_uni_icons2 = common_vendor.resolveComponent("uni-icons");
+  _easycom_uni_icons2();
+}
+const _easycom_uni_icons = () => "../node-modules/@dcloudio/uni-ui/lib/uni-icons/uni-icons.js";
+if (!Math) {
+  _easycom_uni_icons();
+}
+const TAB_ICON_ACTIVE = "#8B5CF6";
+const TAB_ICON_INACTIVE = "#A8B4C9";
+const iconPx = 26;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "TabNavSvg",
   props: {
@@ -7,20 +18,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     active: { type: Boolean }
   },
   setup(__props) {
-    function tabEmoji(name) {
-      const map = {
-        discover: "🧭",
-        filter: "⚙",
-        messages: "💬",
-        mine: "👤"
-      };
-      return map[name] || "·";
-    }
+    const props = __props;
+    const iconType = common_vendor.computed(() => {
+      const filled = props.active;
+      if (props.name === "discover")
+        return filled ? "navigate-filled" : "navigate";
+      if (props.name === "filter")
+        return filled ? "tune-filled" : "tune";
+      if (props.name === "messages")
+        return filled ? "chatbubble-filled" : "chatbubble";
+      return filled ? "person-filled" : "person";
+    });
+    const iconColor = common_vendor.computed(() => props.active ? TAB_ICON_ACTIVE : TAB_ICON_INACTIVE);
     const inst = common_vendor.getCurrentInstance();
     inst != null && inst.uid != null ? inst.uid : Math.floor(Math.random() * 1e9);
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.t(tabEmoji(_ctx.name)),
+        a: common_vendor.p({
+          type: iconType.value,
+          size: iconPx,
+          color: iconColor.value
+        }),
         b: !_ctx.active ? 1 : ""
       };
     };

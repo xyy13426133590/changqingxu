@@ -1,12 +1,11 @@
 <template>
   <view class="page-container gradient-bg auth-flow no-tabbar">
     <view :style="capsuleNavOuterStyle">
-      <view class="auth-top-nav glass-row" :style="capsuleNavRowStyle">
-        <view class="nav-back-wrap" hover-class="btn-press" @tap="goBack">
-          <text class="nav-back">‹</text>
+      <view class="profile-header" :style="capsuleNavRowStyle">
+        <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
+          <text>‹</text>
         </view>
-        <text class="nav-title">实名认证</text>
-        <view class="nav-placeholder" />
+        <text class="title">实名认证</text>
       </view>
     </view>
 
@@ -117,49 +116,6 @@ function onNext() {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.auth-top-nav {
-  position: relative;
-  z-index: 50;
-  flex-shrink: 0;
-  margin: 0 32rpx;
-  padding: 0 24rpx;
-  border-radius: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1rpx solid rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(16px);
-}
-
-.nav-back-wrap {
-  width: 72rpx;
-  height: 72rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 51;
-}
-
-.nav-back {
-  font-size: 40rpx;
-  color: #4b5563;
-}
-
-.nav-title {
-  flex: 1;
-  text-align: center;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1f2937;
-  line-height: 1.2;
-}
-
-.nav-placeholder {
-  width: 72rpx;
 }
 
 .flow-scroll {

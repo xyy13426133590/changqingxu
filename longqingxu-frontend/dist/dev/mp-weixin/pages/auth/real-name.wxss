@@ -3,44 +3,6 @@
   display: flex;
   flex-direction: column;
 }
-.auth-top-nav.data-v-56d11343 {
-  position: relative;
-  z-index: 50;
-  flex-shrink: 0;
-  margin: 0 32rpx;
-  padding: 0 24rpx;
-  border-radius: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1rpx solid rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(16px);
-}
-.nav-back-wrap.data-v-56d11343 {
-  width: 72rpx;
-  height: 72rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 51;
-}
-.nav-back.data-v-56d11343 {
-  font-size: 40rpx;
-  color: #4b5563;
-}
-.nav-title.data-v-56d11343 {
-  flex: 1;
-  text-align: center;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1f2937;
-  line-height: 1.2;
-}
-.nav-placeholder.data-v-56d11343 {
-  width: 72rpx;
-}
 .flow-scroll.data-v-56d11343 {
   flex: 1;
   min-height: 0;

@@ -75,13 +75,14 @@ function switchTab(item: TabItem) {
 
     .tab-text {
       font-size: 22rpx;
-      color: #9CA3AF;
+      color: #A8B4C9;
+      letter-spacing: 0.5rpx;
     }
 
     &.active {
       .tab-icon-slot {
         /* 与未选中保持同尺寸，避免四个里有一个偏大 */
-        filter: drop-shadow(0 6rpx 14rpx rgba(139, 92, 246, 0.42));
+        filter: drop-shadow(0 6rpx 14rpx rgba(139, 92, 246, 0.38));
       }
 
       .tab-text {

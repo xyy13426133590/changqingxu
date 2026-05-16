@@ -58,16 +58,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "34"),
+        a: common_vendor.o(goBack, "5d"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
         d: legalName.value,
-        e: common_vendor.o(($event) => legalName.value = $event.detail.value, "ff"),
+        e: common_vendor.o(($event) => legalName.value = $event.detail.value, "e7"),
         f: idCard.value,
-        g: common_vendor.o(($event) => idCard.value = $event.detail.value, "4b"),
+        g: common_vendor.o(($event) => idCard.value = $event.detail.value, "42"),
         h: common_vendor.t(submitting.value ? "校验中…" : "下一步：人脸识别"),
         i: submitting.value ? 1 : "",
-        j: common_vendor.o(onNext, "cb")
+        j: common_vendor.o(onNext, "2c")
       };
     };
   }
