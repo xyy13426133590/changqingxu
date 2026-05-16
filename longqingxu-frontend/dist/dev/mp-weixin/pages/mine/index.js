@@ -10,10 +10,11 @@ const TabBar = () => "../../components/TabBar.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
-    const defaultAvatar = utils_avatar.avatarUrl();
-    const guestAvatarSrc = utils_avatar.avatarUrl();
+    const defaultAvatar = utils_avatar.DEMO_AVATARS[0];
+    const guestAvatarSrc = utils_avatar.DEMO_AVATARS[1];
     common_vendor.onShow(() => {
       utils_tabbar.safeHideNativeTabBar();
+      void userStore.hydrateProfile();
     });
     const userStore = stores_user.useUserStore();
     function goLogin() {

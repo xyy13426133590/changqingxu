@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:migrate": "typeorm migration:run -d ./dist/database/data-source.js",
     "db:generate": "typeorm migration:generate ./src/database/migrations/Migration -d ./dist/database/data-source.js",
-    "db:create": "typeorm migration:create ./src/database/migrations/Migration"
+    "db:create": "typeorm migration:create ./src/database/migrations/Migration",
+    "seed:dev": "ts-node -r tsconfig-paths/register scripts/seed-dev.ts"
   },
   "dependencies": {
     "@nestjs-modules/ioredis": "^2.0.0",

@@ -1,1 +1,0 @@
-{"version":3,"file":"wechat.config.js","sourceRoot":"","sources":["../../src/config/wechat.config.ts"],"names":[],"mappings":";;;AAAA,2CAA4C;AAE/B,QAAA,YAAY,GAAG,IAAA,mBAAU,EAAC,QAAQ,EAAE,GAAG,EAAE,CAAC,CAAC;IACtD,KAAK,EAAE,OAAO,CAAC,GAAG,CAAC,YAAY,IAAI,EAAE;IACrC,MAAM,EAAE,OAAO,CAAC,GAAG,CAAC,aAAa,IAAI,EAAE;IACvC,QAAQ,EAAE,8CAA8C;CACzD,CAAC,CAAC,CAAC"}

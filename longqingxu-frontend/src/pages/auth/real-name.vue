@@ -1,7 +1,9 @@
 <template>
   <view class="page-container gradient-bg auth-flow no-tabbar">
     <view class="nav glass-row">
-      <text class="nav-back" @click.stop="goBack">‹</text>
+      <view class="nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
+        <text class="nav-back">‹</text>
+      </view>
       <text class="nav-title">实名认证</text>
       <view class="nav-placeholder" />
     </view>
@@ -55,6 +57,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { navigateBackTo } from '@/utils/navigation'
 
 const userStore = useUserStore()
 const legalName = ref('')
@@ -62,7 +65,7 @@ const idCard = ref('')
 const submitting = ref(false)
 
 function goBack() {
-  uni.navigateBack({ fail: () => uni.switchTab({ url: '/pages/mine/index' }) })
+  navigateBackTo('/pages/mine/index')
 }
 
 function validateIdCard18(id: string): { ok: boolean; msg?: string } {
@@ -110,7 +113,10 @@ function onNext() {
   flex-direction: column;
 }
 
-.glass-row {
+.auth-top-nav {
+  position: relative;
+  z-index: 50;
+  flex-shrink: 0;
   margin: 24rpx 32rpx 0;
   padding: 20rpx 24rpx;
   border-radius: 20rpx;
@@ -122,10 +128,19 @@ function onNext() {
   backdrop-filter: blur(16px);
 }
 
+.nav-back-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 51;
+}
+
 .nav-back {
   font-size: 40rpx;
   color: #4b5563;
-  width: 72rpx;
 }
 
 .nav-title {

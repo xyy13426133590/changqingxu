@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
+const utils_navigation = require("../../utils/navigation.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "real-name",
   setup(__props) {
@@ -9,7 +10,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const idCard = common_vendor.ref("");
     const submitting = common_vendor.ref(false);
     function goBack() {
-      common_vendor.index.navigateBack({ fail: () => common_vendor.index.switchTab({ url: "/pages/mine/index" }) });
+      utils_navigation.navigateBackTo("/pages/mine/index");
     }
     function validateIdCard18(id) {
       const s = id.trim().toUpperCase();
@@ -54,14 +55,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "1b"),
+        a: common_vendor.o(goBack, "6e"),
         b: legalName.value,
-        c: common_vendor.o(($event) => legalName.value = $event.detail.value, "a4"),
+        c: common_vendor.o(($event) => legalName.value = $event.detail.value, "c8"),
         d: idCard.value,
-        e: common_vendor.o(($event) => idCard.value = $event.detail.value, "36"),
+        e: common_vendor.o(($event) => idCard.value = $event.detail.value, "b2"),
         f: common_vendor.t(submitting.value ? "校验中…" : "下一步：人脸识别"),
         g: submitting.value ? 1 : "",
-        h: common_vendor.o(onNext, "e5")
+        h: common_vendor.o(onNext, "26")
       };
     };
   }

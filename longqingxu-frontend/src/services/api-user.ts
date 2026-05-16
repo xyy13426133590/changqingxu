@@ -10,14 +10,21 @@ export interface UserProfile {
   nickname: string
   avatar: string
   gender: 'male' | 'female' | 'unknown'
+  birthday?: string
   age: number
   height: number
+  weight?: number
+  hometown?: string
   location: string
   zodiac: string
   zodiacSign: string
   mbti: string
   education: string
+  school?: string
+  schoolTier?: '985' | '211' | null
   occupation: string
+  jobLevel?: string
+  company?: string
   income: string
   bio: string
   hobbies: string[]
@@ -84,13 +91,19 @@ export function apiGetMyCard(): Promise<UserCard> {
 }
 
 // 获取推荐用户列表
-export function apiGetRecommendations(page = 1, limit = 10): Promise<{ users: UserCard[]; total: number }> {
-  return get<{ users: UserCard[]; total: number }>('/users/recommendations', { page, limit })
+export function apiGetRecommendations(
+  page = 1,
+  limit = 10,
+): Promise<{ users: UserCard[]; total: number; recycled?: boolean }> {
+  return get<{ users: UserCard[]; total: number; recycled?: boolean }>(
+    '/users/recommendations',
+    { page, limit },
+  )
 }
 
 // 获取每日推荐
-export function apiGetDailyRecommendations(): Promise<{ users: UserCard[] }> {
-  return get<{ users: UserCard[] }>('/users/daily')
+export function apiGetDailyRecommendations(): Promise<{ users: UserCard[]; recycled?: boolean }> {
+  return get<{ users: UserCard[]; recycled?: boolean }>('/users/daily')
 }
 
 // 获取用户详情

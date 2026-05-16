@@ -116,18 +116,15 @@
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import TabBar from '@/components/TabBar.vue'
-import { avatarUrl } from '@/utils/avatar'
+import { DEMO_AVATARS } from '@/utils/avatar'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
 
-const defaultAvatar = avatarUrl(
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
-)
-const guestAvatarSrc = avatarUrl(
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop',
-)
+const defaultAvatar = DEMO_AVATARS[0]
+const guestAvatarSrc = DEMO_AVATARS[1]
 
 onShow(() => {
   safeHideNativeTabBar()
+  void userStore.hydrateProfile()
 })
 
 const userStore = useUserStore()

@@ -2,7 +2,7 @@
   <view class="page-container gradient-bg">
     <!-- 顶部导航 -->
     <view class="chat-header">
-      <view class="back-btn" @tap.stop="goBack">
+      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
         <text>‹</text>
       </view>
       <image
@@ -38,10 +38,10 @@
         :key="msg.id"
         :id="msg.id"
         class="message-item"
-        :class="{ me: msg.senderId === 'me', other: msg.senderId !== 'me' }"
+        :class="{ me: isFromMe(msg), other: !isFromMe(msg) }"
       >
         <image
-          v-if="msg.senderId !== 'me'"
+          v-if="!isFromMe(msg)"
           class="msg-avatar"
           :src="currentConversation?.avatar"
           mode="aspectFill"
@@ -51,10 +51,10 @@
         <view
           v-if="msg.type === 'text'"
           class="message-bubble"
-          :class="msg.senderId === 'me' ? 'me' : 'other'"
+          :class="isFromMe(msg) ? 'me' : 'other'"
         >
           <text>{{ msg.content }}</text>
-          <view v-if="msg.senderId === 'me'" class="msg-status">
+          <view v-if="isFromMe(msg)" class="msg-status">
             <text v-if="msg.status === 'sending'">◌</text>
             <text v-else-if="msg.status === 'sent'">✓</text>
             <text v-else>✓✓</text>
@@ -65,11 +65,11 @@
         <view
           v-else-if="msg.type === 'image'"
           class="message-bubble image-bubble"
-          :class="msg.senderId === 'me' ? 'me' : 'other'"
+          :class="isFromMe(msg) ? 'me' : 'other'"
           @click="previewImage(msg.content)"
         >
           <image class="msg-image" :src="msg.content" mode="widthFix" />
-          <view v-if="msg.senderId === 'me'" class="msg-status">
+          <view v-if="isFromMe(msg)" class="msg-status">
             <text v-if="msg.status === 'sending'">◌</text>
             <text v-else-if="msg.status === 'sent'">✓</text>
             <text v-else>✓✓</text>
@@ -80,7 +80,7 @@
         <view
           v-else-if="msg.type === 'voice'"
           class="message-bubble voice-bubble"
-          :class="msg.senderId === 'me' ? 'me' : 'other'"
+          :class="isFromMe(msg) ? 'me' : 'other'"
           @click="playVoice(msg.content)"
         >
           <view class="voice-content">
@@ -90,7 +90,7 @@
           <view class="voice-wave-preview">
             <view v-for="i in 5" :key="i" class="voice-bar" :style="{ height: `${Math.random() * 30 + 10}rpx` }"></view>
           </view>
-          <view v-if="msg.senderId === 'me'" class="msg-status">
+          <view v-if="isFromMe(msg)" class="msg-status">
             <text v-if="msg.status === 'sending'">◌</text>
             <text v-else-if="msg.status === 'sent'">✓</text>
             <text v-else>✓✓</text>
@@ -101,10 +101,10 @@
         <view
           v-else-if="msg.type === 'emoji'"
           class="message-bubble emoji-bubble"
-          :class="msg.senderId === 'me' ? 'me' : 'other'"
+          :class="isFromMe(msg) ? 'me' : 'other'"
         >
           <text class="emoji-content">{{ msg.content }}</text>
-          <view v-if="msg.senderId === 'me'" class="msg-status">
+          <view v-if="isFromMe(msg)" class="msg-status">
             <text v-if="msg.status === 'sending'">◌</text>
             <text v-else-if="msg.status === 'sent'">✓</text>
             <text v-else>✓✓</text>
@@ -125,44 +125,49 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onUnload } from '@dcloudio/uni-app'
 import { useMessagesStore } from '@/stores/messages'
+import { useUserStore } from '@/stores/user'
 import ChatInputBar from '@/components/ChatInputBar.vue'
+import { connectChatSocket, disconnectChatSocket } from '@/services/chat-socket'
+import { navigateBackTo } from '@/utils/navigation'
 
 const messagesStore = useMessagesStore()
+const userStore = useUserStore()
 const showRiskBanner = ref(true)
 const conversationId = ref('')
 const playingVoiceId = ref('')
 
-// 当前会话
+function isFromMe(msg: { senderId: string }): boolean {
+  const my = userStore.profile.id
+  return msg.senderId === '__local__' || (!!my && msg.senderId === my)
+}
+
 const currentConversation = computed(() => messagesStore.currentConversation)
-
-// 当前消息列表
 const currentMessages = computed(() => messagesStore.currentMessages)
-
-// 最后一条消息ID（用于自动滚动）
 const lastMessageId = computed(() => {
-  const messages = currentMessages.value
-  if (messages.length === 0) return ''
-  return messages[messages.length - 1].id
+  const list = currentMessages.value
+  if (list.length === 0) return ''
+  return list[list.length - 1].id
 })
 
-// 页面加载
-onLoad((options) => {
+onLoad(async (options) => {
   if (options?.conversationId) {
     conversationId.value = options.conversationId
-    messagesStore.setCurrentConversation(options.conversationId)
+    await messagesStore.setCurrentConversation(options.conversationId)
+    await messagesStore.loadMessages(options.conversationId)
   }
+  await connectChatSocket({
+    onNewMessage: (payload) => messagesStore.applyIncomingMessage(payload as any),
+  })
 })
 
-// 返回：有栈则 navigateBack；仅一层栈时 navigateBack 的 delta 会变成 0 且不触发 fail，需主动回消息 Tab
+onUnload(() => {
+  void disconnectChatSocket()
+})
+
 function goBack() {
-  const pages = getCurrentPages()
-  if (pages.length > 1) {
-    uni.navigateBack({ delta: 1 })
-    return
-  }
-  uni.switchTab({ url: '/pages/messages/index' })
+  navigateBackTo('/pages/messages/index')
 }
 
 // 关闭风险提示

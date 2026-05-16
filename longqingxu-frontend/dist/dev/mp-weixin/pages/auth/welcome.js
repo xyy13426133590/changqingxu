@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_navigation = require("../../utils/navigation.js");
 if (!Math) {
   AuthSafetyTips();
 }
@@ -8,7 +9,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "welcome",
   setup(__props) {
     function goBack() {
-      common_vendor.index.navigateBack({ fail: () => common_vendor.index.switchTab({ url: "/pages/mine/index" }) });
+      utils_navigation.navigateBackTo("/pages/mine/index");
     }
     function goLogin() {
       common_vendor.index.navigateTo({ url: "/pages/auth/login" });
@@ -18,9 +19,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "68"),
-        b: common_vendor.o(goLogin, "02"),
-        c: common_vendor.o(goRegister, "bc")
+        a: common_vendor.o(goBack, "b0"),
+        b: common_vendor.o(goLogin, "9b"),
+        c: common_vendor.o(goRegister, "e1")
       };
     };
   }

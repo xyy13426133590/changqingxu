@@ -1,7 +1,29 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const stores_messages = require("../../stores/messages.js");
+const stores_user = require("../../stores/user.js");
+const utils_navigation = require("../../utils/navigation.js");
 const utils_tabbar = require("../../utils/tabbar.js");
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
 if (!Math) {
   TabBar();
 }
@@ -9,10 +31,14 @@ const TabBar = () => "../../components/TabBar.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
-    common_vendor.onShow(() => {
-      utils_tabbar.safeHideNativeTabBar();
-    });
     const messagesStore = stores_messages.useMessagesStore();
+    common_vendor.onShow(() => __async(this, null, function* () {
+      utils_tabbar.safeHideNativeTabBar();
+      const userStore = stores_user.useUserStore();
+      if (userStore.isLogin) {
+        yield messagesStore.fetchConversations();
+      }
+    }));
     const sortedConversations = common_vendor.computed(() => {
       return [...messagesStore.conversations].sort((a, b) => {
         if (a.isTop && !b.isTop)
@@ -26,17 +52,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return messagesStore.formatTime(timeStr);
     }
     function goBack() {
-      common_vendor.index.switchTab({ url: "/pages/discover/index" });
+      utils_navigation.navigateBackTo("/pages/discover/index");
     }
     function enterChat(conv) {
-      messagesStore.setCurrentConversation(conv.id);
-      common_vendor.index.navigateTo({
-        url: `/pages/messages/chat?conversationId=${conv.id}`
+      return __async(this, null, function* () {
+        yield messagesStore.setCurrentConversation(conv.id);
+        yield messagesStore.loadMessages(conv.id);
+        common_vendor.index.navigateTo({
+          url: `/pages/messages/chat?conversationId=${conv.id}`
+        });
       });
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "b3"),
+        a: common_vendor.o(goBack, "ba"),
         b: sortedConversations.value.length === 0
       }, sortedConversations.value.length === 0 ? {} : {}, {
         c: common_vendor.f(sortedConversations.value, (conv, k0, i0) => {

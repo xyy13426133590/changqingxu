@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
 const services_auth = require("../../services/auth.js");
+const utils_navigation = require("../../utils/navigation.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -47,7 +48,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const agreed = common_vendor.ref(true);
     const loading = common_vendor.ref(false);
     function goBack() {
-      common_vendor.index.navigateBack({ fail: () => common_vendor.index.redirectTo({ url: "/pages/auth/welcome" }) });
+      utils_navigation.navigateBackTo("/pages/auth/welcome");
     }
     function goLogin() {
       common_vendor.index.redirectTo({ url: "/pages/auth/login" });
@@ -93,23 +94,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "ec"),
+        a: common_vendor.o(goBack, "d0"),
         b: phone.value,
-        c: common_vendor.o(($event) => phone.value = $event.detail.value, "c3"),
+        c: common_vendor.o(($event) => phone.value = $event.detail.value, "d0"),
         d: nickname.value,
-        e: common_vendor.o(($event) => nickname.value = $event.detail.value, "82"),
+        e: common_vendor.o(($event) => nickname.value = $event.detail.value, "f4"),
         f: password.value,
-        g: common_vendor.o(($event) => password.value = $event.detail.value, "6f"),
+        g: common_vendor.o(($event) => password.value = $event.detail.value, "6a"),
         h: password2.value,
-        i: common_vendor.o(($event) => password2.value = $event.detail.value, "ba"),
+        i: common_vendor.o(($event) => password2.value = $event.detail.value, "bc"),
         j: agreed.value
       }, agreed.value ? {} : {}, {
         k: agreed.value ? 1 : "",
-        l: common_vendor.o(($event) => agreed.value = !agreed.value, "c1"),
+        l: common_vendor.o(($event) => agreed.value = !agreed.value, "ae"),
         m: common_vendor.t(loading.value ? "提交中…" : "注 册"),
         n: loading.value || !agreed.value ? 1 : "",
-        o: common_vendor.o(submit, "64"),
-        p: common_vendor.o(goLogin, "04")
+        o: common_vendor.o(submit, "aa"),
+        p: common_vendor.o(goLogin, "28")
       });
     };
   }

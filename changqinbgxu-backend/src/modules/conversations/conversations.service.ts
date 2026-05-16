@@ -60,6 +60,7 @@ export class ConversationsService {
         { userId1: userId, userId2: targetUserId },
         { userId1: targetUserId, userId2: userId },
       ],
+      relations: ['user1', 'user2', 'lastMessage'],
     });
 
     if (existingConversation) {
@@ -76,7 +77,16 @@ export class ConversationsService {
 
     this.logger.log(`用户 ${userId} 创建了与 ${targetUserId} 的会话`);
 
-    return this.formatConversationResponse(savedConversation, userId);
+    const withRelations = await this.conversationRepository.findOne({
+      where: { id: savedConversation.id },
+      relations: ['user1', 'user2', 'lastMessage'],
+    });
+
+    if (!withRelations) {
+      throw new NotFoundException('会话创建失败');
+    }
+
+    return this.formatConversationResponse(withRelations, userId);
   }
 
   /**
@@ -173,6 +183,7 @@ export class ConversationsService {
     currentUserId: string,
   ): ConversationResponseDto {
     const isUser1 = conversation.userId1 === currentUserId;
+    const targetUserId = isUser1 ? conversation.userId2 : conversation.userId1;
     const targetUser = isUser1 ? conversation.user2 : conversation.user1;
     const unreadCount = isUser1 ? conversation.unreadCount1 : conversation.unreadCount2;
     const isPinned = isUser1 ? conversation.isPinned1 : conversation.isPinned2;
@@ -180,11 +191,11 @@ export class ConversationsService {
     return {
       id: conversation.id,
       userId: currentUserId,
-      targetUserId: targetUser.id,
+      targetUserId: targetUser?.id ?? targetUserId,
       targetUser: {
-        id: targetUser.id,
-        nickname: targetUser.nickname,
-        avatar: targetUser.avatar,
+        id: targetUser?.id ?? targetUserId,
+        nickname: targetUser?.nickname ?? '',
+        avatar: targetUser?.avatar ?? '',
       },
       lastMessage: conversation.lastMessage
         ? {

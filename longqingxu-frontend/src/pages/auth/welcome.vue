@@ -1,7 +1,7 @@
 <template>
   <view class="page-container gradient-bg welcome-page">
     <view class="top-bar">
-      <view class="back-circle" @click="goBack">
+      <view class="back-circle" hover-class="btn-press" @tap.stop="goBack">
         <text class="back-ico">‹</text>
       </view>
     </view>
@@ -32,9 +32,10 @@
 
 <script setup lang="ts">
 import AuthSafetyTips from '@/components/AuthSafetyTips.vue'
+import { navigateBackTo } from '@/utils/navigation'
 
 function goBack() {
-  uni.navigateBack({ fail: () => uni.switchTab({ url: '/pages/mine/index' }) })
+  navigateBackTo('/pages/mine/index')
 }
 
 function goLogin() {

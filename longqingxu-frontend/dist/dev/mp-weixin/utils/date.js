@@ -32,8 +32,6 @@ const MBTI_TYPES = [
   "ESTP",
   "ESFP"
 ];
-const TIANGAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-const DIZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
 function getZodiac(year) {
   const baseYear = 1900;
   const baseIndex = 0;
@@ -63,11 +61,35 @@ function getMBTI(birthDate) {
   const index = seed % MBTI_TYPES.length;
   return MBTI_TYPES[index];
 }
+const RIYUAN_STEMS = [
+  "甲木",
+  "乙木",
+  "丙火",
+  "丁火",
+  "戊土",
+  "己土",
+  "庚金",
+  "辛金",
+  "壬水",
+  "癸水"
+];
 function getRiyuan(birthDate) {
+  const year = birthDate.getFullYear();
+  const month = birthDate.getMonth() + 1;
   const day = birthDate.getDate();
-  const ganIndex = (day + 4) % 10;
-  const zhiIndex = (day + 2) % 12;
-  return TIANGAN[ganIndex] + DIZHI[zhiIndex];
+  const seed = year * 1e4 + month * 100 + day;
+  return RIYUAN_STEMS[seed % RIYUAN_STEMS.length];
+}
+function getRiyuanEmoji(riyuan) {
+  if (/甲|乙/.test(riyuan))
+    return "🌲";
+  if (/丙|丁/.test(riyuan))
+    return "🔥";
+  if (/戊|己/.test(riyuan))
+    return "⛰️";
+  if (/庚|辛/.test(riyuan))
+    return "⚙️";
+  return "💧";
 }
 function getBirthInfo(birthDate) {
   const year = birthDate.getFullYear();
@@ -117,5 +139,6 @@ function getZodiacSignSymbol(signName) {
   return map[signName] || "⭐";
 }
 exports.getBirthInfo = getBirthInfo;
+exports.getRiyuanEmoji = getRiyuanEmoji;
 exports.getZodiacEmoji = getZodiacEmoji;
 exports.getZodiacSignSymbol = getZodiacSignSymbol;

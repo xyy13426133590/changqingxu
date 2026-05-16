@@ -1,45 +1,34 @@
 <template>
   <view class="page-container gradient-bg">
-    <!-- 顶部导航 -->
     <view class="vip-header">
-      <view class="back-btn" @click="goBack">
+      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
         <text>‹</text>
       </view>
       <text class="title">会员中心</text>
     </view>
 
-    <!-- 内容区 -->
     <scroll-view class="vip-content" scroll-y show-scrollbar="false">
-      <!-- VIP 状态卡片 -->
       <view class="vip-status-card">
         <view class="vip-header-row">
           <view class="vip-icon">
             <text>👑</text>
           </view>
           <view class="vip-info">
-            <text class="vip-title">月度 VIP</text>
-            <text class="vip-expiry">有效期至 2026-06-01（示意）</text>
+            <text class="vip-title">{{ userStore.profile.isVip ? 'VIP 会员' : '尚未开通 VIP' }}</text>
+            <text class="vip-expiry">{{ vipExpiryText }}</text>
           </view>
         </view>
-        <view class="vip-stats">
+        <view v-if="vipStatus.daysRemaining != null && userStore.profile.isVip" class="vip-stats">
           <view class="stat-item">
-            <text class="stat-value">∞</text>
-            <text class="stat-label">无限打招呼</text>
-          </view>
-          <view class="stat-item">
-            <text class="stat-value">32</text>
-            <text class="stat-label">查看联系方式</text>
-          </view>
-          <view class="stat-item">
-            <text class="stat-value">128</text>
-            <text class="stat-label">被查看次数</text>
+            <text class="stat-value">{{ vipStatus.daysRemaining }}</text>
+            <text class="stat-label">剩余天数</text>
           </view>
         </view>
       </view>
 
-      <!-- 套餐选择 -->
       <view class="plan-list">
         <text class="section-title">选择套餐</text>
+        <text v-if="loadError" class="load-error">{{ loadError }}</text>
 
         <view
           v-for="plan in plans"
@@ -50,14 +39,19 @@
         >
           <text v-if="plan.tag" class="plan-tag">{{ plan.tag }}</text>
           <view class="plan-header">
-            <view>
+            <view class="plan-main">
               <text class="plan-name">{{ plan.name }}</text>
-              <text class="plan-desc">{{ plan.duration }}天全部权益</text>
+              <text class="plan-desc">约 {{ planDurationDays(plan) }} 天权益周期</text>
             </view>
             <view class="plan-price-wrap">
               <text class="plan-price">¥{{ plan.price }}</text>
               <text v-if="plan.originalPrice" class="plan-original">¥{{ plan.originalPrice }}</text>
-              <text v-if="plan.save" class="plan-save">省¥{{ plan.save }}</text>
+              <text
+                v-if="plan.originalPrice != null && plan.originalPrice > plan.price"
+                class="plan-save"
+              >
+                省¥{{ plan.originalPrice - plan.price }}
+              </text>
             </view>
           </view>
           <view class="plan-features">
@@ -66,7 +60,6 @@
         </view>
       </view>
 
-      <!-- 权益列表 -->
       <view class="benefits-section">
         <text class="section-title">会员权益</text>
         <view class="benefits-list">
@@ -83,10 +76,9 @@
       </view>
     </scroll-view>
 
-    <!-- 底部购买 -->
     <view class="vip-footer">
       <view class="vip-buy-btn" @click="buyVip">
-        <text>立即开通 ¥68/月（示意）</text>
+        <text>{{ buyButtonLabel }}</text>
       </view>
       <text class="vip-agreement">开通即表示同意《会员服务协议》</text>
     </view>
@@ -94,41 +86,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { apiGetVipPlans, apiCreateOrder, type VipPlan } from '@/services/api-vip'
+import { apiGetVipStatus } from '@/services/api-user'
+import { navigateBackTo } from '@/utils/navigation'
 
 const userStore = useUserStore()
 
-const selectedPlan = ref('monthly')
-
-const plans = [
-  {
-    id: 'monthly',
-    name: '月度 VIP',
-    duration: 30,
-    price: 68,
-    originalPrice: 88,
-    save: 20,
-    tag: '最受欢迎',
-    features: ['无限打招呼', '查看联系方式'],
-  },
-  {
-    id: 'quarterly',
-    name: '季度 VIP',
-    duration: 90,
-    price: 168,
-    save: 36,
-    features: [],
-  },
-  {
-    id: 'yearly',
-    name: '年度 VIP',
-    duration: 365,
-    price: 498,
-    save: 318,
-    features: [],
-  },
-]
+const plans = ref<VipPlan[]>([])
+const selectedPlan = ref('')
+const loadError = ref('')
+const vipStatus = ref<{ isVip: boolean; vipExpiry: string; daysRemaining: number }>({
+  isVip: false,
+  vipExpiry: '',
+  daysRemaining: 0,
+})
 
 const benefits = [
   { icon: '💬', title: '无限打招呼', desc: '不再受每日次数限制' },
@@ -137,14 +110,64 @@ const benefits = [
   { icon: '👁️', title: '访客记录', desc: '查看谁浏览过你的资料' },
 ]
 
-function buyVip() {
-  uni.showToast({ title: '支付功能开发中', icon: 'none' })
+function planDurationDays(plan: VipPlan): number {
+  return Math.round((plan.durationMonths || 1) * 30)
+}
+
+const vipExpiryText = computed(() => {
+  if (!userStore.profile.isVip) return '开通后享专属特权'
+  if (userStore.profile.vipExpiry) {
+    try {
+      return `有效期至 ${new Date(userStore.profile.vipExpiry).toLocaleDateString()}`
+    } catch {
+      return '有效期见个人资料'
+    }
+  }
+  return '有效期见个人资料'
+})
+
+const buyButtonLabel = computed(() => {
+  const p = plans.value.find((x) => x.id === selectedPlan.value)
+  return p ? `立即开通 ¥${p.price}` : '请先选择套餐'
+})
+
+async function load() {
+  loadError.value = ''
+  try {
+    const [{ plans: list }, vip] = await Promise.all([apiGetVipPlans(), apiGetVipStatus()])
+    plans.value = list
+    vipStatus.value = vip
+    if (list.length && !selectedPlan.value) {
+      selectedPlan.value = list[0].id
+    }
+  } catch {
+    loadError.value = '套餐加载失败，请稍后重试'
+    plans.value = []
+  }
+}
+
+onMounted(() => void load())
+
+async function buyVip() {
+  if (!selectedPlan.value) {
+    uni.showToast({ title: '请先选择套餐', icon: 'none' })
+    return
+  }
+  uni.showLoading({ title: '创建订单…', mask: true })
+  try {
+    await apiCreateOrder({ planId: selectedPlan.value, payMethod: 'wechat' })
+    uni.showToast({ title: '订单已创建（演示环境未完成支付闭环）', icon: 'none', duration: 2200 })
+    await userStore.hydrateProfile()
+    vipStatus.value = await apiGetVipStatus()
+  } catch {
+    /* toast handled in api.ts */
+  } finally {
+    uni.hideLoading()
+  }
 }
 
 function goBack() {
-  uni.navigateBack({
-    fail: () => uni.switchTab({ url: '/pages/mine/index' }),
-  })
+  navigateBackTo('/pages/mine/index')
 }
 </script>
 
@@ -155,7 +178,10 @@ function goBack() {
   flex-direction: column;
 }
 
-.back-btn {
-  margin-right: 72rpx;
+.load-error {
+  display: block;
+  font-size: 26rpx;
+  color: #b91c1c;
+  margin-bottom: 16rpx;
 }
 </style>

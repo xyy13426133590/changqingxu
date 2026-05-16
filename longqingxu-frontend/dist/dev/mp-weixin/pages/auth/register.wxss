@@ -14,11 +14,17 @@
   border: 1rpx solid rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(16px);
 }
+.auth-nav-back-wrap.data-v-3d5ab0d5 {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .auth-nav-back.data-v-3d5ab0d5 {
   font-size: 44rpx;
   color: #4b5563;
   font-weight: 300;
-  width: 72rpx;
 }
 .auth-nav-title.data-v-3d5ab0d5 {
   font-size: 34rpx;

@@ -46,7 +46,13 @@ cd changqinbgxu-backend
 npm install
 ```
 
-### 2. 配置环境变量
+### 2. 本地 MySQL / Redis（Navicat 可选）
+
+1. MySQL 8+ 在本机启动后，可用 **Navicat** 连接 `127.0.0.1:3306`。打开「查询」执行 [`docs/database.sql`](docs/database.sql) 全文，创建库 `changqingxu` 与各表。
+2. 安装并启动 **Redis**（默认 `6379`），`.env` 中 `REDIS_HOST=localhost`，否则后端启动会卡在 Redis 重连。
+3. `.env` 里 `DB_*` 与实际库一致；纯本地调试设 `DB_SSL=false`。
+
+### 3. 配置环境变量
 
 复制 `.env.example` 为 `.env`，并填写配置：
 
@@ -82,14 +88,22 @@ WECHAT_APPID=xxx
 WECHAT_SECRET=xxx
 ```
 
-### 3. 初始化数据库
+### 4. 初始化数据库（若未执行 Navicat 脚本）
 
 ```bash
 # 创建数据库并导入表结构
 mysql -u root -p < docs/database.sql
 ```
 
-### 4. 启动服务
+### 5. 联调种子数据（可选）
+
+在 `.env` 已配置且 MySQL/Redis 可连的前提下，可插入一批演示账号（密码均为 `test888`）：
+
+```bash
+pnpm run seed:dev
+```
+
+### 6. 启动服务
 
 ```bash
 # 开发模式
@@ -151,12 +165,11 @@ npm run start:prod
 
 ## 前端对接
 
-前端项目位于 `longqingxu-frontend`，需要在 `services` 目录下创建 API 调用服务。
+前端项目位于同级目录 `longqingxu-frontend`：
 
-主要对接点：
-1. 将 `services/auth.ts` 中的 mock 改为真实 API 调用
-2. 配置 API 基础地址
-3. 处理 JWT 令牌的存储和刷新
+- HTTP 统一响应：`src/services/api.ts`（成功时 `code === 'SUCCESS'`）。
+- 认证与资料：`stores/user.ts` 对接 `/api/auth/*` 与 `GET/PUT /users/me`。
+- 实时聊天：**H5 / App** 使用 `socket.io-client`，命名空间 `/chat`（`src/services/chat-socket.ts`）。**微信小程序**与 Engine.IO / Socket.IO 握手协议不同，联调期以 **REST** 收发为主；上线实时能力需配置合法 `wss` 域名并选用可行的小程序 Socket.IO 适配方案。
 
 ## Docker 部署
 

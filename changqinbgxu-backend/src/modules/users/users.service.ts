@@ -1,11 +1,10 @@
 import {
   Injectable,
   NotFoundException,
-  BadRequestException,
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../../database/entities/user.entity';
 import { Match } from '../../database/entities/match.entity';
 import {
@@ -146,7 +145,7 @@ export class UsersService {
     userId: string,
     page: number = 1,
     limit: number = 10,
-  ): Promise<{ users: UserCardDto[]; total: number }> {
+  ): Promise<{ users: UserCardDto[]; total: number; recycled?: boolean }> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
@@ -155,36 +154,24 @@ export class UsersService {
       throw new NotFoundException('用户不存在');
     }
 
-    // 获取已匹配过的用户ID
     const matchedUserIds = await this.getMatchedUserIds(userId);
+    const skip = (page - 1) * limit;
 
-    // 排除已匹配用户和自己
-    const excludedIds = [...matchedUserIds, userId];
-
-    // 构建查询条件
-    const whereCondition: any = {
-      id: Not(In(excludedIds)),
-      status: 'active',
-    };
-
-    // 应用筛选条件
-    if (user.filterSettings) {
-      const { ageRange, education, incomeRange } = user.filterSettings;
-
-      if (ageRange) {
-        whereCondition.age = Not(In([])); // 后续实现年龄范围过滤
-      }
+    let recycled = false;
+    let users = await this.queryRecommendationUsers(userId, matchedUserIds, true);
+    if (users.length === 0) {
+      users = await this.queryRecommendationUsers(userId, matchedUserIds, false);
+    }
+    if (users.length === 0 && matchedUserIds.length > 0) {
+      users = await this.queryRecommendationUsers(userId, [], false);
+      recycled = users.length > 0;
     }
 
-    const [users, total] = await this.userRepository.findAndCount({
-      where: whereCondition,
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const total = users.length;
+    const pageUsers = users.slice(skip, skip + limit);
+    const userCards = pageUsers.map((u) => this.formatUserCard(u, userId));
 
-    const userCards = users.map((u) => this.formatUserCard(u, userId));
-
-    return { users: userCards, total };
+    return { users: userCards, total, ...(recycled ? { recycled: true } : {}) };
   }
 
   /**
@@ -192,19 +179,95 @@ export class UsersService {
    */
   async getDailyRecommendations(
     userId: string,
-  ): Promise<{ users: UserCardDto[] }> {
-    // 随机获取 10 个活跃用户
-    const users = await this.userRepository
+  ): Promise<{ users: UserCardDto[]; recycled?: boolean }> {
+    const matchedUserIds = await this.getMatchedUserIds(userId);
+    let users = await this.queryRecommendationUsers(
+      userId,
+      matchedUserIds,
+      false,
+      10,
+      true,
+    );
+    let recycled = false;
+    if (users.length === 0 && matchedUserIds.length > 0) {
+      users = await this.queryRecommendationUsers(userId, [], false, 10, true);
+      recycled = users.length > 0;
+    }
+    const userCards = users.map((u) => this.formatUserCard(u, userId));
+    return { users: userCards, ...(recycled ? { recycled: true } : {}) };
+  }
+
+  /**
+   * 推荐候选用户查询（排除自己与已滑卡用户；可选应用筛选）
+   */
+  private async queryRecommendationUsers(
+    userId: string,
+    matchedUserIds: string[],
+    applyFilters: boolean,
+    take?: number,
+    randomOrder = false,
+  ): Promise<User[]> {
+    const qb = this.userRepository
       .createQueryBuilder('user')
       .where('user.id != :userId', { userId })
-      .andWhere('user.status = :status', { status: 'active' })
-      .orderBy('RAND()')
-      .limit(10)
-      .getMany();
+      .andWhere('user.status = :status', { status: 'active' });
 
-    const userCards = users.map((u) => this.formatUserCard(u, userId));
+    if (matchedUserIds.length > 0) {
+      qb.andWhere('user.id NOT IN (:...matchedUserIds)', { matchedUserIds });
+    }
 
-    return { users: userCards };
+    if (applyFilters) {
+      const current = await this.userRepository.findOne({
+        where: { id: userId },
+        select: ['filterSettings'],
+      });
+      const fs = (current?.filterSettings || {}) as {
+        ageRange?: { min?: number; max?: number };
+        education?: string[];
+        incomeRange?: { min?: string; max?: string };
+      };
+      const { ageRange, education, incomeRange } = fs;
+
+      const ageMin = ageRange?.min
+      const ageMax = ageRange?.max
+      if (
+        typeof ageMin === 'number' &&
+        typeof ageMax === 'number' &&
+        !Number.isNaN(ageMin) &&
+        !Number.isNaN(ageMax) &&
+        ageMin <= ageMax
+      ) {
+        qb.andWhere('user.age IS NOT NULL')
+          .andWhere('user.age >= :ageMin', { ageMin })
+          .andWhere('user.age <= :ageMax', { ageMax });
+      }
+
+      if (Array.isArray(education) && education.length > 0) {
+        qb.andWhere('user.education IN (:...educations)', {
+          educations: education,
+        });
+      }
+
+      if (
+        incomeRange != null &&
+        typeof incomeRange.min === 'string' &&
+        incomeRange.min.length > 0
+      ) {
+        qb.andWhere('user.income = :income', { income: incomeRange.min });
+      }
+    }
+
+    if (randomOrder) {
+      qb.orderBy('RAND()');
+    } else {
+      qb.orderBy('user.created_at', 'DESC');
+    }
+
+    if (take != null && take > 0) {
+      qb.take(take);
+    }
+
+    return qb.getMany();
   }
 
   /**
@@ -286,13 +349,14 @@ export class UsersService {
     // 计算星座
     const zodiacSign = this.getZodiacSign(month, day);
 
-    // 生成伪随机的 MBTI 和日柱（实际应根据更复杂的算法）
+    // 与前端 date.ts 一致的确定性趣味算法
+    const seed = year * 10000 + month * 100 + day;
     const mbtiTypes = ['INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP',
                        'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP'];
-    const mbti = mbtiTypes[Math.floor(Math.random() * mbtiTypes.length)];
+    const mbti = mbtiTypes[seed % mbtiTypes.length];
 
     const riyuanTypes = ['甲木', '乙木', '丙火', '丁火', '戊土', '己土', '庚金', '辛金', '壬水', '癸水'];
-    const riyuan = riyuanTypes[Math.floor(Math.random() * riyuanTypes.length)];
+    const riyuan = riyuanTypes[seed % riyuanTypes.length];
 
     return { zodiac, zodiacSign, mbti, riyuan };
   }

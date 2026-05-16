@@ -2,7 +2,7 @@
   <view class="page-container gradient-bg">
     <!-- 顶部导航 -->
     <view class="messages-header">
-      <view class="back-btn" @click="goBack">
+      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
         <text>‹</text>
       </view>
       <text class="title">消息</text>
@@ -47,14 +47,20 @@
 import { computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useMessagesStore } from '@/stores/messages'
+import { useUserStore } from '@/stores/user'
 import TabBar from '@/components/TabBar.vue'
+import { navigateBackTo } from '@/utils/navigation'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
 
-onShow(() => {
-  safeHideNativeTabBar()
-})
-
 const messagesStore = useMessagesStore()
+
+onShow(async () => {
+  safeHideNativeTabBar()
+  const userStore = useUserStore()
+  if (userStore.isLogin) {
+    await messagesStore.fetchConversations()
+  }
+})
 
 // 排序后的会话列表（置顶的在前）
 const sortedConversations = computed(() => {
@@ -74,14 +80,13 @@ function formatTime(timeStr: string): string {
 
 // 返回发现页
 function goBack() {
-  uni.switchTab({ url: '/pages/discover/index' })
+  navigateBackTo('/pages/discover/index')
 }
 
 // 进入聊天页
-function enterChat(conv: { id: string; userId: string; nickname: string; avatar: string }) {
-  // 设置当前会话并清除未读
-  messagesStore.setCurrentConversation(conv.id)
-  // 跳转到聊天页
+async function enterChat(conv: { id: string; userId: string; nickname: string; avatar: string }) {
+  await messagesStore.setCurrentConversation(conv.id)
+  await messagesStore.loadMessages(conv.id)
   uni.navigateTo({
     url: `/pages/messages/chat?conversationId=${conv.id}`,
   })

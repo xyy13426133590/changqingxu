@@ -6,7 +6,7 @@
         <view class="avatar-ripple-small">
           <image
             class="avatar-img"
-            :src="userStore.profile.avatar || headerAvatarFallback"
+            :src="headerAvatarSrc"
             mode="aspectFill"
           />
         </view>
@@ -44,14 +44,38 @@
             <image class="daily-avatar anim-avatar" :src="user.avatar" mode="aspectFill" />
             <text class="daily-name">{{ user.nickname }}</text>
           </view>
+          <view v-if="!pageLoading && dailyUsers.length === 0" class="daily-empty">
+            <text class="daily-empty-text">{{ dailyEmptyHint }}</text>
+          </view>
         </view>
       </scroll-view>
     </view>
 
     <!-- 用户卡片区域 -->
     <view class="card-container">
+      <view v-if="pageLoading" class="empty-card glass">
+        <text class="empty-title">加载中…</text>
+      </view>
+      <view v-else-if="!currentUser" class="empty-card glass">
+        <text class="empty-title">暂无推荐</text>
+        <text class="empty-desc">{{ emptyHint }}</text>
+        <view class="empty-actions">
+          <view
+            v-if="userStore.isLogin"
+            class="empty-btn primary"
+            @click="resetDiscoverSwipes"
+          >
+            重新浏览
+          </view>
+          <view class="empty-btn" :class="{ primary: !userStore.isLogin }" @click="reloadDiscover">
+            重新加载
+          </view>
+          <view v-if="!userStore.isLogin" class="empty-btn" @click="goLogin">去登录</view>
+          <view v-else class="empty-btn" @click="navigateToFilter">调整筛选</view>
+        </view>
+      </view>
       <view
-        v-if="currentUser"
+        v-else
         class="user-card glass"
         :style="cardStyle"
         @touchstart="handleTouchStart"
@@ -59,9 +83,8 @@
         @touchend="handleTouchEnd"
         @tap="handleCardTap"
       >
-        <!-- 喜欢/右滑：cx-heart「极光弧抛」；不喜欢/左滑：cx-pass「裂隙坍缩」 -->
-        <transition :name="cardTransitionName" mode="out-in" :appear="false">
-          <view v-if="currentUser" :key="currentUser.id" class="user-card-body">
+        <!-- 小程序 transition 易导致卡片内容不渲染，改用 key 切换 -->
+        <view v-if="currentUser" :key="currentUser.id" class="user-card-body">
         <!-- 照片区域 -->
         <view class="photo-area">
           <image
@@ -121,30 +144,30 @@
           </view>
           
           <view class="user-meta">
-            <text>{{ currentUser.age }}岁 · {{ currentUser.location }} · {{ currentUser.height }}cm</text>
+            <text>{{ currentUser.age }}岁 · {{ currentUser.location }} · {{ currentUser.height ?? '—' }}cm</text>
           </view>
           
           <!-- 标签区 -->
           <view class="tags-row">
-            <view class="tag-yellow zodiac-glow">
+            <view v-if="currentUser.zodiac" class="tag-yellow zodiac-glow">
               <text>{{ getZodiacEmoji(currentUser.zodiac) }} {{ currentUser.zodiac }}</text>
             </view>
-            <view class="tag-blue">
+            <view v-if="currentUser.zodiacSign" class="tag-blue">
               <text>{{ getZodiacSignEmoji(currentUser.zodiacSign) }} {{ currentUser.zodiacSign }}</text>
             </view>
-            <view class="tag-amber">
+            <view v-if="currentUser.riyuan" class="tag-amber">
               <text>{{ getRiyuanEmoji(currentUser.riyuan) }} {{ currentUser.riyuan }}</text>
             </view>
-            <view class="tag-purple tag-mbti">
+            <view v-if="currentUser.mbti" class="tag-purple tag-mbti">
               <text class="font-mono">{{ currentUser.mbti }}</text>
             </view>
-            <view class="tag-purple-light">
+            <view v-if="currentUser.education" class="tag-purple-light">
               <text>📚 {{ currentUser.education }}</text>
             </view>
-            <view class="tag-green">
+            <view v-if="currentUser.occupation" class="tag-green">
               <text>💼 {{ currentUser.occupation }}</text>
             </view>
-            <view class="tag-orange">
+            <view v-if="currentUser.income" class="tag-orange">
               <text>💰 {{ currentUser.income }}</text>
             </view>
           </view>
@@ -158,19 +181,18 @@
             <text>{{ currentUser.matchReason }} · 传统民俗趣味参考</text>
           </view>
         </view>
-          </view>
-        </transition>
+        </view>
       </view>
-      
-      <!-- 滑动提示 -->
-      <view class="swipe-hints">
+
+      <!-- 滑动提示（仅有推荐卡时显示） -->
+      <view v-if="currentUser && !pageLoading" class="swipe-hints">
         <text class="hint-left">← 不喜欢</text>
         <text class="hint-right">喜欢 →</text>
       </view>
     </view>
 
     <!-- 底部操作栏 -->
-    <view class="action-bar">
+    <view v-if="currentUser && !pageLoading" class="action-bar">
       <view class="action-btn dislike" @click="commitPass">
         <text class="btn-icon">✕</text>
       </view>
@@ -195,39 +217,107 @@ import { useDiscoverStore } from '@/stores/discover'
 import { useUserStore } from '@/stores/user'
 import { useMessagesStore } from '@/stores/messages'
 import TabBar from '@/components/TabBar.vue'
+import { getToken } from '@/services/api'
+import { isMpWeixinLocalhostApi, mpWeixinApiHint } from '@/utils/dev-api'
+import { resolveAvatar, DEMO_AVATARS } from '@/utils/avatar'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
-
-/** 与发现页卡片同源：直连演示图（小程序需在后台配置 download 合法域名 images.unsplash.com，或开发工具勾选不校验） */
-const headerAvatarFallback =
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop'
 
 const discoverStore = useDiscoverStore()
 const userStore = useUserStore()
 const messagesStore = useMessagesStore()
 
-/** 卡片大图：与 currentUser 同步；加载失败时降级本地图（避免域名未配时整块空白） */
-const CARD_AVATAR_PLACEHOLDER = '/static/avatars/placeholder.png'
-const cardAvatarSrc = ref('')
+const headerAvatarSrc = computed(() =>
+  resolveAvatar(userStore.profile.avatar, userStore.profile.id),
+)
+
+/** 卡片大图：与 currentUser 同步；加载失败时降级本地图 */
+const cardAvatarSrc = ref<string>(DEMO_AVATARS[0])
 
 const currentUser = computed(() => discoverStore.currentUser)
 
 watch(
   currentUser,
   (u) => {
-    cardAvatarSrc.value = u?.avatar || CARD_AVATAR_PLACEHOLDER
+    cardAvatarSrc.value = u?.avatar || resolveAvatar('', u?.id)
   },
   { immediate: true },
 )
 
 function onCardAvatarError() {
-  if (!cardAvatarSrc.value.includes('placeholder')) {
-    cardAvatarSrc.value = CARD_AVATAR_PLACEHOLDER
+  const u = currentUser.value
+  cardAvatarSrc.value = resolveAvatar('', u?.id)
+}
+
+function onDailyAvatarError(userId: string) {
+  const u = dailyUsers.value.find((x) => x.id === userId)
+  if (u) {
+    u.avatar = resolveAvatar('', userId)
   }
 }
 const dailyUsers = computed(() => discoverStore.dailyRecommendations)
+const pageLoading = ref(false)
 
-/** 与 <transition :name> 对应：cx-heart 喜欢 | cx-pass 不喜欢 */
-const cardTransitionName = ref<'cx-heart' | 'cx-pass'>('cx-heart')
+const dailyEmptyHint = computed(() => {
+  if (!getToken()) return '登录后查看每日推荐'
+  if (discoverStore.loadError) return '加载失败，请点重新加载'
+  return '暂无推荐，可点下方重新浏览'
+})
+
+const emptyHint = computed(() => {
+  if (isMpWeixinLocalhostApi()) {
+    return mpWeixinApiHint()
+  }
+  if (!userStore.isLogin && !getToken()) {
+    return '登录后可查看推荐用户；本地可先执行后端 seed:dev 写入演示账号。'
+  }
+  if (discoverStore.loadError) {
+    return discoverStore.loadError
+  }
+  if (discoverStore.recommendationsRecycled) {
+    return '本地演示账号较少，你已滑完一轮；系统已重新展示推荐。继续滑卡会再次看完，可点「重新浏览」清空记录。'
+  }
+  if (userStore.isLogin) {
+    return '已看完当前推荐，或筛选过严。可点「重新浏览」清空滑卡记录，或放宽筛选条件。'
+  }
+  return '库里暂无其他用户。请先登录，或运行 pnpm run seed:dev 写入演示数据。'
+})
+
+async function reloadDiscover() {
+  if (isMpWeixinLocalhostApi()) {
+    uni.showModal({
+      title: '接口地址',
+      content: mpWeixinApiHint(),
+      showCancel: false,
+    })
+    return
+  }
+  await loadDiscoverIfAuthed()
+  if (hasAuthSession() && !discoverStore.currentUser) {
+    uni.showToast({ title: '仍无推荐，请检查后端与数据库', icon: 'none' })
+  }
+}
+
+async function resetDiscoverSwipes() {
+  if (!getToken()) {
+    goLogin()
+    return
+  }
+  pageLoading.value = true
+  try {
+    const ok = await discoverStore.resetAndReloadDiscover()
+    if (ok) {
+      uni.showToast({ title: '已恢复推荐', icon: 'success' })
+    } else {
+      uni.showToast({ title: '仍无推荐，请检查后端或 seed 数据', icon: 'none' })
+    }
+  } finally {
+    pageLoading.value = false
+  }
+}
+
+function goLogin() {
+  uni.navigateTo({ url: '/pages/auth/login' })
+}
 
 // 触摸滑动相关
 const touchStartX = ref(0)
@@ -374,25 +464,44 @@ function resetCard() {
 /** 右滑 / 星标：极光弧抛 — 向右上旋出 + 饱和拉高；新卡自左下带回弹入 */
 function commitLike() {
   if (!currentUser.value) return
-  cardTransitionName.value = 'cx-heart'
   discoverStore.likeUser(currentUser.value.id)
 }
 
 /** 左滑 / X：裂隙坍缩 — 左下角铰链旋入暗部 + 灰阶；新卡自「亮缝」收缩浮现 */
 function commitPass() {
   if (!currentUser.value) return
-  cardTransitionName.value = 'cx-pass'
   discoverStore.dislikeUser(currentUser.value.id)
 }
 
-function handleGreeting() {
-  if (currentUser.value) {
-    const convId = messagesStore.createConversation(
-      currentUser.value.id,
-      currentUser.value.nickname,
-      currentUser.value.avatar
+async function handleGreeting() {
+  const peer = currentUser.value
+  if (!peer?.id) {
+    uni.showToast({ title: '用户信息异常，请刷新推荐', icon: 'none' })
+    return
+  }
+  if (!userStore.isLogin) {
+    uni.navigateTo({ url: '/pages/auth/welcome' })
+    return
+  }
+  uni.showLoading({ mask: true, title: '准备聊天…' })
+  try {
+    const convId = await messagesStore.createConversation(
+      peer.id,
+      peer.nickname,
+      peer.avatar,
     )
+    if (!convId) {
+      uni.showToast({ title: '创建会话失败', icon: 'none' })
+      return
+    }
+    await messagesStore.setCurrentConversation(convId)
+    await messagesStore.loadMessages(convId)
     uni.navigateTo({ url: `/pages/messages/chat?conversationId=${convId}` })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : '创建会话失败'
+    uni.showToast({ title: msg, icon: 'none' })
+  } finally {
+    uni.hideLoading()
   }
 }
 
@@ -418,14 +527,49 @@ function hideNativeTabBar() {
   safeHideNativeTabBar()
 }
 
-onShow(() => {
+function hasAuthSession(): boolean {
+  return !!(getToken() || userStore.token || userStore.isLogin)
+}
+
+async function loadDiscoverIfAuthed() {
+  if (!hasAuthSession()) {
+    discoverStore.clearDiscoverData()
+    return
+  }
+  pageLoading.value = true
+  try {
+    discoverStore.repairFiltersState()
+    await discoverStore.loadDiscoverPage()
+    if (!discoverStore.currentUser && discoverStore.users.length === 0) {
+      await discoverStore.resetAndReloadDiscover()
+    }
+    void userStore.hydrateProfile()
+  } finally {
+    pageLoading.value = false
+  }
+}
+
+watch(
+  () => userStore.isLogin,
+  (loggedIn) => {
+    if (loggedIn && hasAuthSession()) {
+      void loadDiscoverIfAuthed()
+    }
+  },
+)
+
+onShow(async () => {
   hideNativeTabBar()
   nextTick(hideNativeTabBar)
+  if (isMpWeixinLocalhostApi()) {
+    uni.showToast({ title: '请配置局域网 API 地址', icon: 'none', duration: 3000 })
+  }
+  await loadDiscoverIfAuthed()
 })
 
 onMounted(() => {
   hideNativeTabBar()
-  discoverStore.generateDailyRecommendations()
+  void loadDiscoverIfAuthed()
 })
 </script>
 
@@ -434,5 +578,71 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.empty-card {
+  margin: 24rpx;
+  padding: 48rpx 32rpx;
+  border-radius: 24rpx;
+  text-align: center;
+}
+
+.empty-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 32rpx;
+}
+
+.empty-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  align-items: center;
+}
+
+.empty-btn {
+  padding: 20rpx 48rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  color: #4b5563;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.empty-btn.primary {
+  color: #fff;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+}
+
+.daily-empty {
+  display: inline-flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  min-width: 280rpx;
+}
+
+.daily-empty-text {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+/* 小程序：保证卡片内容区有高度，避免只显示空玻璃框 */
+.user-card-body {
+  min-height: 520rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-area {
+  min-height: 360rpx;
 }
 </style>

@@ -1,6 +1,8 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const services_auth = require("../services/auth.js");
+const services_apiAuth = require("../services/api-auth.js");
+const services_apiUser = require("../services/api-user.js");
+const services_api = require("../services/api.js");
 const utils_avatar = require("../utils/avatar.js");
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
@@ -41,30 +43,40 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-const MOCK_DEFAULT_AVATAR = utils_avatar.avatarUrl();
-function profileFromMockUser(user) {
+function mapApiUserToProfile(p) {
+  var _a;
+  const gender = p.gender === "male" || p.gender === "female" ? p.gender : "";
+  let vipExpiry;
+  if (p.vipExpiry != null) {
+    vipExpiry = typeof p.vipExpiry === "string" ? p.vipExpiry : new Date(p.vipExpiry).toISOString();
+  }
   return {
-    id: user.id,
-    nickname: user.nickname,
-    avatar: MOCK_DEFAULT_AVATAR,
-    gender: "female",
-    birthday: "",
-    age: 26,
-    hometown: "北京",
-    location: "北京朝阳区",
-    zodiac: "兔",
-    zodiacSign: "天秤座",
-    mbti: "INFP",
-    riyuan: "甲木",
-    education: "本科",
-    occupation: "产品经理",
-    jobLevel: "中级",
-    income: "10万-20万",
-    bio: "认真生活，期待遇见同频的你～",
-    hobbies: [],
-    isRealName: false,
-    isFaceVerified: false,
-    isVip: false
+    id: p.id,
+    nickname: p.nickname,
+    avatar: utils_avatar.resolveAvatar(p.avatar, p.id),
+    gender,
+    birthday: (_a = p.birthday) != null ? _a : void 0,
+    hometown: p.hometown || "",
+    location: p.location || "",
+    age: p.age,
+    height: p.height,
+    weight: p.weight,
+    zodiac: p.zodiac || "",
+    zodiacSign: p.zodiacSign || "",
+    mbti: p.mbti || "",
+    riyuan: p.riyuan || "",
+    education: p.education || "",
+    school: p.school,
+    schoolTier: p.schoolTier,
+    occupation: p.occupation || "",
+    jobLevel: p.jobLevel || "",
+    company: p.company,
+    bio: p.bio || "",
+    hobbies: p.hobbies || [],
+    isRealName: !!p.isRealName,
+    isFaceVerified: !!p.isFaceVerified,
+    isVip: !!p.isVip,
+    vipExpiry
   };
 }
 function maskIdCard(id) {
@@ -77,26 +89,11 @@ const useUserStore = common_vendor.defineStore("user", () => {
   const token = common_vendor.ref("");
   const isLogin = common_vendor.ref(false);
   const realNameDraft = common_vendor.ref(null);
-  const profile = common_vendor.ref({
-    nickname: "小雨",
-    avatar: utils_avatar.avatarUrl(),
-    zodiac: "兔",
-    zodiacSign: "天秤座",
-    mbti: "INFP",
-    riyuan: "甲木",
-    age: 26,
-    location: "北京朝阳区",
-    height: 162,
-    education: "本科",
-    occupation: "产品经理",
-    income: "20万-30万",
-    isRealName: true,
-    isVip: true
-  });
+  const profile = common_vendor.ref({});
   const dailyGreetings = common_vendor.ref(3);
   const maxDailyGreetings = common_vendor.ref(3);
   const remainingGreetings = common_vendor.computed(() => dailyGreetings.value);
-  const canGreet = common_vendor.computed(() => dailyGreetings.value > 0 || profile.value.isVip);
+  const canGreet = common_vendor.computed(() => dailyGreetings.value > 0 || !!profile.value.isVip);
   const vipStatus = common_vendor.computed(() => {
     if (!profile.value.isVip)
       return "none";
@@ -107,6 +104,7 @@ const useUserStore = common_vendor.defineStore("user", () => {
     if (savedToken) {
       token.value = savedToken;
       isLogin.value = true;
+      void hydrateProfile();
     } else {
       token.value = "";
       isLogin.value = false;
@@ -114,22 +112,84 @@ const useUserStore = common_vendor.defineStore("user", () => {
     }
     resetDailyGreetings();
   }
+  function hydrateProfile() {
+    return __async(this, null, function* () {
+      const t = services_api.getToken() || token.value || common_vendor.index.getStorageSync("token");
+      if (!t)
+        return false;
+      try {
+        const me = yield services_apiUser.apiGetMe();
+        profile.value = __spreadValues(__spreadValues({}, profile.value), mapApiUserToProfile(me));
+        isLogin.value = true;
+        token.value = t;
+        return true;
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "";
+        if (msg.includes("401") || msg.includes("未授权") || msg.includes("Unauthorized") || msg.includes("登录已过期")) {
+          logout();
+        }
+        return false;
+      }
+    });
+  }
   function loginByPhone(phone, password) {
     return __async(this, null, function* () {
-      const { token: t, user } = yield services_auth.authLogin({ phone, password });
-      setLogin(t, profileFromMockUser(user));
+      yield services_apiAuth.apiLogin({ phone, password });
+      const me = yield services_apiUser.apiGetMe();
+      const access = services_api.getToken();
+      if (!access)
+        throw new Error("登录态异常");
+      setLogin(access, mapApiUserToProfile(me));
     });
   }
   function loginBySms(phone, code) {
     return __async(this, null, function* () {
-      const { token: t, user } = yield services_auth.authLoginBySms(phone, code);
-      setLogin(t, profileFromMockUser(user));
+      const auth = yield services_apiAuth.apiSmsLogin({ phone, code });
+      const access = services_api.getToken();
+      if (!access)
+        throw new Error("登录态异常");
+      try {
+        const me = yield services_apiUser.apiGetMe();
+        setLogin(access, mapApiUserToProfile(me));
+      } catch (e) {
+        setLogin(access, {
+          id: auth.user.id,
+          nickname: auth.user.nickname || `用户${phone.slice(-4)}`,
+          avatar: utils_avatar.resolveAvatar(auth.user.avatar, auth.user.id),
+          gender: "",
+          hometown: "",
+          location: "",
+          zodiac: "",
+          zodiacSign: "",
+          mbti: "",
+          riyuan: "",
+          education: "",
+          occupation: "",
+          jobLevel: "",
+          income: "",
+          bio: "",
+          hobbies: [],
+          isRealName: !!auth.user.isRealName,
+          isFaceVerified: !!auth.user.isFaceVerified,
+          isVip: !!auth.user.isVip
+        });
+      }
     });
   }
   function loginByWeChat() {
     return __async(this, null, function* () {
-      const { token: t, user } = yield services_auth.authLoginWechatMock();
-      setLogin(t, profileFromMockUser(user));
+      let code;
+      const loginRes = yield common_vendor.index.login({ provider: "weixin" });
+      code = loginRes.code;
+      if (!code) {
+        throw new Error("请在微信小程序中使用微信登录，或使用手机号登录");
+      }
+      yield services_apiAuth.apiWechatLogin({ code });
+      const me = yield services_apiUser.apiGetMe();
+      const access = services_api.getToken();
+      if (!access)
+        throw new Error("登录态异常");
+      setLogin(access, mapApiUserToProfile(me));
     });
   }
   function setRealNameDraft(payload) {
@@ -157,8 +217,12 @@ const useUserStore = common_vendor.defineStore("user", () => {
   }
   function registerByPhone(phone, password, nickname) {
     return __async(this, null, function* () {
-      const { token: t, user } = yield services_auth.authRegister({ phone, password, nickname });
-      setLogin(t, profileFromMockUser(user));
+      yield services_apiAuth.apiRegister({ phone, password, nickname });
+      const me = yield services_apiUser.apiGetMe();
+      const access = services_api.getToken();
+      if (!access)
+        throw new Error("登录态异常");
+      setLogin(access, mapApiUserToProfile(me));
     });
   }
   function resetDailyGreetings() {
@@ -185,16 +249,17 @@ const useUserStore = common_vendor.defineStore("user", () => {
     common_vendor.index.setStorageSync("token", userToken);
   }
   function logout() {
+    services_api.clearToken();
     token.value = "";
     isLogin.value = false;
     profile.value = {};
     realNameDraft.value = null;
-    common_vendor.index.removeStorageSync("token");
+    useDiscoverStore().clearDiscoverData();
   }
   function updateProfile(data) {
     profile.value = __spreadValues(__spreadValues({}, profile.value), data);
   }
-  function upgradeVip(planId, expiryDate) {
+  function upgradeVip(_planId, expiryDate) {
     profile.value.isVip = true;
     profile.value.vipExpiry = expiryDate;
   }
@@ -207,6 +272,7 @@ const useUserStore = common_vendor.defineStore("user", () => {
     canGreet,
     vipStatus,
     init,
+    hydrateProfile,
     resetDailyGreetings,
     useGreeting,
     setLogin,

@@ -8,12 +8,14 @@ import { Conversation } from '../../database/entities/conversation.entity';
 import { User } from '../../database/entities/user.entity';
 import { ConversationsModule } from '../conversations/conversations.module';
 import { UsersModule } from '../users/users.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Message, Conversation, User]),
     ConversationsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [MessagesController],
   providers: [MessagesService, MessagesGateway],

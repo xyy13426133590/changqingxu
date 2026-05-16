@@ -8,6 +8,24 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+/** class-validator / Nest 校验错误常为 string[]，合并为单条可读文案 */
+function normalizeErrorMessage(raw: unknown, fallback: string): string {
+  if (raw == null) return fallback;
+  if (typeof raw === 'string') return raw;
+  if (Array.isArray(raw)) {
+    return raw
+      .map((item) =>
+        typeof item === 'string' ? item : JSON.stringify(item),
+      )
+      .filter(Boolean)
+      .join('; ');
+  }
+  if (typeof raw === 'object') {
+    return JSON.stringify(raw);
+  }
+  return String(raw);
+}
+
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
@@ -23,9 +41,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
-      const exceptionResponse = exception.getResponse() as any;
-      message = exceptionResponse.message || exception.message;
-      code = exceptionResponse.code || 'HTTP_ERROR';
+      const exceptionResponse = exception.getResponse();
+      if (typeof exceptionResponse === 'string') {
+        message = exceptionResponse;
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
+        const body = exceptionResponse as Record<string, unknown>;
+        message = normalizeErrorMessage(body.message, exception.message);
+        if (body.code != null && typeof body.code === 'string') {
+          code = body.code;
+        } else {
+          code = 'HTTP_ERROR';
+        }
+      } else {
+        message = exception.message;
+      }
+    } else if (exception instanceof Error) {
+      message = exception.message;
     }
 
     // 记录错误日志

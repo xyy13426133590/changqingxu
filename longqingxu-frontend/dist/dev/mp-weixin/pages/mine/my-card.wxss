@@ -6,3 +6,12 @@
 .back-btn.data-v-985ac3ab {
   margin-right: 72rpx;
 }
+.info-detail--meta.data-v-985ac3ab {
+  margin-bottom: 8rpx;
+}
+.info-detail--meta text.data-v-985ac3ab {
+  display: block;
+  font-size: 24rpx;
+  line-height: 1.45;
+  word-break: break-all;
+}

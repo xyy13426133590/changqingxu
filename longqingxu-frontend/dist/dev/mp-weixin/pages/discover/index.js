@@ -3,39 +3,121 @@ const common_vendor = require("../../common/vendor.js");
 const stores_discover = require("../../stores/discover.js");
 const stores_user = require("../../stores/user.js");
 const stores_messages = require("../../stores/messages.js");
+const services_api = require("../../services/api.js");
+const utils_devApi = require("../../utils/dev-api.js");
+const utils_avatar = require("../../utils/avatar.js");
 const utils_tabbar = require("../../utils/tabbar.js");
-if (!Array) {
-  const _component_transition = common_vendor.resolveComponent("transition");
-  _component_transition();
-}
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
 if (!Math) {
   TabBar();
 }
 const TabBar = () => "../../components/TabBar.js";
-const headerAvatarFallback = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop";
-const CARD_AVATAR_PLACEHOLDER = "/static/avatars/placeholder.png";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
     const discoverStore = stores_discover.useDiscoverStore();
     const userStore = stores_user.useUserStore();
     const messagesStore = stores_messages.useMessagesStore();
-    const cardAvatarSrc = common_vendor.ref("");
+    const headerAvatarSrc = common_vendor.computed(
+      () => utils_avatar.resolveAvatar(userStore.profile.avatar, userStore.profile.id)
+    );
+    const cardAvatarSrc = common_vendor.ref(utils_avatar.DEMO_AVATARS[0]);
     const currentUser = common_vendor.computed(() => discoverStore.currentUser);
     common_vendor.watch(
       currentUser,
       (u) => {
-        cardAvatarSrc.value = (u == null ? void 0 : u.avatar) || CARD_AVATAR_PLACEHOLDER;
+        cardAvatarSrc.value = (u == null ? void 0 : u.avatar) || utils_avatar.resolveAvatar("", u == null ? void 0 : u.id);
       },
       { immediate: true }
     );
     function onCardAvatarError() {
-      if (!cardAvatarSrc.value.includes("placeholder")) {
-        cardAvatarSrc.value = CARD_AVATAR_PLACEHOLDER;
-      }
+      const u = currentUser.value;
+      cardAvatarSrc.value = utils_avatar.resolveAvatar("", u == null ? void 0 : u.id);
     }
     const dailyUsers = common_vendor.computed(() => discoverStore.dailyRecommendations);
-    const cardTransitionName = common_vendor.ref("cx-heart");
+    const pageLoading = common_vendor.ref(false);
+    const dailyEmptyHint = common_vendor.computed(() => {
+      if (!services_api.getToken())
+        return "登录后查看每日推荐";
+      if (discoverStore.loadError)
+        return "加载失败，请点重新加载";
+      return "暂无推荐，可点下方重新浏览";
+    });
+    const emptyHint = common_vendor.computed(() => {
+      if (utils_devApi.isMpWeixinLocalhostApi()) {
+        return utils_devApi.mpWeixinApiHint();
+      }
+      if (!userStore.isLogin && !services_api.getToken()) {
+        return "登录后可查看推荐用户；本地可先执行后端 seed:dev 写入演示账号。";
+      }
+      if (discoverStore.loadError) {
+        return discoverStore.loadError;
+      }
+      if (discoverStore.recommendationsRecycled) {
+        return "本地演示账号较少，你已滑完一轮；系统已重新展示推荐。继续滑卡会再次看完，可点「重新浏览」清空记录。";
+      }
+      if (userStore.isLogin) {
+        return "已看完当前推荐，或筛选过严。可点「重新浏览」清空滑卡记录，或放宽筛选条件。";
+      }
+      return "库里暂无其他用户。请先登录，或运行 pnpm run seed:dev 写入演示数据。";
+    });
+    function reloadDiscover() {
+      return __async(this, null, function* () {
+        if (utils_devApi.isMpWeixinLocalhostApi()) {
+          common_vendor.index.showModal({
+            title: "接口地址",
+            content: utils_devApi.mpWeixinApiHint(),
+            showCancel: false
+          });
+          return;
+        }
+        yield loadDiscoverIfAuthed();
+        if (hasAuthSession() && !discoverStore.currentUser) {
+          common_vendor.index.showToast({ title: "仍无推荐，请检查后端与数据库", icon: "none" });
+        }
+      });
+    }
+    function resetDiscoverSwipes() {
+      return __async(this, null, function* () {
+        if (!services_api.getToken()) {
+          goLogin();
+          return;
+        }
+        pageLoading.value = true;
+        try {
+          const ok = yield discoverStore.resetAndReloadDiscover();
+          if (ok) {
+            common_vendor.index.showToast({ title: "已恢复推荐", icon: "success" });
+          } else {
+            common_vendor.index.showToast({ title: "仍无推荐，请检查后端或 seed 数据", icon: "none" });
+          }
+        } finally {
+          pageLoading.value = false;
+        }
+      });
+    }
+    function goLogin() {
+      common_vendor.index.navigateTo({ url: "/pages/auth/login" });
+    }
     const touchStartX = common_vendor.ref(0);
     const touchStartY = common_vendor.ref(0);
     const touchEndX = common_vendor.ref(0);
@@ -170,24 +252,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function commitLike() {
       if (!currentUser.value)
         return;
-      cardTransitionName.value = "cx-heart";
       discoverStore.likeUser(currentUser.value.id);
     }
     function commitPass() {
       if (!currentUser.value)
         return;
-      cardTransitionName.value = "cx-pass";
       discoverStore.dislikeUser(currentUser.value.id);
     }
     function handleGreeting() {
-      if (currentUser.value) {
-        const convId = messagesStore.createConversation(
-          currentUser.value.id,
-          currentUser.value.nickname,
-          currentUser.value.avatar
-        );
-        common_vendor.index.navigateTo({ url: `/pages/messages/chat?conversationId=${convId}` });
-      }
+      return __async(this, null, function* () {
+        const peer = currentUser.value;
+        if (!(peer == null ? void 0 : peer.id)) {
+          common_vendor.index.showToast({ title: "用户信息异常，请刷新推荐", icon: "none" });
+          return;
+        }
+        if (!userStore.isLogin) {
+          common_vendor.index.navigateTo({ url: "/pages/auth/welcome" });
+          return;
+        }
+        common_vendor.index.showLoading({ mask: true, title: "准备聊天…" });
+        try {
+          const convId = yield messagesStore.createConversation(
+            peer.id,
+            peer.nickname,
+            peer.avatar
+          );
+          if (!convId) {
+            common_vendor.index.showToast({ title: "创建会话失败", icon: "none" });
+            return;
+          }
+          yield messagesStore.setCurrentConversation(convId);
+          yield messagesStore.loadMessages(convId);
+          common_vendor.index.navigateTo({ url: `/pages/messages/chat?conversationId=${convId}` });
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "创建会话失败";
+          common_vendor.index.showToast({ title: msg, icon: "none" });
+        } finally {
+          common_vendor.index.hideLoading();
+        }
+      });
     }
     function navigateToFilter() {
       common_vendor.index.switchTab({ url: "/pages/filter/index" });
@@ -204,23 +307,58 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function hideNativeTabBar() {
       utils_tabbar.safeHideNativeTabBar();
     }
-    common_vendor.onShow(() => {
+    function hasAuthSession() {
+      return !!(services_api.getToken() || userStore.token || userStore.isLogin);
+    }
+    function loadDiscoverIfAuthed() {
+      return __async(this, null, function* () {
+        if (!hasAuthSession()) {
+          discoverStore.clearDiscoverData();
+          return;
+        }
+        pageLoading.value = true;
+        try {
+          discoverStore.repairFiltersState();
+          yield discoverStore.loadDiscoverPage();
+          if (!discoverStore.currentUser && discoverStore.users.length === 0) {
+            yield discoverStore.resetAndReloadDiscover();
+          }
+          void userStore.hydrateProfile();
+        } finally {
+          pageLoading.value = false;
+        }
+      });
+    }
+    common_vendor.watch(
+      () => userStore.isLogin,
+      (loggedIn) => {
+        if (loggedIn && hasAuthSession()) {
+          void loadDiscoverIfAuthed();
+        }
+      }
+    );
+    common_vendor.onShow(() => __async(this, null, function* () {
       hideNativeTabBar();
       common_vendor.nextTick$1(hideNativeTabBar);
-    });
+      if (utils_devApi.isMpWeixinLocalhostApi()) {
+        common_vendor.index.showToast({ title: "请配置局域网 API 地址", icon: "none", duration: 3e3 });
+      }
+      yield loadDiscoverIfAuthed();
+    }));
     common_vendor.onMounted(() => {
       hideNativeTabBar();
-      discoverStore.generateDailyRecommendations();
+      void loadDiscoverIfAuthed();
     });
     return (_ctx, _cache) => {
+      var _a;
       return common_vendor.e({
-        a: common_vendor.unref(userStore).profile.avatar || headerAvatarFallback,
-        b: common_vendor.o(navigateToFilter, "d8"),
+        a: headerAvatarSrc.value,
+        b: common_vendor.o(navigateToFilter, "1b"),
         c: common_vendor.unref(messagesStore).totalUnread > 0
       }, common_vendor.unref(messagesStore).totalUnread > 0 ? {
         d: common_vendor.t(common_vendor.unref(messagesStore).totalUnread > 99 ? "99+" : common_vendor.unref(messagesStore).totalUnread)
       } : {}, {
-        e: common_vendor.o(navigateToMessages, "ae"),
+        e: common_vendor.o(navigateToMessages, "66"),
         f: common_vendor.f(dailyUsers.value, (user, k0, i0) => {
           return {
             a: user.avatar,
@@ -229,57 +367,96 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => navigateToUserDetail(user.id), user.id)
           };
         }),
-        g: currentUser.value
+        g: !pageLoading.value && dailyUsers.value.length === 0
+      }, !pageLoading.value && dailyUsers.value.length === 0 ? {
+        h: common_vendor.t(dailyEmptyHint.value)
+      } : {}, {
+        i: pageLoading.value
+      }, pageLoading.value ? {} : !currentUser.value ? common_vendor.e({
+        k: common_vendor.t(emptyHint.value),
+        l: common_vendor.unref(userStore).isLogin
+      }, common_vendor.unref(userStore).isLogin ? {
+        m: common_vendor.o(resetDiscoverSwipes, "54")
+      } : {}, {
+        n: !common_vendor.unref(userStore).isLogin ? 1 : "",
+        o: common_vendor.o(reloadDiscover, "6e"),
+        p: !common_vendor.unref(userStore).isLogin
+      }, !common_vendor.unref(userStore).isLogin ? {
+        q: common_vendor.o(goLogin, "a1")
+      } : {
+        r: common_vendor.o(navigateToFilter, "f6")
+      }) : common_vendor.e({
+        s: currentUser.value
       }, currentUser.value ? common_vendor.e({
-        h: currentUser.value
-      }, currentUser.value ? common_vendor.e({
-        i: cardAvatarSrc.value,
-        j: common_vendor.o(onCardAvatarError, "b7"),
-        k: likeOverlayOpacity.value,
-        l: passOverlayOpacity.value,
-        m: currentUser.value.isRealName
+        t: cardAvatarSrc.value,
+        v: common_vendor.o(onCardAvatarError, "ae"),
+        w: likeOverlayOpacity.value,
+        x: passOverlayOpacity.value,
+        y: currentUser.value.isRealName
       }, currentUser.value.isRealName ? {} : {}, {
-        n: currentUser.value.isVip
+        z: currentUser.value.isVip
       }, currentUser.value.isVip ? {} : {}, {
-        o: common_vendor.o(($event) => openReportFlow("home"), "c4"),
-        p: common_vendor.t(currentUser.value.nickname),
-        q: common_vendor.t(currentUser.value.gender === "female" ? "♀" : "♂"),
-        r: common_vendor.n(currentUser.value.gender),
-        s: common_vendor.t(currentUser.value.matchReason),
-        t: common_vendor.t(currentUser.value.matchTagline),
-        v: common_vendor.t(currentUser.value.matchScore),
-        w: common_vendor.t(currentUser.value.age),
-        x: common_vendor.t(currentUser.value.location),
-        y: common_vendor.t(currentUser.value.height),
-        z: common_vendor.t(getZodiacEmoji(currentUser.value.zodiac)),
-        A: common_vendor.t(currentUser.value.zodiac),
-        B: common_vendor.t(getZodiacSignEmoji(currentUser.value.zodiacSign)),
-        C: common_vendor.t(currentUser.value.zodiacSign),
-        D: common_vendor.t(getRiyuanEmoji(currentUser.value.riyuan)),
-        E: common_vendor.t(currentUser.value.riyuan),
-        F: common_vendor.t(currentUser.value.mbti),
-        G: common_vendor.t(currentUser.value.education),
-        H: common_vendor.t(currentUser.value.occupation),
-        I: common_vendor.t(currentUser.value.income),
-        J: common_vendor.t(currentUser.value.bio),
-        K: common_vendor.t(currentUser.value.matchReason),
-        L: currentUser.value.id
+        A: common_vendor.o(($event) => openReportFlow("home"), "35"),
+        B: common_vendor.t(currentUser.value.nickname),
+        C: common_vendor.t(currentUser.value.gender === "female" ? "♀" : "♂"),
+        D: common_vendor.n(currentUser.value.gender),
+        E: common_vendor.t(currentUser.value.matchReason),
+        F: common_vendor.t(currentUser.value.matchTagline),
+        G: common_vendor.t(currentUser.value.matchScore),
+        H: common_vendor.t(currentUser.value.age),
+        I: common_vendor.t(currentUser.value.location),
+        J: common_vendor.t((_a = currentUser.value.height) != null ? _a : "—"),
+        K: currentUser.value.zodiac
+      }, currentUser.value.zodiac ? {
+        L: common_vendor.t(getZodiacEmoji(currentUser.value.zodiac)),
+        M: common_vendor.t(currentUser.value.zodiac)
+      } : {}, {
+        N: currentUser.value.zodiacSign
+      }, currentUser.value.zodiacSign ? {
+        O: common_vendor.t(getZodiacSignEmoji(currentUser.value.zodiacSign)),
+        P: common_vendor.t(currentUser.value.zodiacSign)
+      } : {}, {
+        Q: currentUser.value.riyuan
+      }, currentUser.value.riyuan ? {
+        R: common_vendor.t(getRiyuanEmoji(currentUser.value.riyuan)),
+        S: common_vendor.t(currentUser.value.riyuan)
+      } : {}, {
+        T: currentUser.value.mbti
+      }, currentUser.value.mbti ? {
+        U: common_vendor.t(currentUser.value.mbti)
+      } : {}, {
+        V: currentUser.value.education
+      }, currentUser.value.education ? {
+        W: common_vendor.t(currentUser.value.education)
+      } : {}, {
+        X: currentUser.value.occupation
+      }, currentUser.value.occupation ? {
+        Y: common_vendor.t(currentUser.value.occupation)
+      } : {}, {
+        Z: currentUser.value.income
+      }, currentUser.value.income ? {
+        aa: common_vendor.t(currentUser.value.income)
+      } : {}, {
+        ab: common_vendor.t(currentUser.value.bio),
+        ac: common_vendor.t(currentUser.value.matchReason),
+        ad: currentUser.value.id
       }) : {}, {
-        M: common_vendor.p({
-          name: cardTransitionName.value,
-          mode: "out-in",
-          appear: false
-        }),
-        N: common_vendor.s(cardStyle.value),
-        O: common_vendor.o(handleTouchStart, "c9"),
-        P: common_vendor.o(handleTouchMove, "ac"),
-        Q: common_vendor.o(handleTouchEnd, "a9"),
-        R: common_vendor.o(handleCardTap, "4f")
-      }) : {}, {
-        S: common_vendor.o(commitPass, "cd"),
-        T: common_vendor.o(handleGreeting, "d3"),
-        U: common_vendor.o(commitLike, "5c"),
-        V: common_vendor.p({
+        ae: common_vendor.s(cardStyle.value),
+        af: common_vendor.o(handleTouchStart, "4e"),
+        ag: common_vendor.o(handleTouchMove, "9a"),
+        ah: common_vendor.o(handleTouchEnd, "8f"),
+        ai: common_vendor.o(handleCardTap, "33")
+      }), {
+        j: !currentUser.value,
+        aj: currentUser.value && !pageLoading.value
+      }, currentUser.value && !pageLoading.value ? {} : {}, {
+        ak: currentUser.value && !pageLoading.value
+      }, currentUser.value && !pageLoading.value ? {
+        al: common_vendor.o(commitPass, "a5"),
+        am: common_vendor.o(handleGreeting, "16"),
+        an: common_vendor.o(commitLike, "a3")
+      } : {}, {
+        ao: common_vendor.p({
           active: "discover"
         })
       });

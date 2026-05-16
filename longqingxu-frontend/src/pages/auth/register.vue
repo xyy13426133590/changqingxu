@@ -1,7 +1,9 @@
 <template>
   <view class="page-container gradient-bg auth-page">
-    <view class="auth-nav glass-row" @click="goBack">
-      <text class="auth-nav-back">‹</text>
+    <view class="auth-nav glass-row">
+      <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
+        <text class="auth-nav-back">‹</text>
+      </view>
       <text class="auth-nav-title">注册</text>
       <view class="auth-nav-placeholder" />
     </view>
@@ -64,6 +66,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import AuthSafetyTips from '@/components/AuthSafetyTips.vue'
 import { useUserStore } from '@/stores/user'
 import { validatePhone, validatePassword } from '@/services/auth'
+import { navigateBackTo } from '@/utils/navigation'
 
 const userStore = useUserStore()
 const phone = ref('')
@@ -85,7 +88,7 @@ const agreed = ref(true)
 const loading = ref(false)
 
 function goBack() {
-  uni.navigateBack({ fail: () => uni.redirectTo({ url: '/pages/auth/welcome' }) })
+  navigateBackTo('/pages/auth/welcome')
 }
 
 function goLogin() {
@@ -151,11 +154,18 @@ async function submit() {
   backdrop-filter: blur(16px);
 }
 
+.auth-nav-back-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .auth-nav-back {
   font-size: 44rpx;
   color: #4b5563;
   font-weight: 300;
-  width: 72rpx;
 }
 
 .auth-nav-title {

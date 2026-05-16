@@ -1,5 +1,8 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+const services_apiUser = require("../services/api-user.js");
+const services_apiMatch = require("../services/api-match.js");
+const utils_avatar = require("../utils/avatar.js");
 var __defProp = Object.defineProperty;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
@@ -15,6 +18,26 @@ var __spreadValues = (a, b) => {
         __defNormalProp(a, prop, b[prop]);
     }
   return a;
+};
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
 };
 const EDUCATION_FILTER_VALUES = [
   "大专及以下",
@@ -59,156 +82,82 @@ function normalizeIncomeFilter(income) {
   }
   return DEFAULT_INCOME;
 }
-function makeUser(p) {
-  return __spreadValues({
-    age: 26,
-    gender: "female",
-    location: "北京",
-    height: 165,
-    zodiac: "兔",
-    zodiacSign: "天秤座",
-    mbti: "INFP",
-    riyuan: "甲木",
-    education: "本科",
-    occupation: "产品经理",
-    income: "20万-30万",
-    matchScore: 88,
-    matchReason: "生肖三合",
-    matchTagline: "志趣相投",
-    isRealName: true,
-    isVip: false,
-    bio: "认真生活，期待遇见同频的你～",
+function mapApiCard(c) {
+  var _a, _b;
+  const g = c.gender === "male" ? "male" : "female";
+  return {
+    id: c.id,
+    nickname: c.nickname,
+    avatar: utils_avatar.resolveAvatar(c.avatar, c.id),
+    age: (_a = c.age) != null ? _a : 0,
+    gender: g,
+    location: c.location || "",
+    height: c.height,
+    zodiac: c.zodiac || "",
+    zodiacSign: c.zodiacSign || "",
+    mbti: c.mbti || "",
+    riyuan: c.riyuan || "",
+    education: c.education || "",
+    occupation: c.occupation || "",
+    income: c.income || "",
+    matchScore: (_b = c.matchScore) != null ? _b : 0,
+    matchReason: c.matchReason || "",
+    matchTagline: c.matchTagline || "",
+    isRealName: !!c.isRealName,
+    isVip: !!c.isVip,
+    bio: c.bio || "",
     photos: []
-  }, p);
+  };
+}
+function repairFilters(f) {
+  if (typeof f.ageMin !== "number" || Number.isNaN(f.ageMin))
+    f.ageMin = 18;
+  if (typeof f.ageMax !== "number" || Number.isNaN(f.ageMax))
+    f.ageMax = 35;
+  if (f.ageMax < f.ageMin)
+    f.ageMax = f.ageMin;
+  f.education = normalizeEducationFilter(f.education);
+  f.income = normalizeIncomeFilter(f.income);
+  if (f.distance !== "sameCity" && f.distance !== "sameProvince" && f.distance !== "all") {
+    f.distance = "sameCity";
+  }
+  if (f.zodiacMatch !== "all" && f.zodiacMatch !== "sanhe" && f.zodiacMatch !== "liuhe" && f.zodiacMatch !== "both") {
+    f.zodiacMatch = "all";
+  }
+}
+function buildFilterPayload(f) {
+  repairFilters(f);
+  let zodiacMatch;
+  switch (f.zodiacMatch) {
+    case "sanhe":
+      zodiacMatch = ["三合"];
+      break;
+    case "liuhe":
+      zodiacMatch = ["六合"];
+      break;
+    case "both":
+      zodiacMatch = ["三合", "六合"];
+      break;
+    default:
+      zodiacMatch = void 0;
+  }
+  let distance;
+  if (f.distance === "sameCity")
+    distance = 50;
+  else if (f.distance === "sameProvince")
+    distance = 200;
+  else
+    distance = void 0;
+  return {
+    ageRange: { min: f.ageMin, max: f.ageMax },
+    education: [f.education],
+    incomeRange: f.income != null ? { min: f.income, max: f.income } : void 0,
+    zodiacMatch,
+    distance
+  };
 }
 const useDiscoverStore = common_vendor.defineStore("discover", () => {
-  const users = common_vendor.ref([
-    makeUser({
-      id: "u1",
-      nickname: "林溪",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop",
-      location: "北京朝阳区",
-      height: 162,
-      zodiac: "兔",
-      zodiacSign: "天秤座",
-      mbti: "INFP",
-      riyuan: "甲木",
-      matchScore: 92,
-      matchReason: "生肖三合",
-      matchTagline: "志趣相投",
-      isVip: true,
-      bio: "喜欢旅行、摄影、烘焙，期待遇见有趣的你～"
-    }),
-    makeUser({
-      id: "u2",
-      nickname: "苏晴",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop",
-      location: "北京海淀区",
-      height: 165,
-      zodiac: "龙",
-      zodiacSign: "天蝎座",
-      mbti: "ENFJ",
-      riyuan: "丙火",
-      education: "硕士及以上",
-      occupation: "金融分析师",
-      income: "30万-50万",
-      matchScore: 85,
-      matchReason: "兴趣相投",
-      matchTagline: "性格互补"
-    }),
-    makeUser({
-      id: "u3",
-      nickname: "安然",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop",
-      zodiac: "蛇",
-      zodiacSign: "处女座",
-      mbti: "ISFJ",
-      riyuan: "乙木",
-      occupation: "设计师",
-      matchScore: 90
-    }),
-    makeUser({
-      id: "u4",
-      nickname: "若瑶",
-      avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=500&fit=crop",
-      zodiac: "马",
-      zodiacSign: "射手座",
-      mbti: "ESFP",
-      riyuan: "丁火",
-      occupation: "市场运营",
-      matchScore: 82,
-      matchReason: "六合",
-      matchTagline: "缘分合拍"
-    }),
-    makeUser({
-      id: "u5",
-      nickname: "清越",
-      avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=500&fit=crop",
-      zodiac: "羊",
-      zodiacSign: "双鱼座",
-      mbti: "INFJ",
-      riyuan: "戊土",
-      occupation: "教师",
-      matchScore: 87
-    }),
-    makeUser({
-      id: "u6",
-      nickname: "知夏",
-      avatar: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=500&fit=crop",
-      zodiac: "猴",
-      zodiacSign: "双子座",
-      mbti: "ENTP",
-      riyuan: "庚金",
-      occupation: "法务",
-      matchScore: 80,
-      isVip: true
-    }),
-    makeUser({
-      id: "u7",
-      nickname: "晚星",
-      avatar: "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&h=500&fit=crop",
-      zodiac: "鸡",
-      zodiacSign: "狮子座",
-      mbti: "ESTJ",
-      riyuan: "辛金",
-      occupation: "咨询顾问",
-      matchScore: 84
-    }),
-    makeUser({
-      id: "u8",
-      nickname: "书言",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
-      gender: "male",
-      zodiac: "狗",
-      zodiacSign: "水瓶座",
-      mbti: "INTP",
-      riyuan: "壬水",
-      occupation: "研发工程师",
-      matchScore: 79
-    }),
-    makeUser({
-      id: "u9",
-      nickname: "南乔",
-      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop",
-      zodiac: "猪",
-      zodiacSign: "巨蟹座",
-      mbti: "ISFP",
-      riyuan: "癸水",
-      occupation: "医护",
-      matchScore: 91
-    }),
-    makeUser({
-      id: "u10",
-      nickname: "时宜",
-      avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=500&fit=crop",
-      zodiac: "鼠",
-      zodiacSign: "摩羯座",
-      mbti: "ISTJ",
-      riyuan: "甲木",
-      occupation: "公务员",
-      matchScore: 86
-    })
-  ]);
+  const users = common_vendor.ref([]);
   const currentIndex = common_vendor.ref(0);
   const filters = common_vendor.ref({
     zodiacMatch: "all",
@@ -221,22 +170,88 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
   const dailyRecommendations = common_vendor.ref([]);
   const currentUser = common_vendor.computed(() => users.value[currentIndex.value]);
   const hasMore = common_vendor.computed(() => currentIndex.value < users.value.length - 1);
+  const loadError = common_vendor.ref(null);
+  const recommendationsRecycled = common_vendor.ref(false);
+  function fetchRecommendations() {
+    return __async(this, null, function* () {
+      try {
+        const { users: list, recycled } = yield services_apiUser.apiGetRecommendations(1, 50);
+        users.value = (list != null ? list : []).map(mapApiCard);
+        recommendationsRecycled.value = !!recycled;
+        loadError.value = null;
+        currentIndex.value = 0;
+        return users.value.length > 0;
+      } catch (e) {
+        users.value = [];
+        loadError.value = e instanceof Error ? e.message : "推荐列表加载失败";
+        currentIndex.value = 0;
+        return false;
+      }
+    });
+  }
+  function fetchDailyRecommendations() {
+    return __async(this, null, function* () {
+      try {
+        const { users: list } = yield services_apiUser.apiGetDailyRecommendations();
+        dailyRecommendations.value = (list != null ? list : []).map(mapApiCard);
+        return dailyRecommendations.value.length > 0;
+      } catch (e) {
+        dailyRecommendations.value = [];
+        return false;
+      }
+    });
+  }
+  function resetAndReloadDiscover() {
+    return __async(this, null, function* () {
+      try {
+        yield services_apiMatch.apiResetSwipeHistory();
+      } catch (e) {
+        return false;
+      }
+      recommendationsRecycled.value = false;
+      yield loadDiscoverPage();
+      return users.value.length > 0;
+    });
+  }
+  function loadDiscoverPage() {
+    return __async(this, null, function* () {
+      repairFilters(filters.value);
+      yield Promise.all([fetchRecommendations(), fetchDailyRecommendations()]);
+    });
+  }
   function nextUser() {
     if (hasMore.value) {
       currentIndex.value++;
+      return;
     }
+    void fetchRecommendations();
   }
   function likeUser(userId) {
-    console.log("Like user:", userId);
-    nextUser();
+    return __async(this, null, function* () {
+      try {
+        yield services_apiMatch.apiLikeUser(userId);
+        nextUser();
+      } catch (e) {
+      }
+    });
   }
   function dislikeUser(userId) {
-    console.log("Dislike user:", userId);
-    nextUser();
+    return __async(this, null, function* () {
+      try {
+        yield services_apiMatch.apiPassUser(userId);
+        nextUser();
+      } catch (e) {
+      }
+    });
   }
   function superLikeUser(userId) {
-    console.log("Super like user:", userId);
-    nextUser();
+    return __async(this, null, function* () {
+      try {
+        yield services_apiMatch.apiSuperLikeUser(userId);
+        nextUser();
+      } catch (e) {
+      }
+    });
   }
   function updateFilters(newFilters) {
     filters.value = __spreadValues(__spreadValues({}, filters.value), newFilters);
@@ -265,19 +280,32 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     };
   }
   function applyFilters() {
-    currentIndex.value = 0;
-    console.log("Applying filters:", filters.value);
+    return __async(this, null, function* () {
+      try {
+        yield services_apiUser.apiUpdateFilters(buildFilterPayload(filters.value));
+      } catch (e) {
+      }
+      currentIndex.value = 0;
+      yield fetchRecommendations();
+    });
   }
   function generateDailyRecommendations() {
-    const pool = [...users.value];
-    for (let i = pool.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-    dailyRecommendations.value = pool.slice(0, 10);
+    return __async(this, null, function* () {
+      yield fetchDailyRecommendations();
+    });
   }
   function reset() {
     currentIndex.value = 0;
+  }
+  function clearDiscoverData() {
+    users.value = [];
+    dailyRecommendations.value = [];
+    currentIndex.value = 0;
+    loadError.value = null;
+    recommendationsRecycled.value = false;
+  }
+  function repairFiltersState() {
+    repairFilters(filters.value);
   }
   return {
     users,
@@ -286,6 +314,12 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     hasMore,
     filters,
     dailyRecommendations,
+    loadError,
+    recommendationsRecycled,
+    resetAndReloadDiscover,
+    fetchRecommendations,
+    fetchDailyRecommendations,
+    loadDiscoverPage,
     nextUser,
     likeUser,
     dislikeUser,
@@ -297,16 +331,16 @@ const useDiscoverStore = common_vendor.defineStore("discover", () => {
     resetFilters,
     applyFilters,
     generateDailyRecommendations,
-    reset
+    reset,
+    clearDiscoverData,
+    repairFiltersState
   };
 }, {
   persist: {
     key: "discover-store",
     paths: ["filters"],
     afterRestore: ({ store }) => {
-      const f = store.filters;
-      f.education = normalizeEducationFilter(f.education);
-      f.income = normalizeIncomeFilter(f.income);
+      repairFilters(store.filters);
     }
   }
 });

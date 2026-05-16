@@ -2,7 +2,7 @@
   <view class="page-container gradient-bg">
     <!-- 顶部导航 -->
     <view class="profile-header">
-      <view class="back-btn" @click="goBack">
+      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
         <text>‹</text>
       </view>
       <text class="title">完善资料</text>
@@ -84,6 +84,13 @@
           </view>
           <view class="auto-info-item">
             <view class="auto-info-icon-slot">
+              <text class="auto-info-icon-text">{{ getRiyuanEmojiSafe(autoInfo.riyuan) }}</text>
+            </view>
+            <view class="info-value">{{ autoInfo.riyuan }}</view>
+            <view class="info-label">日元</view>
+          </view>
+          <view class="auto-info-item">
+            <view class="auto-info-icon-slot">
               <text class="auto-info-icon-text">🧩</text>
             </view>
             <view class="info-value font-mono">{{ autoInfo.mbti }}</view>
@@ -93,9 +100,6 @@
         <view class="hint-box">
           <text>以上信息基于生日自动生成，仅供娱乐交友使用，不代表命理测算</text>
         </view>
-        <picker class="form-select" mode="selector" :range="riyuanOptions" :value="riyuanIndex" @change="onRiyuanChange">
-          <view class="form-select-label">{{ formData.riyuan || '日元（暂不填写）' }}</view>
-        </picker>
       </view>
 
       <!-- 教育与职业 -->
@@ -176,14 +180,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
-import { useUserStore } from '@/stores/user'
-import { avatarUrl } from '@/utils/avatar'
-import { getBirthInfo, getZodiacEmoji as getZodiacEmojiFromDate, getZodiacSignSymbol } from '@/utils/date'
+import { ref, computed, reactive, onMounted } from 'vue'
+import { useUserStore, type UserProfile } from '@/stores/user'
+import { resolveAvatar, DEMO_AVATARS } from '@/utils/avatar'
+import {
+  getBirthInfo,
+  getZodiacEmoji as getZodiacEmojiFromDate,
+  getZodiacSignSymbol,
+  getRiyuanEmoji,
+} from '@/utils/date'
+import { apiUpdateProfile } from '@/services/api-user'
+import { navigateBackTo } from '@/utils/navigation'
 
-// 安全的 emoji 获取函数
 function getZodiacEmojiSafe(zodiac: string): string {
   return getZodiacEmojiFromDate(zodiac) || '🐰'
+}
+
+function getRiyuanEmojiSafe(riyuan: string): string {
+  return getRiyuanEmoji(riyuan || '') || '💧'
 }
 
 const userStore = useUserStore()
@@ -192,7 +206,7 @@ const userStore = useUserStore()
 const formData = reactive({
   avatar:
     userStore.profile.avatar ||
-    avatarUrl('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop'),
+    DEMO_AVATARS[0],
   nickname: userStore.profile.nickname || '',
   gender: userStore.profile.gender || '',
   birthday: userStore.profile.birthday || '',
@@ -200,7 +214,6 @@ const formData = reactive({
   weight: userStore.profile.weight?.toString() || '',
   hometown: userStore.profile.hometown || '',
   location: userStore.profile.location || '',
-  riyuan: userStore.profile.riyuan || '',
   education: userStore.profile.education || '',
   school: userStore.profile.school || '',
   schoolTier: userStore.profile.schoolTier || null,
@@ -218,6 +231,7 @@ const autoInfo = computed(() => {
     return {
       zodiac: userStore.profile.zodiac || '兔',
       zodiacSign: userStore.profile.zodiacSign || '天秤座',
+      riyuan: userStore.profile.riyuan || '甲木',
       mbti: userStore.profile.mbti || 'INFP',
     }
   }
@@ -226,6 +240,7 @@ const autoInfo = computed(() => {
   return {
     zodiac: info.zodiac,
     zodiacSign: info.zodiacSign,
+    riyuan: info.riyuan,
     mbti: info.mbti,
   }
 })
@@ -242,12 +257,6 @@ const genderLabel = computed(() => {
   if (formData.gender === 'male') return '男'
   if (formData.gender === 'female') return '女'
   return '性别'
-})
-
-const riyuanOptions = ['暂不填写', '甲木 🌲', '乙木 🌿', '丙火 🔥', '丁火 🕯️', '戊土 ⛰️', '己土 🌾', '庚金 ⚔️', '辛金 💎', '壬水 🌊', '癸水 💧']
-const riyuanIndex = computed(() => {
-  const map: Record<string, number> = { '甲木': 1, '乙木': 2, '丙火': 3, '丁火': 4, '戊土': 5, '己土': 6, '庚金': 7, '辛金': 8, '壬水': 9, '癸水': 10 }
-  return map[formData.riyuan || ''] || 0
 })
 
 const educationOptions = ['大专及以下', '本科', '硕士及以上']
@@ -342,22 +351,79 @@ function uploadAvatar() {
   })
 }
 
-function saveProfile() {
-  // 更新store
-  userStore.updateProfile({
-    ...formData,
-    zodiac: autoInfo.value.zodiac,
-    zodiacSign: autoInfo.value.zodiacSign,
-    mbti: autoInfo.value.mbti,
-  })
-  // 返回首页
-  uni.switchTab({ url: '/pages/discover/index' })
+onMounted(async () => {
+  await userStore.hydrateProfile()
+  const p = userStore.profile
+  formData.avatar = p.avatar || formData.avatar
+  formData.nickname = p.nickname || ''
+  formData.gender = p.gender || ''
+  formData.birthday = p.birthday || ''
+  formData.height = p.height?.toString() || ''
+  formData.weight = p.weight?.toString() || ''
+  formData.hometown = p.hometown || ''
+  formData.location = p.location || ''
+  formData.education = p.education || ''
+  formData.school = p.school || ''
+  formData.schoolTier = p.schoolTier ?? null
+  formData.occupation = p.occupation || ''
+  formData.jobLevel = p.jobLevel || ''
+  formData.company = p.company || ''
+  formData.income = p.income || ''
+  formData.bio = p.bio || ''
+  formData.hobbies = p.hobbies || []
+})
+
+async function saveProfile() {
+  const gh = Number.parseInt(formData.height, 10)
+  const gw = Number.parseInt(formData.weight, 10)
+  const gd: 'male' | 'female' | 'unknown' =
+    formData.gender === 'male'
+      ? 'male'
+      : formData.gender === 'female'
+        ? 'female'
+        : 'unknown'
+  uni.showLoading({ title: '保存中', mask: true })
+  try {
+    const avatarPayload =
+      formData.avatar.startsWith('http') ? formData.avatar : undefined
+    await apiUpdateProfile({
+      ...(avatarPayload ? { avatar: avatarPayload } : {}),
+      nickname: formData.nickname,
+      gender: gd,
+      birthday: formData.birthday || undefined,
+      height: Number.isFinite(gh) ? gh : undefined,
+      weight: Number.isFinite(gw) ? gw : undefined,
+      hometown: formData.hometown || undefined,
+      location: formData.location || undefined,
+      education: formData.education || undefined,
+      school: formData.school || undefined,
+      schoolTier: formData.schoolTier,
+      occupation: formData.occupation || undefined,
+      jobLevel: formData.jobLevel || undefined,
+      company: formData.company || undefined,
+      income: formData.income || undefined,
+      bio: formData.bio || undefined,
+      hobbies: formData.hobbies?.length ? formData.hobbies : undefined,
+    })
+    await userStore.hydrateProfile()
+    userStore.updateProfile({
+      ...(formData as unknown as Partial<UserProfile>),
+      zodiac: autoInfo.value.zodiac,
+      zodiacSign: autoInfo.value.zodiacSign,
+      riyuan: autoInfo.value.riyuan,
+      mbti: autoInfo.value.mbti,
+    })
+    uni.switchTab({ url: '/pages/discover/index' })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : '保存失败'
+    uni.showToast({ title: msg, icon: 'none' })
+  } finally {
+    uni.hideLoading()
+  }
 }
 
 function goBack() {
-  uni.navigateBack({
-    fail: () => uni.switchTab({ url: '/pages/mine/index' }),
-  })
+  navigateBackTo('/pages/mine/index')
 }
 </script>
 
@@ -370,5 +436,47 @@ function goBack() {
 
 .back-btn {
   margin-right: 72rpx;
+}
+
+/* 生辰四项单行展示，避免换行 */
+.auto-info-grid--row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.auto-info-grid--row .auto-info-item {
+  flex: 1;
+  min-width: 0;
+  padding: 16rpx 6rpx 20rpx;
+  box-sizing: border-box;
+}
+
+.auto-info-grid--row .auto-info-icon-slot {
+  width: 56rpx;
+  height: 56rpx;
+  margin-bottom: 8rpx;
+}
+
+.auto-info-grid--row .auto-info-icon-text {
+  font-size: 32rpx;
+}
+
+.auto-info-grid--row .info-value {
+  font-size: 22rpx;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.auto-info-grid--row .info-label {
+  font-size: 20rpx;
+  margin-top: 4rpx;
+  white-space: nowrap;
 }
 </style>

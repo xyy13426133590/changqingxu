@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
+const utils_navigation = require("../../utils/navigation.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "face-verify",
   setup(__props) {
@@ -43,7 +44,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       onlyFace.value = (q == null ? void 0 : q.onlyFace) === "1" || (q == null ? void 0 : q.onlyFace) === "true";
     });
     function goBack() {
-      common_vendor.index.navigateBack({ fail: () => common_vendor.index.switchTab({ url: "/pages/mine/index" }) });
+      utils_navigation.navigateBackTo("/pages/mine/index");
     }
     function goRealName() {
       common_vendor.index.redirectTo({ url: "/pages/auth/real-name" });
@@ -70,16 +71,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         running.value = false;
         common_vendor.index.showToast({ title: "认证成功（演示）", icon: "success" });
         setTimeout(() => {
-          common_vendor.index.navigateBack({ fail: () => common_vendor.index.switchTab({ url: "/pages/mine/index" }) });
+          utils_navigation.navigateBackTo("/pages/mine/index");
         }, 500);
       }, 2800);
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "4d"),
+        a: common_vendor.o(goBack, "42"),
         b: onlyFace.value
       }, onlyFace.value ? {} : !hasDraft.value ? {
-        d: common_vendor.o(goRealName, "b0")
+        d: common_vendor.o(goRealName, "f0")
       } : {}, {
         c: !hasDraft.value,
         e: common_vendor.t(stepEmoji.value),
@@ -94,7 +95,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         i: common_vendor.t(running.value ? "识别中…" : "开始识别"),
         j: running.value || !canStart.value ? 1 : "",
-        k: common_vendor.o(onStart, "78")
+        k: common_vendor.o(onStart, "25")
       });
     };
   }

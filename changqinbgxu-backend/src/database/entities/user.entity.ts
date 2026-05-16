@@ -85,10 +85,11 @@ export class User {
   @Column({ length: 100, default: '' })
   school: string;
 
+  /** MySQL ENUM 勿在 enum 数组里写 null；可空由 nullable 表达，否则 synchronize 会生成非法 DDL */
   @Column({
     name: 'school_tier',
     type: 'enum',
-    enum: ['985', '211', null],
+    enum: ['985', '211'],
     nullable: true,
   })
   schoolTier: '985' | '211' | null;

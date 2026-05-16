@@ -1,3 +1,11 @@
 "use strict";
-const mpPlaceholder = "/assets/avatar-placeholder.2db2889a.png";
-exports.mpPlaceholder = mpPlaceholder;
+const demo0 = "/assets/demo-0.cfec08ca.jpg";
+const demo1 = "/assets/demo-1.ac08bdd8.jpg";
+const demo2 = "/assets/demo-2.9b845f21.jpg";
+const demo3 = "/assets/demo-3.45c21bf2.jpg";
+const demo4 = "/assets/demo-4.4b3dc19b.jpg";
+exports.demo0 = demo0;
+exports.demo1 = demo1;
+exports.demo2 = demo2;
+exports.demo3 = demo3;
+exports.demo4 = demo4;

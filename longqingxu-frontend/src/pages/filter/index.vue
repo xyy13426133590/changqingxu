@@ -2,7 +2,7 @@
   <view class="page-container gradient-bg">
     <!-- 顶部导航 -->
     <view class="filter-header">
-      <view class="back-btn" @click="goBack">
+      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
         <text>‹</text>
       </view>
       <text class="header-title">筛选条件</text>
@@ -37,7 +37,7 @@
       <view class="filter-section glass">
         <view class="filter-title">年龄范围</view>
         <slider
-          :value="filters.ageMax"
+          :value="ageMaxDisplay"
           min="18"
           max="60"
           active-color="#8B5CF6"
@@ -47,7 +47,7 @@
         />
         <view class="slider-labels">
           <text>18岁</text>
-          <text class="current">{{ filters.ageMax }}岁</text>
+          <text class="current">{{ ageMaxDisplay }}岁</text>
           <text>60岁</text>
         </view>
       </view>
@@ -123,9 +123,11 @@ import {
 } from '@/stores/discover'
 import TabBar from '@/components/TabBar.vue'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
+import { navigateBackTo } from '@/utils/navigation'
 
 onShow(() => {
   safeHideNativeTabBar()
+  discoverStore.repairFiltersState()
 })
 
 const discoverStore = useDiscoverStore()
@@ -133,8 +135,17 @@ const discoverStore = useDiscoverStore()
 // 筛选条件数据
 const filters = computed(() => discoverStore.filters)
 
+const ageMaxDisplay = computed(() => {
+  const v = filters.value.ageMax
+  if (typeof v === 'number' && !Number.isNaN(v)) return Math.min(60, Math.max(18, v))
+  return 35
+})
+
+type ZodiacMatchFilter = 'all' | 'sanhe' | 'liuhe' | 'both'
+type DistanceFilter = 'sameCity' | 'sameProvince' | 'all'
+
 // 趣味配对选项
-const zodiacOptions = [
+const zodiacOptions: { value: ZodiacMatchFilter; label: string; desc: string }[] = [
   { value: 'all', label: '不限', desc: '' },
   { value: 'sanhe', label: '三合 ✨', desc: '猴鼠龙 / 蛇鸡牛 / 虎马狗 / 猪兔羊' },
   { value: 'liuhe', label: '六合 🌟', desc: '鼠牛 / 虎猪 / 兔狗 / 龙鸡 / 蛇猴 / 马羊' },
@@ -142,7 +153,7 @@ const zodiacOptions = [
 ]
 
 // 距离选项
-const distanceOptions = [
+const distanceOptions: { value: DistanceFilter; label: string }[] = [
   { value: 'sameCity', label: '同城' },
   { value: 'sameProvince', label: '同省' },
   { value: 'all', label: '不限' },
@@ -155,18 +166,19 @@ const educationOptions: EducationFilterOption[] = ['大专及以下', '本科', 
 const incomeOptions = [...INCOME_FILTER_OPTIONS]
 
 // 设置生肖配对
-function setZodiacMatch(value: 'all' | 'sanhe' | 'liuhe' | 'both') {
+function setZodiacMatch(value: ZodiacMatchFilter) {
   discoverStore.updateFilters({ zodiacMatch: value })
 }
 
-// 年龄滑块变化
-function onAgeChange(e: { detail: { value: number } }) {
-  const value = e.detail.value
-  discoverStore.setAgeRange(18, value)
+// 年龄滑块变化（小程序 detail.value 可能为字符串）
+function onAgeChange(e: { detail: { value: number | string } }) {
+  const value = Number(e.detail.value)
+  const max = Number.isFinite(value) ? Math.min(60, Math.max(18, value)) : 35
+  discoverStore.setAgeRange(18, max)
 }
 
 // 设置距离
-function setDistance(value: 'sameCity' | 'sameProvince' | 'all') {
+function setDistance(value: DistanceFilter) {
   discoverStore.updateFilters({ distance: value })
 }
 
@@ -181,13 +193,18 @@ function setIncome(value: string) {
 
 // 返回上一页
 function goBack() {
-  uni.switchTab({ url: '/pages/discover/index' })
+  navigateBackTo('/pages/discover/index')
 }
 
 // 应用筛选
-function applyFilters() {
-  discoverStore.applyFilters()
-  uni.switchTab({ url: '/pages/discover/index' })
+async function applyFilters() {
+  uni.showLoading({ mask: true, title: '应用筛选…' })
+  try {
+    await discoverStore.applyFilters()
+  } finally {
+    uni.hideLoading()
+    uni.switchTab({ url: '/pages/discover/index' })
+  }
 }
 </script>
 

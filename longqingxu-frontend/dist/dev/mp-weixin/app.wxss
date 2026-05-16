@@ -403,6 +403,43 @@ cover-image {
 .no-tabbar {
   padding-bottom: env(safe-area-inset-bottom);
 }
+/* ==================== 顶栏返回按钮（全局） ==================== */
+/* flex 居中标题会铺满整行并挡住左侧返回区，导致小程序里点击无反应 */
+.filter-header .back-btn,
+.profile-header .back-btn,
+.messages-header .back-btn,
+.my-card-header .back-btn,
+.vip-header .back-btn,
+.chat-header .back-btn {
+  position: relative;
+  z-index: 30;
+  flex-shrink: 0;
+}
+.filter-header .header-title,
+.profile-header .title,
+.messages-header .title,
+.my-card-header .title,
+.vip-header .title {
+  pointer-events: none;
+}
+/* 仅禁用 back-btn 内文字抢点击；勿对 .auth-nav-back / .nav-back 全局禁用，否则 @tap 绑在文字上无效 */
+.back-btn text {
+  pointer-events: none;
+}
+.auth-nav .auth-nav-back-wrap,
+.glass-row.nav .nav-back-wrap,
+.auth-top-nav .nav-back-wrap,
+.user-detail-nav .nav-back-wrap,
+.welcome-page .back-circle {
+  position: relative;
+  z-index: 30;
+  flex-shrink: 0;
+}
+.auth-nav .auth-nav-title,
+.glass-row.nav .nav-title,
+.user-detail-nav .nav-title {
+  pointer-events: none;
+}
 /* ==================== 筛选页专用样式 ==================== */
 /* 筛选页头部 */
 .filter-header {
@@ -1832,21 +1869,27 @@ cover-image {
   margin-top: 0;
 }
 .auto-info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16rpx;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 12rpx;
   margin-bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 .auto-info-grid .auto-info-item {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: #f9fafb;
   border: 1rpx solid #e5e7eb;
   border-radius: 16rpx;
-  padding: 20rpx 12rpx 24rpx;
+  padding: 20rpx 8rpx 24rpx;
   text-align: center;
   min-height: 0;
+  box-sizing: border-box;
   /* 三列统一图标位：固定框 + 居中，避免 emoji / 符号 / 缺图标导致高低不齐 */
   /* 星座符号略调字号，与 emoji 视觉重量接近 */
 }
@@ -1873,9 +1916,13 @@ cover-image {
   color: #8b5cf6;
 }
 .auto-info-grid .auto-info-item .info-value {
-  font-size: 30rpx;
+  font-size: 26rpx;
   font-weight: 700;
   color: #8b5cf6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
   margin-bottom: 6rpx;
   line-height: 1.35;
   width: 100%;
@@ -2270,6 +2317,11 @@ cover-image {
   justify-content: space-around;
   text-align: center;
 }
+.vip-status-card .vip-stats .stat-item .stat-value,
+.vip-status-card .vip-stats .stat-item .stat-label {
+  display: block;
+  line-height: 1.35;
+}
 .vip-status-card .vip-stats .stat-item .stat-value {
   font-size: 48rpx;
   font-weight: 700;
@@ -2283,6 +2335,7 @@ cover-image {
   margin-bottom: 40rpx;
 }
 .plan-list .section-title {
+  display: block;
   font-size: 30rpx;
   font-weight: 700;
   color: #1F2937;
@@ -2309,56 +2362,84 @@ cover-image {
   border-radius: 20rpx;
   font-size: 22rpx;
   color: #fff;
+  line-height: 1.3;
 }
 .plan-list .plan-item .plan-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16rpx;
+  align-items: flex-start;
+  gap: 24rpx;
+  margin-bottom: 20rpx;
 }
-.plan-list .plan-item .plan-header .plan-name {
+.plan-list .plan-item .plan-main {
+  flex: 1;
+  min-width: 0;
+}
+.plan-list .plan-item .plan-main .plan-name,
+.plan-list .plan-item .plan-main .plan-desc {
+  display: block;
+  line-height: 1.35;
+}
+.plan-list .plan-item .plan-main .plan-name {
   font-size: 32rpx;
   font-weight: 700;
   color: #1F2937;
 }
-.plan-list .plan-item .plan-header .plan-price-wrap {
+.plan-list .plan-item .plan-main .plan-desc {
+  font-size: 26rpx;
+  color: #6B7280;
+  margin-top: 8rpx;
+}
+.plan-list .plan-item .plan-price-wrap {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4rpx;
+  min-width: 160rpx;
+}
+.plan-list .plan-item .plan-price-wrap .plan-price,
+.plan-list .plan-item .plan-price-wrap .plan-original,
+.plan-list .plan-item .plan-price-wrap .plan-save {
+  display: block;
+  line-height: 1.3;
   text-align: right;
 }
-.plan-list .plan-item .plan-header .plan-price-wrap .plan-price {
+.plan-list .plan-item .plan-price-wrap .plan-price {
   font-size: 40rpx;
   font-weight: 700;
   color: #F97316;
 }
-.plan-list .plan-item .plan-header .plan-price-wrap .plan-original {
+.plan-list .plan-item .plan-price-wrap .plan-original {
   font-size: 24rpx;
   color: #9CA3AF;
   text-decoration: line-through;
 }
-.plan-list .plan-item .plan-header .plan-price-wrap .plan-save {
+.plan-list .plan-item .plan-price-wrap .plan-save {
   font-size: 24rpx;
   color: #10B981;
 }
-.plan-list .plan-item .plan-desc {
-  font-size: 26rpx;
-  color: #6B7280;
-  margin-bottom: 16rpx;
-}
 .plan-list .plan-item .plan-features {
   display: flex;
-  gap: 16rpx;
+  gap: 12rpx;
   flex-wrap: wrap;
+  align-items: center;
 }
 .plan-list .plan-item .plan-features .feature-tag {
+  display: block;
   padding: 8rpx 16rpx;
   background: rgba(249, 115, 22, 0.15);
   border-radius: 8rpx;
   font-size: 22rpx;
   color: #C2410C;
+  line-height: 1.3;
 }
 .benefits-section {
   margin-bottom: 40rpx;
 }
 .benefits-section .section-title {
+  display: block;
   font-size: 30rpx;
   font-weight: 700;
   color: #1F2937;
@@ -2373,9 +2454,10 @@ cover-image {
 }
 .benefits-section .benefits-list .benefit-item {
   display: flex;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
   gap: 24rpx;
-  margin-bottom: 32rpx;
+  margin-bottom: 28rpx;
 }
 .benefits-section .benefits-list .benefit-item:last-child {
   margin-bottom: 0;
@@ -2391,13 +2473,28 @@ cover-image {
   flex-shrink: 0;
 }
 .benefits-section .benefits-list .benefit-item .benefit-icon text {
+  display: block;
   font-size: 36rpx;
+  line-height: 1;
+  text-align: center;
+}
+.benefits-section .benefits-list .benefit-item .benefit-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6rpx;
+}
+.benefits-section .benefits-list .benefit-item .benefit-info .benefit-title,
+.benefits-section .benefits-list .benefit-item .benefit-info .benefit-desc {
+  display: block;
+  line-height: 1.4;
 }
 .benefits-section .benefits-list .benefit-item .benefit-info .benefit-title {
   font-size: 28rpx;
   font-weight: 600;
   color: #1F2937;
-  margin-bottom: 8rpx;
 }
 .benefits-section .benefits-list .benefit-item .benefit-info .benefit-desc {
   font-size: 24rpx;

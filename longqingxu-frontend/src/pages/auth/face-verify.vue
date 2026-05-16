@@ -1,7 +1,9 @@
 <template>
   <view class="page-container gradient-bg face-page">
-    <view class="nav glass-row" @click="goBack">
-      <text class="nav-back">‹</text>
+    <view class="nav glass-row">
+      <view class="nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
+        <text class="nav-back">‹</text>
+      </view>
       <text class="nav-title">人脸识别</text>
       <view class="nav-placeholder" />
     </view>
@@ -49,6 +51,7 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
+import { navigateBackTo } from '@/utils/navigation'
 
 const userStore = useUserStore()
 const onlyFace = ref(false)
@@ -90,7 +93,7 @@ onLoad((q) => {
 })
 
 function goBack() {
-  uni.navigateBack({ fail: () => uni.switchTab({ url: '/pages/mine/index' }) })
+  navigateBackTo('/pages/mine/index')
 }
 
 function goRealName() {
@@ -118,7 +121,7 @@ function onStart() {
     running.value = false
     uni.showToast({ title: '认证成功（演示）', icon: 'success' })
     setTimeout(() => {
-      uni.navigateBack({ fail: () => uni.switchTab({ url: '/pages/mine/index' }) })
+      navigateBackTo('/pages/mine/index')
     }, 500)
   }, 2800)
 }
@@ -143,10 +146,17 @@ function onStart() {
   backdrop-filter: blur(16px);
 }
 
+.nav-back-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .nav-back {
   font-size: 40rpx;
   color: #4b5563;
-  width: 72rpx;
 }
 
 .nav-title {

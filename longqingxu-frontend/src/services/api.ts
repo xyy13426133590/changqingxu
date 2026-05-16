@@ -102,12 +102,14 @@ export function request<T = any>(config: RequestConfig): Promise<T> {
 
         resolve(response.data)
       },
-      fail: (err) => {
+      fail: () => {
+        const hint = `无法连接服务器，请检查后端是否启动及 .env 中 VITE_API_BASE_URL（当前：${API_BASE_URL}）`
         uni.showToast({
           title: '网络请求失败',
           icon: 'none',
+          duration: 2800,
         })
-        reject(err)
+        reject(new Error(hint))
       },
     })
   })

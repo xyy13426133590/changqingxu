@@ -3,7 +3,9 @@
     <!-- 流程一：仅微信登录 + 进入手机登录 -->
     <template v-if="!phoneLoginExpanded">
       <view class="auth-nav glass-row">
-        <text class="auth-nav-back btn-press" @tap.stop="goBack">‹</text>
+        <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
+          <text class="auth-nav-back">‹</text>
+        </view>
         <text class="auth-nav-title">登录</text>
         <view class="auth-nav-placeholder" />
       </view>
@@ -15,7 +17,7 @@
         </view>
 
         <button
-          type="default"
+          type="button"
           class="wx-btn btn-press"
           :class="{ disabled: loadingWx }"
           :disabled="loadingWx"
@@ -28,7 +30,7 @@
         <text class="wx-hint">演示环境模拟成功；正式版需配置微信开放平台与后端换票。</text>
 
         <button
-          type="default"
+          type="button"
           class="phone-entry-btn btn-press"
           :class="{ disabled: loadingWx }"
           :disabled="loadingWx"
@@ -44,7 +46,9 @@
     <!-- 流程二：整页切换为手机登录，与微信区完全分离；左上角返回微信登录 -->
     <template v-else>
       <view class="auth-nav glass-row auth-nav-phone">
-        <text class="auth-nav-back btn-press" @click.stop="closePhoneLogin">‹</text>
+        <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="closePhoneLogin">
+          <text class="auth-nav-back">‹</text>
+        </view>
         <text class="auth-nav-title">验证码登录</text>
         <view class="auth-nav-placeholder" />
       </view>
@@ -72,7 +76,7 @@
               placeholder="请输入验证码"
             />
             <button
-              type="default"
+              type="button"
               class="code-btn btn-press"
               :class="{ disabled: smsCooldown > 0 || smsSending }"
               :disabled="smsCooldown > 0 || smsSending"
@@ -84,7 +88,7 @@
           </view>
           <text class="sms-tip">演示验证码 {{ demoSms }}；填 11 位大陆手机号后可直接登录，也可先点获取验证码。</text>
           <button
-            type="default"
+            type="button"
             class="auth-submit btn-press"
             :class="{ disabled: loadingSms }"
             :disabled="loadingSms"
@@ -111,9 +115,13 @@
 import { ref, onUnmounted } from 'vue'
 import { onBackPress } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
-import { validatePhone, sendSmsCode, DEMO_SMS_CODE } from '@/services/auth'
+import { validatePhone, DEMO_SMS_CODE } from '@/services/auth'
+import { apiSendSms } from '@/services/api-auth'
+import { useDiscoverStore } from '@/stores/discover'
+import { navigateBackTo } from '@/utils/navigation'
 
 const userStore = useUserStore()
+const discoverStore = useDiscoverStore()
 const phone = ref('')
 const smsCode = ref('')
 /** false：仅微信登录页；true：整页切换为手机登录（与微信区互斥） */
@@ -145,7 +153,7 @@ onBackPress(() => {
 })
 
 function goBack() {
-  uni.navigateBack({ fail: () => uni.switchTab({ url: '/pages/mine/index' }) })
+  navigateBackTo('/pages/mine/index')
 }
 
 function openPhoneLogin() {
@@ -183,7 +191,7 @@ async function onSendSms() {
   smsSending.value = true
   uni.showLoading({ title: '发送中', mask: true })
   try {
-    await sendSmsCode(p)
+    await apiSendSms({ phone: p, type: 'login' })
     uni.hideLoading()
     uni.showToast({ title: '演示环境：验证码已就绪', icon: 'success', duration: 1800 })
     startSmsCooldown()
@@ -199,7 +207,12 @@ async function onSendSms() {
   }
 }
 
-function goDiscoverAfterAuth() {
+async function goDiscoverAfterAuth() {
+  try {
+    await discoverStore.loadDiscoverPage()
+  } catch {
+    /* 发现页 onShow 会再拉一次 */
+  }
   uni.switchTab({
     url: '/pages/discover/index',
     fail: () => {
@@ -278,11 +291,18 @@ async function submitSms() {
   backdrop-filter: blur(16px);
 }
 
+.auth-nav-back-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .auth-nav-back {
   font-size: 44rpx;
   color: #4b5563;
   font-weight: 300;
-  width: 72rpx;
 }
 
 .auth-nav-title {

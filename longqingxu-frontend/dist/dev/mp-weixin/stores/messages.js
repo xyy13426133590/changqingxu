@@ -1,181 +1,282 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+const services_apiConversation = require("../services/api-conversation.js");
 const utils_avatar = require("../utils/avatar.js");
-function seedConversationTimes() {
-  const t1 = /* @__PURE__ */ new Date();
-  t1.setHours(10, 21, 0, 0);
-  const t2 = /* @__PURE__ */ new Date();
-  t2.setDate(t2.getDate() - 1);
-  t2.setHours(18, 30, 0, 0);
-  return { t1: t1.toISOString(), t2: t2.toISOString() };
-}
-const { t1: seedT1, t2: seedT2 } = seedConversationTimes();
-const useMessagesStore = common_vendor.defineStore("messages", () => {
-  const conversations = common_vendor.ref([
-    {
-      id: "c1",
-      userId: "u1",
-      nickname: "林溪",
-      avatar: utils_avatar.avatarUrl(),
-      lastMessage: "周末要不要一起看展？",
-      lastMessageTime: seedT1,
-      unreadCount: 1,
-      isTop: false
-    },
-    {
-      id: "c2",
-      userId: "u2",
-      nickname: "苏晴",
-      avatar: utils_avatar.avatarUrl(),
-      lastMessage: "好的，回见",
-      lastMessageTime: seedT2,
-      unreadCount: 0,
-      isTop: false
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
     }
-  ]);
-  const messages = common_vendor.ref({
-    c1: [
-      {
-        id: "m1",
-        conversationId: "c1",
-        senderId: "u1",
-        content: "你好呀，看了你的资料很投缘～",
-        type: "text",
-        status: "read",
-        createdAt: "2024-01-15 10:15:00"
-      },
-      {
-        id: "m2",
-        conversationId: "c1",
-        senderId: "me",
-        content: "谢谢，我也觉得～",
-        type: "text",
-        status: "read",
-        createdAt: "2024-01-15 10:18:00"
-      },
-      {
-        id: "m3",
-        conversationId: "c1",
-        senderId: "u1",
-        content: "周末要不要一起看展？",
-        type: "text",
-        status: "sent",
-        createdAt: "2024-01-15 10:21:00"
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
       }
-    ]
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
   });
-  const currentConversationId = common_vendor.ref("");
-  const currentConversation = common_vendor.computed(() => {
-    return conversations.value.find((c) => c.id === currentConversationId.value);
-  });
-  const currentMessages = common_vendor.computed(() => {
-    return messages.value[currentConversationId.value] || [];
-  });
-  const totalUnread = common_vendor.computed(() => {
-    return conversations.value.reduce((sum, c) => sum + c.unreadCount, 0);
-  });
-  function setCurrentConversation(id) {
-    currentConversationId.value = id;
-    const conv = conversations.value.find((c) => c.id === id);
-    if (conv) {
-      conv.unreadCount = 0;
+};
+function summarizeLast(type, content) {
+  switch (type) {
+    case "image":
+      return "[图片]";
+    case "voice":
+      return "[语音]";
+    case "emoji":
+      return "[表情]";
+    default:
+      return (content || "").slice(0, 50);
+  }
+}
+function mapApiConversation(row) {
+  var _a, _b, _c, _d, _e, _f, _g;
+  const last = row.lastMessage;
+  const lastContent = last ? summarizeLast(last.type, last.content) : "";
+  const lastTime = (last == null ? void 0 : last.createdAt) ? typeof last.createdAt === "string" ? last.createdAt : new Date(last.createdAt).toISOString() : row.updatedAt != null ? typeof row.updatedAt === "string" ? row.updatedAt : new Date(row.updatedAt).toISOString() : "";
+  return {
+    id: row.id,
+    userId: (_b = (_a = row.targetUser) == null ? void 0 : _a.id) != null ? _b : row.targetUserId,
+    nickname: ((_c = row.targetUser) == null ? void 0 : _c.nickname) || "",
+    avatar: utils_avatar.resolveAvatar((_d = row.targetUser) == null ? void 0 : _d.avatar, (_e = row.targetUser) == null ? void 0 : _e.id),
+    lastMessage: lastContent,
+    lastMessageTime: lastTime,
+    unreadCount: (_f = row.unreadCount) != null ? _f : 0,
+    isTop: (_g = row.isPinned) != null ? _g : false
+  };
+}
+function mapApiMessage(m) {
+  const t = m.type === "text" || m.type === "image" || m.type === "voice" || m.type === "emoji" ? m.type : "text";
+  let content = m.content;
+  if (t === "voice") {
+    if (m.mediaUrl) {
+      content = JSON.stringify({ url: m.mediaUrl, duration: (m.mediaDuration || 1) * 1e3 });
     }
+  } else if (t === "image" && m.mediaUrl) {
+    content = m.mediaUrl;
+  }
+  const createdAt = typeof m.createdAt === "string" ? m.createdAt : new Date(m.createdAt).toISOString();
+  return {
+    id: m.id,
+    conversationId: m.conversationId,
+    senderId: m.senderId,
+    content,
+    type: t,
+    status: m.isRead ? "read" : "sent",
+    createdAt,
+    duration: m.mediaDuration != null ? m.mediaDuration * 1e3 : void 0
+  };
+}
+function mapSocketPayload(p) {
+  return mapApiMessage({
+    id: p.id,
+    conversationId: p.conversationId,
+    senderId: p.senderId,
+    receiverId: p.receiverId,
+    type: p.type || "text",
+    content: p.content,
+    mediaUrl: p.mediaUrl,
+    mediaDuration: p.mediaDuration,
+    isRead: p.isRead,
+    createdAt: p.createdAt
+  });
+}
+const useMessagesStore = common_vendor.defineStore("messages", () => {
+  const conversations = common_vendor.ref([]);
+  const messages = common_vendor.ref({});
+  const currentConversationId = common_vendor.ref("");
+  const currentConversation = common_vendor.computed(
+    () => conversations.value.find((c) => c.id === currentConversationId.value)
+  );
+  const currentMessages = common_vendor.computed(() => messages.value[currentConversationId.value] || []);
+  const totalUnread = common_vendor.computed(
+    () => conversations.value.reduce((sum, c) => sum + c.unreadCount, 0)
+  );
+  function fetchConversations() {
+    return __async(this, null, function* () {
+      try {
+        const rows = yield services_apiConversation.apiGetConversations();
+        conversations.value = rows.map(mapApiConversation);
+        const ids = new Set(rows.map((r) => r.id));
+        const next = {};
+        Object.keys(messages.value).forEach((k) => {
+          if (ids.has(k))
+            next[k] = messages.value[k];
+        });
+        messages.value = next;
+      } catch (e) {
+        conversations.value = [];
+      }
+    });
+  }
+  function loadMessages(conversationId) {
+    return __async(this, null, function* () {
+      try {
+        const { messages: rows } = yield services_apiConversation.apiGetMessages(conversationId, 1, 100);
+        const mapped = rows.map(mapApiMessage).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        messages.value = __spreadProps(__spreadValues({}, messages.value), { [conversationId]: mapped });
+      } catch (e) {
+        messages.value = __spreadProps(__spreadValues({}, messages.value), { [conversationId]: [] });
+      }
+    });
+  }
+  function applyIncomingMessage(raw) {
+    const m = "receiverId" in raw && typeof raw.receiverId === "string" ? mapSocketPayload(raw) : mapApiMessage(raw);
+    const convId = m.conversationId;
+    const list = messages.value[convId] || [];
+    if (list.some((x) => x.id === m.id))
+      return;
+    messages.value = __spreadProps(__spreadValues({}, messages.value), { [convId]: [...list, m] });
+    const conv = conversations.value.find((c) => c.id === convId);
+    if (conv) {
+      conv.lastMessage = summarizeLast(m.type, m.content);
+      conv.lastMessageTime = m.createdAt;
+      if (convId !== currentConversationId.value)
+        conv.unreadCount++;
+    }
+  }
+  function setCurrentConversation(id) {
+    return __async(this, null, function* () {
+      currentConversationId.value = id;
+      const conv = conversations.value.find((c) => c.id === id);
+      if (conv)
+        conv.unreadCount = 0;
+      try {
+        yield services_apiConversation.apiMarkMessagesRead(id);
+      } catch (e) {
+      }
+    });
   }
   function sendMessage(content, type = "text", extra) {
-    if (!currentConversationId.value)
-      return;
-    const newMessage = {
-      id: `m${Date.now()}`,
-      conversationId: currentConversationId.value,
-      senderId: "me",
-      content,
-      type,
-      status: "sending",
-      createdAt: (/* @__PURE__ */ new Date()).toISOString(),
-      duration: extra == null ? void 0 : extra.duration
-    };
-    if (!messages.value[currentConversationId.value]) {
-      messages.value[currentConversationId.value] = [];
-    }
-    messages.value[currentConversationId.value].push(newMessage);
-    const conv = conversations.value.find((c) => c.id === currentConversationId.value);
-    if (conv) {
-      conv.lastMessage = getMessageSummary(type, content);
-      conv.lastMessageTime = (/* @__PURE__ */ new Date()).toISOString();
-    }
-    setTimeout(() => {
-      newMessage.status = "sent";
-    }, 500);
+    return __async(this, null, function* () {
+      var _a, _b, _c;
+      const cid = currentConversationId.value;
+      const conv = conversations.value.find((c) => c.id === cid);
+      if (!cid || !conv)
+        return;
+      const tempId = `temp_${Date.now()}`;
+      const optimistic = {
+        id: tempId,
+        conversationId: cid,
+        senderId: "__local__",
+        content,
+        type,
+        status: "sending",
+        createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+        duration: extra == null ? void 0 : extra.duration
+      };
+      messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: [...messages.value[cid] || [], optimistic] });
+      conv.lastMessage = summarizeLast(type, content);
+      conv.lastMessageTime = optimistic.createdAt;
+      if (type !== "text") {
+        const finalList = ((_a = messages.value[cid]) == null ? void 0 : _a.map(
+          (m) => m.id === tempId ? __spreadProps(__spreadValues({}, m), { status: "sent" }) : m
+        )) || [];
+        messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: finalList });
+        common_vendor.index.showToast({ title: "联调默认仅文本走 REST", icon: "none" });
+        return;
+      }
+      const payload = {
+        conversationId: cid,
+        receiverId: conv.userId,
+        type,
+        content
+      };
+      try {
+        const saved = yield services_apiConversation.apiSendMessage(payload);
+        const mapped = mapApiMessage(saved);
+        const arr = ((_b = messages.value[cid]) == null ? void 0 : _b.filter((m) => m.id !== tempId)) || [];
+        messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: [...arr, mapped].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) });
+        const lc = conversations.value.find((c) => c.id === cid);
+        if (lc) {
+          lc.lastMessage = summarizeLast(mapped.type, mapped.content);
+          lc.lastMessageTime = mapped.createdAt;
+        }
+      } catch (e) {
+        const arr = ((_c = messages.value[cid]) == null ? void 0 : _c.filter((m) => m.id !== tempId)) || [];
+        messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: arr });
+      }
+    });
   }
-  function getMessageSummary(type, content) {
-    switch (type) {
-      case "image":
-        return "[图片]";
-      case "voice":
-        return "[语音]";
-      case "emoji":
-        return "[表情]";
-      default:
-        return content.slice(0, 50);
-    }
+  function createConversation(peerUserId, nickname, avatar) {
+    return __async(this, null, function* () {
+      var _a, _b, _c;
+      if (!peerUserId) {
+        throw new Error("对方用户 ID 无效");
+      }
+      const row = yield services_apiConversation.apiCreateConversation(peerUserId);
+      if (!(row == null ? void 0 : row.id)) {
+        throw new Error("创建会话失败，请稍后重试");
+      }
+      const mapped = mapApiConversation(row);
+      if (!mapped.id) {
+        throw new Error("会话数据异常");
+      }
+      if (!mapped.userId) {
+        mapped.userId = (_c = (_b = (_a = row.targetUser) == null ? void 0 : _a.id) != null ? _b : row.targetUserId) != null ? _c : peerUserId;
+      }
+      if (!mapped.nickname && nickname)
+        mapped.nickname = nickname;
+      if (!mapped.avatar && avatar)
+        mapped.avatar = utils_avatar.resolveAvatar(avatar, mapped.userId);
+      const ix = conversations.value.findIndex((c) => c.id === mapped.id);
+      if (ix >= 0)
+        conversations.value.splice(ix, 1);
+      conversations.value.unshift(mapped);
+      return mapped.id;
+    });
   }
   function receiveMessage(conversationId, message) {
-    if (!messages.value[conversationId]) {
-      messages.value[conversationId] = [];
-    }
-    messages.value[conversationId].push(message);
+    messages.value = __spreadProps(__spreadValues({}, messages.value), {
+      [conversationId]: [...messages.value[conversationId] || [], message]
+    });
     const conv = conversations.value.find((c) => c.id === conversationId);
     if (conv) {
-      conv.lastMessage = getMessageSummary(message.type, message.content);
+      conv.lastMessage = summarizeLast(message.type, message.content);
       conv.lastMessageTime = message.createdAt || (/* @__PURE__ */ new Date()).toISOString();
-      if (conversationId !== currentConversationId.value) {
-        conv.unreadCount++;
-      }
     }
-  }
-  function createConversation(userId, nickname, avatar) {
-    const existing = conversations.value.find((c) => c.userId === userId);
-    if (existing) {
-      return existing.id;
-    }
-    const newConv = {
-      id: `c${Date.now()}`,
-      userId,
-      nickname,
-      avatar,
-      lastMessage: "",
-      lastMessageTime: "",
-      unreadCount: 0,
-      isTop: false
-    };
-    conversations.value.unshift(newConv);
-    return newConv.id;
   }
   function deleteConversation(id) {
     const index = conversations.value.findIndex((c) => c.id === id);
-    if (index > -1) {
+    if (index > -1)
       conversations.value.splice(index, 1);
-      delete messages.value[id];
-      if (currentConversationId.value === id) {
-        currentConversationId.value = "";
-      }
-    }
+    const next = __spreadValues({}, messages.value);
+    delete next[id];
+    messages.value = next;
+    if (currentConversationId.value === id)
+      currentConversationId.value = "";
   }
   function topConversation(id) {
     const conv = conversations.value.find((c) => c.id === id);
-    if (conv) {
+    if (conv)
       conv.isTop = !conv.isTop;
-      conversations.value.sort((a, b) => {
-        if (a.isTop && !b.isTop)
-          return -1;
-        if (!a.isTop && b.isTop)
-          return 1;
-        return 0;
-      });
-    }
   }
   function clearMessages(conversationId) {
-    messages.value[conversationId] = [];
+    messages.value = __spreadProps(__spreadValues({}, messages.value), { [conversationId]: [] });
     const conv = conversations.value.find((c) => c.id === conversationId);
     if (conv) {
       conv.lastMessage = "";
@@ -185,20 +286,6 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
   function lastMessageTimestamp(timeStr) {
     if (!timeStr)
       return 0;
-    if (timeStr === "刚刚")
-      return Date.now();
-    if (timeStr === "昨天") {
-      const d = /* @__PURE__ */ new Date();
-      d.setDate(d.getDate() - 1);
-      d.setHours(12, 0, 0, 0);
-      return d.getTime();
-    }
-    const hm = timeStr.match(/^(\d{1,2}):(\d{2})$/);
-    if (hm) {
-      const d = /* @__PURE__ */ new Date();
-      d.setHours(parseInt(hm[1], 10), parseInt(hm[2], 10), 0, 0);
-      return d.getTime();
-    }
     const t = new Date(timeStr).getTime();
     return Number.isFinite(t) ? t : 0;
   }
@@ -208,20 +295,9 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
   function formatTime(timeStr) {
     if (!timeStr)
       return "";
-    if (timeStr === "刚刚")
-      return "刚刚";
-    let msgDate = new Date(timeStr);
-    if (!Number.isFinite(msgDate.getTime())) {
-      const hm = timeStr.match(/^(\d{1,2}):(\d{2})$/);
-      if (hm) {
-        msgDate = /* @__PURE__ */ new Date();
-        msgDate.setHours(parseInt(hm[1], 10), parseInt(hm[2], 10), 0, 0);
-      } else if (timeStr === "昨天") {
-        return "昨天";
-      } else {
-        return timeStr;
-      }
-    }
+    const msgDate = new Date(timeStr);
+    if (!Number.isFinite(msgDate.getTime()))
+      return timeStr;
     const now = /* @__PURE__ */ new Date();
     const diffMs = now.getTime() - msgDate.getTime();
     if (diffMs >= 0 && diffMs < 6e4)
@@ -229,15 +305,12 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const msgDayStart = new Date(msgDate.getFullYear(), msgDate.getMonth(), msgDate.getDate());
     const diffDays = Math.floor((todayStart.getTime() - msgDayStart.getTime()) / 864e5);
-    if (diffDays === 0) {
+    if (diffDays === 0)
       return `${pad2(msgDate.getHours())}:${pad2(msgDate.getMinutes())}`;
-    }
-    if (diffDays === 1) {
+    if (diffDays === 1)
       return "昨天";
-    }
-    if (msgDate.getFullYear() === now.getFullYear()) {
+    if (msgDate.getFullYear() === now.getFullYear())
       return `${msgDate.getMonth() + 1}月${msgDate.getDate()}日`;
-    }
     return `${msgDate.getFullYear()}/${pad2(msgDate.getMonth() + 1)}/${pad2(msgDate.getDate())}`;
   }
   return {
@@ -247,9 +320,12 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
     currentConversation,
     currentMessages,
     totalUnread,
+    fetchConversations,
+    loadMessages,
     setCurrentConversation,
     sendMessage,
     receiveMessage,
+    applyIncomingMessage,
     createConversation,
     deleteConversation,
     topConversation,
@@ -257,10 +333,5 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
     formatTime,
     lastMessageTimestamp
   };
-}, {
-  persist: {
-    key: "messages-store",
-    paths: ["conversations", "messages"]
-  }
 });
 exports.useMessagesStore = useMessagesStore;

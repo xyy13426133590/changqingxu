@@ -2,6 +2,27 @@
 const common_vendor = require("../../common/vendor.js");
 const stores_discover = require("../../stores/discover.js");
 const utils_tabbar = require("../../utils/tabbar.js");
+const utils_navigation = require("../../utils/navigation.js");
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
 if (!Math) {
   TabBar();
 }
@@ -11,9 +32,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     common_vendor.onShow(() => {
       utils_tabbar.safeHideNativeTabBar();
+      discoverStore.repairFiltersState();
     });
     const discoverStore = stores_discover.useDiscoverStore();
     const filters = common_vendor.computed(() => discoverStore.filters);
+    const ageMaxDisplay = common_vendor.computed(() => {
+      const v = filters.value.ageMax;
+      if (typeof v === "number" && !Number.isNaN(v))
+        return Math.min(60, Math.max(18, v));
+      return 35;
+    });
     const zodiacOptions = [
       { value: "all", label: "不限", desc: "" },
       { value: "sanhe", label: "三合 ✨", desc: "猴鼠龙 / 蛇鸡牛 / 虎马狗 / 猪兔羊" },
@@ -31,8 +59,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       discoverStore.updateFilters({ zodiacMatch: value });
     }
     function onAgeChange(e) {
-      const value = e.detail.value;
-      discoverStore.setAgeRange(18, value);
+      const value = Number(e.detail.value);
+      const max = Number.isFinite(value) ? Math.min(60, Math.max(18, value)) : 35;
+      discoverStore.setAgeRange(18, max);
     }
     function setDistance(value) {
       discoverStore.updateFilters({ distance: value });
@@ -44,15 +73,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       discoverStore.setIncomeFilter(value);
     }
     function goBack() {
-      common_vendor.index.switchTab({ url: "/pages/discover/index" });
+      utils_navigation.navigateBackTo("/pages/discover/index");
     }
     function applyFilters() {
-      discoverStore.applyFilters();
-      common_vendor.index.switchTab({ url: "/pages/discover/index" });
+      return __async(this, null, function* () {
+        common_vendor.index.showLoading({ mask: true, title: "应用筛选…" });
+        try {
+          yield discoverStore.applyFilters();
+        } finally {
+          common_vendor.index.hideLoading();
+          common_vendor.index.switchTab({ url: "/pages/discover/index" });
+        }
+      });
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "82"),
+        a: common_vendor.o(goBack, "47"),
         b: common_vendor.f(zodiacOptions, (opt, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(opt.label),
@@ -65,9 +101,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: common_vendor.o(($event) => setZodiacMatch(opt.value), opt.value)
           });
         }),
-        c: filters.value.ageMax,
-        d: common_vendor.o(onAgeChange, "86"),
-        e: common_vendor.t(filters.value.ageMax),
+        c: ageMaxDisplay.value,
+        d: common_vendor.o(onAgeChange, "9e"),
+        e: common_vendor.t(ageMaxDisplay.value),
         f: common_vendor.f(distanceOptions, (opt, k0, i0) => {
           return {
             a: common_vendor.t(opt.label),
@@ -92,7 +128,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => setIncome(opt), opt)
           };
         }),
-        i: common_vendor.o(applyFilters, "8f"),
+        i: common_vendor.o(applyFilters, "38"),
         j: common_vendor.p({
           active: "filter"
         })

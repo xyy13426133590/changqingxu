@@ -35,43 +35,45 @@ class WebSocketService {
       return
     }
 
-    // 使用 uni-app 的 WebSocket API
-    const socketTask = uni.connectSocket({
-      url: `${WS_BASE_URL}?token=${token}`,
-      header: {
-        Authorization: `Bearer ${token}`,
-      },
-      protocols: ['chat'],
-    })
+    /** uni.connectSocket 在类型上可能为 Promise<SocketTask>，与运行时一致 */
+    void Promise.resolve(
+      uni.connectSocket({
+        url: `${WS_BASE_URL}?token=${token}`,
+        header: {
+          Authorization: `Bearer ${token}`,
+        },
+        protocols: ['chat'],
+      }),
+    ).then((socketTask: UniApp.SocketTask) => {
+      socketTask.onOpen(() => {
+        console.log('WebSocket 已连接')
+        this.reconnectAttempts = 0
+        this.connectCallbacks.forEach((cb) => cb())
+      })
 
-    socketTask.onOpen(() => {
-      console.log('WebSocket 已连接')
-      this.reconnectAttempts = 0
-      this.connectCallbacks.forEach((cb) => cb())
-    })
+      socketTask.onMessage((res: UniApp.OnSocketMessageCallbackResult) => {
+        try {
+          const data = JSON.parse(res.data as string)
+          this.handleMessage(data)
+        } catch (error) {
+          console.error('WebSocket 消息解析失败:', error)
+        }
+      })
 
-    socketTask.onMessage((res) => {
-      try {
-        const data = JSON.parse(res.data)
-        this.handleMessage(data)
-      } catch (error) {
-        console.error('WebSocket 消息解析失败:', error)
-      }
-    })
+      socketTask.onClose((res: UniNamespace.OnSocketCloseOptions) => {
+        console.log('WebSocket 已断开:', res.code, res.reason)
+        this.socket = null
+        this.disconnectCallbacks.forEach((cb) => cb(String(res.code || 'unknown')))
+        this.attemptReconnect()
+      })
 
-    socketTask.onClose((res) => {
-      console.log('WebSocket 已断开:', res.code, res.reason)
-      this.socket = null
-      this.disconnectCallbacks.forEach((cb) => cb(String(res.code || 'unknown')))
-      this.attemptReconnect()
-    })
+      socketTask.onError((err: UniApp.GeneralCallbackResult) => {
+        console.error('WebSocket 错误:', err)
+        this.errorCallbacks.forEach((cb) => cb(err))
+      })
 
-    socketTask.onError((err) => {
-      console.error('WebSocket 错误:', err)
-      this.errorCallbacks.forEach((cb) => cb(err))
+      this.socket = socketTask
     })
-
-    this.socket = socketTask
   }
 
   /**

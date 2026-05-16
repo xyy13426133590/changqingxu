@@ -37,3 +37,8 @@ export function apiSuperLikeUser(targetUserId: string): Promise<MatchResponse> {
 export function apiGetMutualMatches(): Promise<MatchResponse[]> {
   return get<MatchResponse[]>('/matches/mutual')
 }
+
+// 清空当前账号滑卡记录（演示/联调）
+export function apiResetSwipeHistory(): Promise<{ deleted: number }> {
+  return post<{ deleted: number }>('/matches/reset-swipes', {})
+}

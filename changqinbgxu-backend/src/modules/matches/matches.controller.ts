@@ -65,4 +65,14 @@ export class MatchesController {
   async getMutualMatches(@CurrentUser('id') userId: string) {
     return this.matchesService.getMutualMatches(userId);
   }
+
+  @Post('reset-swipes')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '清空滑卡记录（演示/联调）' })
+  @ApiResponse({ status: 200, description: '已清空' })
+  async resetSwipeHistory(@CurrentUser('id') userId: string) {
+    return this.matchesService.resetSwipeHistory(userId);
+  }
 }

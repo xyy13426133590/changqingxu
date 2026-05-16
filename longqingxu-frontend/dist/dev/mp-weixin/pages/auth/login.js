@@ -2,6 +2,9 @@
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
 const services_auth = require("../../services/auth.js");
+const services_apiAuth = require("../../services/api-auth.js");
+const stores_discover = require("../../stores/discover.js");
+const utils_navigation = require("../../utils/navigation.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -26,6 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "login",
   setup(__props) {
     const userStore = stores_user.useUserStore();
+    const discoverStore = stores_discover.useDiscoverStore();
     const phone = common_vendor.ref("");
     const smsCode = common_vendor.ref("");
     const phoneLoginExpanded = common_vendor.ref(false);
@@ -49,7 +53,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return false;
     });
     function goBack() {
-      common_vendor.index.navigateBack({ fail: () => common_vendor.index.switchTab({ url: "/pages/mine/index" }) });
+      utils_navigation.navigateBackTo("/pages/mine/index");
     }
     function openPhoneLogin() {
       if (loadingWx.value)
@@ -86,7 +90,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         smsSending.value = true;
         common_vendor.index.showLoading({ title: "发送中", mask: true });
         try {
-          yield services_auth.sendSmsCode(p);
+          yield services_apiAuth.apiSendSms({ phone: p, type: "login" });
           common_vendor.index.hideLoading();
           common_vendor.index.showToast({ title: "演示环境：验证码已就绪", icon: "success", duration: 1800 });
           startSmsCooldown();
@@ -103,11 +107,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     }
     function goDiscoverAfterAuth() {
-      common_vendor.index.switchTab({
-        url: "/pages/discover/index",
-        fail: () => {
-          common_vendor.index.reLaunch({ url: "/pages/discover/index" });
+      return __async(this, null, function* () {
+        try {
+          yield discoverStore.loadDiscoverPage();
+        } catch (e) {
         }
+        common_vendor.index.switchTab({
+          url: "/pages/discover/index",
+          fail: () => {
+            common_vendor.index.reLaunch({ url: "/pages/discover/index" });
+          }
+        });
       });
     }
     function onWeChatLogin() {
@@ -166,30 +176,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.e({
         a: !phoneLoginExpanded.value
       }, !phoneLoginExpanded.value ? {
-        b: common_vendor.o(goBack, "7b"),
+        b: common_vendor.o(goBack, "35"),
         c: common_vendor.t(loadingWx.value ? "登录中…" : "微信一键登录"),
         d: loadingWx.value ? 1 : "",
         e: loadingWx.value,
-        f: common_vendor.o(onWeChatLogin, "df"),
+        f: common_vendor.o(onWeChatLogin, "e4"),
         g: loadingWx.value ? 1 : "",
         h: loadingWx.value,
-        i: common_vendor.o(openPhoneLogin, "69")
+        i: common_vendor.o(openPhoneLogin, "4c")
       } : {
-        j: common_vendor.o(closePhoneLogin, "18"),
+        j: common_vendor.o(closePhoneLogin, "ea"),
         k: phone.value,
-        l: common_vendor.o(($event) => phone.value = $event.detail.value, "ba"),
+        l: common_vendor.o(($event) => phone.value = $event.detail.value, "11"),
         m: smsCode.value,
-        n: common_vendor.o(($event) => smsCode.value = $event.detail.value, "60"),
+        n: common_vendor.o(($event) => smsCode.value = $event.detail.value, "f7"),
         o: common_vendor.t(smsCooldown.value > 0 ? `${smsCooldown.value}s` : smsSending.value ? "发送中" : "获取验证码"),
         p: smsCooldown.value > 0 || smsSending.value ? 1 : "",
         q: smsCooldown.value > 0 || smsSending.value,
-        r: common_vendor.o(onSendSms, "87"),
+        r: common_vendor.o(onSendSms, "bb"),
         s: common_vendor.t(common_vendor.unref(demoSms)),
         t: common_vendor.t(loadingSms.value ? "登录中…" : "登录"),
         v: loadingSms.value ? 1 : "",
         w: loadingSms.value,
-        x: common_vendor.o(submitSms, "6e"),
-        y: common_vendor.o(goRegister, "48"),
+        x: common_vendor.o(submitSms, "5e"),
+        y: common_vendor.o(goRegister, "75"),
         z: common_vendor.t(common_vendor.unref(demoSms))
       });
     };

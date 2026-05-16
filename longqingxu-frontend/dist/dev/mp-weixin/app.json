@@ -56,6 +56,5 @@
     "getLocation"
   ],
   "lazyCodeLoading": "requiredComponents",
-  "usingComponents": {},
-  "sitemapLocation": "sitemap27.json"
+  "usingComponents": {}
 }

@@ -3,3 +3,60 @@
   display: flex;
   flex-direction: column;
 }
+.empty-card.data-v-20534a7c {
+  margin: 24rpx;
+  padding: 48rpx 32rpx;
+  border-radius: 24rpx;
+  text-align: center;
+}
+.empty-title.data-v-20534a7c {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16rpx;
+}
+.empty-desc.data-v-20534a7c {
+  display: block;
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 32rpx;
+}
+.empty-actions.data-v-20534a7c {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  align-items: center;
+}
+.empty-btn.data-v-20534a7c {
+  padding: 20rpx 48rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  color: #4b5563;
+  background: rgba(255, 255, 255, 0.6);
+}
+.empty-btn.primary.data-v-20534a7c {
+  color: #fff;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+}
+.daily-empty.data-v-20534a7c {
+  display: inline-flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  min-width: 280rpx;
+}
+.daily-empty-text.data-v-20534a7c {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+/* 小程序：保证卡片内容区有高度，避免只显示空玻璃框 */
+.user-card-body.data-v-20534a7c {
+  min-height: 520rpx;
+  display: flex;
+  flex-direction: column;
+}
+.photo-area.data-v-20534a7c {
+  min-height: 360rpx;
+}

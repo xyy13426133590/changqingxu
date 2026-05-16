@@ -29,10 +29,6 @@ const MBTI_TYPES = [
   'ISTP', 'ISFP', 'ESTP', 'ESFP',
 ]
 
-// 天干地支 - 日柱计算
-const TIANGAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
-const DIZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
-
 /**
  * 根据出生年份计算生肖
  */
@@ -83,15 +79,38 @@ export function getMBTI(birthDate: Date): string {
   return MBTI_TYPES[index]
 }
 
+/** 日元（天干五行）展示名，与资料卡/发现页一致 */
+const RIYUAN_STEMS = [
+  '甲木',
+  '乙木',
+  '丙火',
+  '丁火',
+  '戊土',
+  '己土',
+  '庚金',
+  '辛金',
+  '壬水',
+  '癸水',
+] as const
+
 /**
- * 计算日柱（简化版，仅供娱乐参考）
+ * 根据生日计算日元（确定性趣味算法，仅供娱乐参考）
  */
 export function getRiyuan(birthDate: Date): string {
+  const year = birthDate.getFullYear()
+  const month = birthDate.getMonth() + 1
   const day = birthDate.getDate()
-  const ganIndex = (day + 4) % 10 // 简化计算
-  const zhiIndex = (day + 2) % 12
+  const seed = year * 10000 + month * 100 + day
+  return RIYUAN_STEMS[seed % RIYUAN_STEMS.length]
+}
 
-  return TIANGAN[ganIndex] + DIZHI[zhiIndex]
+/** 日元展示用 emoji */
+export function getRiyuanEmoji(riyuan: string): string {
+  if (/甲|乙/.test(riyuan)) return '🌲'
+  if (/丙|丁/.test(riyuan)) return '🔥'
+  if (/戊|己/.test(riyuan)) return '⛰️'
+  if (/庚|辛/.test(riyuan)) return '⚙️'
+  return '💧'
 }
 
 /**
