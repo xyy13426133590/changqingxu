@@ -6,8 +6,8 @@
   box-sizing: border-box;
 }
 .glass-row.data-v-6c56cc25 {
-  margin: 24rpx 32rpx 0;
-  padding: 20rpx 24rpx;
+  margin: 0 32rpx;
+  padding: 0 24rpx;
   border-radius: 20rpx;
   display: flex;
   align-items: center;

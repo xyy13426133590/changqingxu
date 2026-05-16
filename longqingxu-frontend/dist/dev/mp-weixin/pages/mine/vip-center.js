@@ -4,6 +4,7 @@ const stores_user = require("../../stores/user.js");
 const services_apiVip = require("../../services/api-vip.js");
 const services_apiUser = require("../../services/api-user.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -27,6 +28,8 @@ var __async = (__this, __arguments, generator) => {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "vip-center",
   setup(__props) {
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     const userStore = stores_user.useUserStore();
     const plans = common_vendor.ref([]);
     const selectedPlan = common_vendor.ref("");
@@ -101,18 +104,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "96"),
-        b: common_vendor.t(common_vendor.unref(userStore).profile.isVip ? "VIP 会员" : "尚未开通 VIP"),
-        c: common_vendor.t(vipExpiryText.value),
-        d: vipStatus.value.daysRemaining != null && common_vendor.unref(userStore).profile.isVip
+        a: common_vendor.o(goBack, "1c"),
+        b: common_vendor.s(capsuleNavRowStyle.value),
+        c: common_vendor.s(capsuleNavOuterStyle.value),
+        d: common_vendor.t(common_vendor.unref(userStore).profile.isVip ? "VIP 会员" : "尚未开通 VIP"),
+        e: common_vendor.t(vipExpiryText.value),
+        f: vipStatus.value.daysRemaining != null && common_vendor.unref(userStore).profile.isVip
       }, vipStatus.value.daysRemaining != null && common_vendor.unref(userStore).profile.isVip ? {
-        e: common_vendor.t(vipStatus.value.daysRemaining)
+        g: common_vendor.t(vipStatus.value.daysRemaining)
       } : {}, {
-        f: loadError.value
+        h: loadError.value
       }, loadError.value ? {
-        g: common_vendor.t(loadError.value)
+        i: common_vendor.t(loadError.value)
       } : {}, {
-        h: common_vendor.f(plans.value, (plan, k0, i0) => {
+        j: common_vendor.f(plans.value, (plan, k0, i0) => {
           return common_vendor.e({
             a: plan.tag
           }, plan.tag ? {
@@ -140,7 +145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             m: common_vendor.o(($event) => selectedPlan.value = plan.id, plan.id)
           });
         }),
-        i: common_vendor.f(benefits, (benefit, k0, i0) => {
+        k: common_vendor.f(benefits, (benefit, k0, i0) => {
           return {
             a: common_vendor.t(benefit.icon),
             b: common_vendor.t(benefit.title),
@@ -148,8 +153,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: benefit.title
           };
         }),
-        j: common_vendor.t(buyButtonLabel.value),
-        k: common_vendor.o(buyVip, "7d")
+        l: common_vendor.t(buyButtonLabel.value),
+        m: common_vendor.o(buyVip, "63")
       });
     };
   }

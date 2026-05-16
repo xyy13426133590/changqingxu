@@ -1,0 +1,60 @@
+{
+  "pages": [
+    "pages/discover/index",
+    "pages/filter/index",
+    "pages/messages/index",
+    "pages/messages/chat",
+    "pages/mine/index",
+    "pages/mine/profile-edit",
+    "pages/mine/my-card",
+    "pages/mine/vip-center",
+    "pages/user/detail",
+    "pages/auth/welcome",
+    "pages/auth/login",
+    "pages/auth/register",
+    "pages/auth/real-name",
+    "pages/auth/face-verify"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "长情许",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "custom": false,
+    "color": "#999999",
+    "selectedColor": "#8B5CF6",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/discover/index",
+        "text": "发现"
+      },
+      {
+        "pagePath": "pages/filter/index",
+        "text": "筛选"
+      },
+      {
+        "pagePath": "pages/messages/index",
+        "text": "消息"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于匹配附近的人"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {}
+}

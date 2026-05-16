@@ -7,6 +7,7 @@ const services_api = require("../../services/api.js");
 const utils_devApi = require("../../utils/dev-api.js");
 const utils_avatar = require("../../utils/avatar.js");
 const utils_tabbar = require("../../utils/tabbar.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -34,6 +35,8 @@ const TabBar = () => "../../components/TabBar.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     const discoverStore = stores_discover.useDiscoverStore();
     const userStore = stores_user.useUserStore();
     const messagesStore = stores_messages.useMessagesStore();
@@ -353,13 +356,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       return common_vendor.e({
         a: headerAvatarSrc.value,
-        b: common_vendor.o(navigateToFilter, "1b"),
+        b: common_vendor.o(navigateToFilter, "55"),
         c: common_vendor.unref(messagesStore).totalUnread > 0
       }, common_vendor.unref(messagesStore).totalUnread > 0 ? {
         d: common_vendor.t(common_vendor.unref(messagesStore).totalUnread > 99 ? "99+" : common_vendor.unref(messagesStore).totalUnread)
       } : {}, {
-        e: common_vendor.o(navigateToMessages, "66"),
-        f: common_vendor.f(dailyUsers.value, (user, k0, i0) => {
+        e: common_vendor.o(navigateToMessages, "93"),
+        f: common_vendor.s(capsuleNavRowStyle.value),
+        g: common_vendor.s(capsuleNavOuterStyle.value),
+        h: common_vendor.f(dailyUsers.value, (user, k0, i0) => {
           return {
             a: user.avatar,
             b: common_vendor.t(user.nickname),
@@ -367,96 +372,96 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => navigateToUserDetail(user.id), user.id)
           };
         }),
-        g: !pageLoading.value && dailyUsers.value.length === 0
+        i: !pageLoading.value && dailyUsers.value.length === 0
       }, !pageLoading.value && dailyUsers.value.length === 0 ? {
-        h: common_vendor.t(dailyEmptyHint.value)
+        j: common_vendor.t(dailyEmptyHint.value)
       } : {}, {
-        i: pageLoading.value
+        k: pageLoading.value
       }, pageLoading.value ? {} : !currentUser.value ? common_vendor.e({
-        k: common_vendor.t(emptyHint.value),
-        l: common_vendor.unref(userStore).isLogin
+        m: common_vendor.t(emptyHint.value),
+        n: common_vendor.unref(userStore).isLogin
       }, common_vendor.unref(userStore).isLogin ? {
-        m: common_vendor.o(resetDiscoverSwipes, "54")
+        o: common_vendor.o(resetDiscoverSwipes, "83")
       } : {}, {
-        n: !common_vendor.unref(userStore).isLogin ? 1 : "",
-        o: common_vendor.o(reloadDiscover, "6e"),
-        p: !common_vendor.unref(userStore).isLogin
+        p: !common_vendor.unref(userStore).isLogin ? 1 : "",
+        q: common_vendor.o(reloadDiscover, "bf"),
+        r: !common_vendor.unref(userStore).isLogin
       }, !common_vendor.unref(userStore).isLogin ? {
-        q: common_vendor.o(goLogin, "a1")
+        s: common_vendor.o(goLogin, "e6")
       } : {
-        r: common_vendor.o(navigateToFilter, "f6")
+        t: common_vendor.o(navigateToFilter, "b5")
       }) : common_vendor.e({
-        s: currentUser.value
+        v: currentUser.value
       }, currentUser.value ? common_vendor.e({
-        t: cardAvatarSrc.value,
-        v: common_vendor.o(onCardAvatarError, "ae"),
-        w: likeOverlayOpacity.value,
-        x: passOverlayOpacity.value,
-        y: currentUser.value.isRealName
+        w: cardAvatarSrc.value,
+        x: common_vendor.o(onCardAvatarError, "f1"),
+        y: likeOverlayOpacity.value,
+        z: passOverlayOpacity.value,
+        A: currentUser.value.isRealName
       }, currentUser.value.isRealName ? {} : {}, {
-        z: currentUser.value.isVip
+        B: currentUser.value.isVip
       }, currentUser.value.isVip ? {} : {}, {
-        A: common_vendor.o(($event) => openReportFlow("home"), "35"),
-        B: common_vendor.t(currentUser.value.nickname),
-        C: common_vendor.t(currentUser.value.gender === "female" ? "♀" : "♂"),
-        D: common_vendor.n(currentUser.value.gender),
-        E: common_vendor.t(currentUser.value.matchReason),
-        F: common_vendor.t(currentUser.value.matchTagline),
-        G: common_vendor.t(currentUser.value.matchScore),
-        H: common_vendor.t(currentUser.value.age),
-        I: common_vendor.t(currentUser.value.location),
-        J: common_vendor.t((_a = currentUser.value.height) != null ? _a : "—"),
-        K: currentUser.value.zodiac
+        C: common_vendor.o(($event) => openReportFlow("home"), "f9"),
+        D: common_vendor.t(currentUser.value.nickname),
+        E: common_vendor.t(currentUser.value.gender === "female" ? "♀" : "♂"),
+        F: common_vendor.n(currentUser.value.gender),
+        G: common_vendor.t(currentUser.value.matchReason),
+        H: common_vendor.t(currentUser.value.matchTagline),
+        I: common_vendor.t(currentUser.value.matchScore),
+        J: common_vendor.t(currentUser.value.age),
+        K: common_vendor.t(currentUser.value.location),
+        L: common_vendor.t((_a = currentUser.value.height) != null ? _a : "—"),
+        M: currentUser.value.zodiac
       }, currentUser.value.zodiac ? {
-        L: common_vendor.t(getZodiacEmoji(currentUser.value.zodiac)),
-        M: common_vendor.t(currentUser.value.zodiac)
+        N: common_vendor.t(getZodiacEmoji(currentUser.value.zodiac)),
+        O: common_vendor.t(currentUser.value.zodiac)
       } : {}, {
-        N: currentUser.value.zodiacSign
+        P: currentUser.value.zodiacSign
       }, currentUser.value.zodiacSign ? {
-        O: common_vendor.t(getZodiacSignEmoji(currentUser.value.zodiacSign)),
-        P: common_vendor.t(currentUser.value.zodiacSign)
+        Q: common_vendor.t(getZodiacSignEmoji(currentUser.value.zodiacSign)),
+        R: common_vendor.t(currentUser.value.zodiacSign)
       } : {}, {
-        Q: currentUser.value.riyuan
+        S: currentUser.value.riyuan
       }, currentUser.value.riyuan ? {
-        R: common_vendor.t(getRiyuanEmoji(currentUser.value.riyuan)),
-        S: common_vendor.t(currentUser.value.riyuan)
+        T: common_vendor.t(getRiyuanEmoji(currentUser.value.riyuan)),
+        U: common_vendor.t(currentUser.value.riyuan)
       } : {}, {
-        T: currentUser.value.mbti
+        V: currentUser.value.mbti
       }, currentUser.value.mbti ? {
-        U: common_vendor.t(currentUser.value.mbti)
+        W: common_vendor.t(currentUser.value.mbti)
       } : {}, {
-        V: currentUser.value.education
+        X: currentUser.value.education
       }, currentUser.value.education ? {
-        W: common_vendor.t(currentUser.value.education)
+        Y: common_vendor.t(currentUser.value.education)
       } : {}, {
-        X: currentUser.value.occupation
+        Z: currentUser.value.occupation
       }, currentUser.value.occupation ? {
-        Y: common_vendor.t(currentUser.value.occupation)
+        aa: common_vendor.t(currentUser.value.occupation)
       } : {}, {
-        Z: currentUser.value.income
+        ab: currentUser.value.income
       }, currentUser.value.income ? {
-        aa: common_vendor.t(currentUser.value.income)
+        ac: common_vendor.t(currentUser.value.income)
       } : {}, {
-        ab: common_vendor.t(currentUser.value.bio),
-        ac: common_vendor.t(currentUser.value.matchReason),
-        ad: currentUser.value.id
+        ad: common_vendor.t(currentUser.value.bio),
+        ae: common_vendor.t(currentUser.value.matchReason),
+        af: currentUser.value.id
       }) : {}, {
-        ae: common_vendor.s(cardStyle.value),
-        af: common_vendor.o(handleTouchStart, "4e"),
-        ag: common_vendor.o(handleTouchMove, "9a"),
-        ah: common_vendor.o(handleTouchEnd, "8f"),
-        ai: common_vendor.o(handleCardTap, "33")
+        ag: common_vendor.s(cardStyle.value),
+        ah: common_vendor.o(handleTouchStart, "74"),
+        ai: common_vendor.o(handleTouchMove, "3b"),
+        aj: common_vendor.o(handleTouchEnd, "f5"),
+        ak: common_vendor.o(handleCardTap, "e9")
       }), {
-        j: !currentUser.value,
-        aj: currentUser.value && !pageLoading.value
+        l: !currentUser.value,
+        al: currentUser.value && !pageLoading.value
       }, currentUser.value && !pageLoading.value ? {} : {}, {
-        ak: currentUser.value && !pageLoading.value
+        am: currentUser.value && !pageLoading.value
       }, currentUser.value && !pageLoading.value ? {
-        al: common_vendor.o(commitPass, "a5"),
-        am: common_vendor.o(handleGreeting, "16"),
-        an: common_vendor.o(commitLike, "a3")
+        an: common_vendor.o(commitPass, "c9"),
+        ao: common_vendor.o(handleGreeting, "c1"),
+        ap: common_vendor.o(commitLike, "98")
       } : {}, {
-        ao: common_vendor.p({
+        aq: common_vendor.p({
           active: "discover"
         })
       });

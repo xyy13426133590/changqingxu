@@ -1,0 +1,1 @@
+"use strict";const t=require("../services/api.js");exports.isMpWeixinLocalhostApi=function(){return/localhost|127\.0\.0\.1/i.test(t.API_BASE_URL)},exports.mpWeixinApiHint=function(){return"小程序无法访问 localhost。请在 longqingxu-frontend/.env 将 VITE_API_BASE_URL 改为电脑局域网 IP（如 http://192.168.1.100:3000/api），重新编译并在开发者工具勾选「不校验合法域名」。"};

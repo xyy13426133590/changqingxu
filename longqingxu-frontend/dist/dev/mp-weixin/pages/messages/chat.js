@@ -4,6 +4,7 @@ const stores_messages = require("../../stores/messages.js");
 const stores_user = require("../../stores/user.js");
 const services_chatSocket = require("../../services/chat-socket.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -31,6 +32,8 @@ const ChatInputBar = () => "../../components/ChatInputBar.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "chat",
   setup(__props) {
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     const messagesStore = stores_messages.useMessagesStore();
     const userStore = stores_user.useUserStore();
     const showRiskBanner = common_vendor.ref(true);
@@ -132,14 +135,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       var _a, _b;
       return common_vendor.e({
-        a: common_vendor.o(goBack, "7d"),
+        a: common_vendor.o(goBack, "6b"),
         b: (_a = currentConversation.value) == null ? void 0 : _a.avatar,
         c: common_vendor.t((_b = currentConversation.value) == null ? void 0 : _b.nickname),
-        d: showRiskBanner.value
+        d: common_vendor.s(capsuleNavRowStyle.value),
+        e: common_vendor.s(capsuleNavOuterStyle.value),
+        f: showRiskBanner.value
       }, showRiskBanner.value ? {
-        e: common_vendor.o(dismissRisk, "c2")
+        g: common_vendor.o(dismissRisk, "ec")
       } : {}, {
-        f: common_vendor.f(currentMessages.value, (msg, k0, i0) => {
+        h: common_vendor.f(currentMessages.value, (msg, k0, i0) => {
           var _a2;
           return common_vendor.e({
             a: !isFromMe(msg)
@@ -202,11 +207,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             J: !isFromMe(msg) ? 1 : ""
           });
         }),
-        g: lastMessageId.value,
-        h: common_vendor.o(onSendText, "8a"),
-        i: common_vendor.o(onSendVoice, "4b"),
-        j: common_vendor.o(onSendImage, "bc"),
-        k: common_vendor.p({
+        i: lastMessageId.value,
+        j: common_vendor.o(onSendText, "ef"),
+        k: common_vendor.o(onSendVoice, "29"),
+        l: common_vendor.o(onSendImage, "36"),
+        m: common_vendor.p({
           placeholder: "文明发言，涉及站外引导将提示风险…"
         })
       });

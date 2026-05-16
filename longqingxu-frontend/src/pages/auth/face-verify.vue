@@ -1,11 +1,13 @@
 <template>
-  <view class="page-container gradient-bg face-page" :style="pageSafeStyle">
-    <view class="auth-top-nav glass-row">
-      <view class="nav-back-wrap" hover-class="btn-press" @tap="goBack">
-        <text class="nav-back">‹</text>
+  <view class="page-container gradient-bg face-page">
+    <view :style="capsuleNavOuterStyle">
+      <view class="auth-top-nav glass-row" :style="capsuleNavRowStyle">
+        <view class="nav-back-wrap" hover-class="btn-press" @tap="goBack">
+          <text class="nav-back">‹</text>
+        </view>
+        <text class="nav-title">人脸识别</text>
+        <view class="nav-placeholder" />
       </view>
-      <text class="nav-title">人脸识别</text>
-      <view class="nav-placeholder" />
     </view>
 
     <view class="face-body">
@@ -52,9 +54,10 @@ import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import { navigateBackTo } from '@/utils/navigation'
-import { getPageSafeTopStyle } from '@/utils/safe-area'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
 
-const pageSafeStyle = getPageSafeTopStyle()
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const userStore = useUserStore()
 const onlyFace = ref(false)
@@ -141,9 +144,9 @@ function onStart() {
   position: relative;
   z-index: 50;
   flex-shrink: 0;
-  margin: 12rpx 32rpx 0;
-  padding: 16rpx 20rpx;
-  min-height: 88rpx;
+  margin: 0 32rpx;
+  padding: 0 20rpx;
+  min-height: 0;
   border-radius: 20rpx;
   display: flex;
   align-items: center;

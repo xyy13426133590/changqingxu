@@ -1,12 +1,13 @@
 <template>
   <view class="page-container gradient-bg">
-    <!-- 顶部导航 -->
-    <view class="messages-header">
-      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
-        <text>‹</text>
+    <view :style="capsuleNavOuterStyle">
+      <view class="messages-header" :style="capsuleNavRowStyle">
+        <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
+          <text>‹</text>
+        </view>
+        <text class="title">消息</text>
+        <view class="placeholder" />
       </view>
-      <text class="title">消息</text>
-      <view class="placeholder" />
     </view>
 
     <!-- 会话列表 -->
@@ -51,6 +52,10 @@ import { useUserStore } from '@/stores/user'
 import TabBar from '@/components/TabBar.vue'
 import { navigateBackTo } from '@/utils/navigation'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const messagesStore = useMessagesStore()
 

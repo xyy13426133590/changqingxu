@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
 const utils_avatar = require("../../utils/avatar.js");
 const utils_tabbar = require("../../utils/tabbar.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __defProp = Object.defineProperty;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
@@ -28,9 +29,45 @@ const AUTH_TAG_DONE = "已认证";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
+    const pageTopInsetStyle = common_vendor.computed(() => utils_safeArea.getCapsulePageTopPaddingStyle());
     const defaultAvatar = utils_avatar.DEMO_AVATARS[0];
     const guestAvatarSrc = utils_avatar.DEMO_AVATARS[1];
     const userStore = stores_user.useUserStore();
+    function strFilled(v) {
+      return typeof v === "string" && v.trim().length > 0;
+    }
+    function numFilled(v) {
+      return v != null && typeof v === "number" && !Number.isNaN(v);
+    }
+    function computeProfileCompletenessPercent(p) {
+      var _a, _b;
+      const checks = [
+        strFilled(p.nickname),
+        strFilled(p.avatar),
+        p.gender === "male" || p.gender === "female",
+        strFilled(p.birthday) || numFilled(p.age),
+        numFilled(p.height),
+        numFilled(p.weight),
+        strFilled(p.location),
+        strFilled(p.hometown),
+        strFilled(p.education),
+        strFilled(p.school),
+        strFilled(p.occupation),
+        strFilled(p.jobLevel),
+        strFilled(p.company),
+        strFilled(p.income),
+        strFilled(p.bio),
+        ((_b = (_a = p.hobbies) == null ? void 0 : _a.length) != null ? _b : 0) > 0,
+        strFilled(p.mbti),
+        !!p.isRealName,
+        !!p.isFaceVerified
+      ];
+      const hit = checks.filter(Boolean).length;
+      return Math.min(100, Math.round(hit / checks.length * 100));
+    }
+    const profileCompletenessPercent = common_vendor.computed(
+      () => userStore.isLogin ? computeProfileCompletenessPercent(userStore.profile) : 0
+    );
     common_vendor.onShow(() => {
       utils_tabbar.safeHideNativeTabBar();
       void userStore.hydrateProfile();
@@ -101,7 +138,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           goFaceVerify();
           break;
         case "discover":
-          navigateToDiscover();
+          common_vendor.index.switchTab({ url: "/pages/discover/index" });
           break;
         case "logout":
           onLogout();
@@ -139,9 +176,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function navigateTo(page) {
       common_vendor.index.navigateTo({ url: `/pages/mine/${page}` });
     }
-    function navigateToDiscover() {
-      common_vendor.index.switchTab({ url: "/pages/discover/index" });
-    }
     function onLogout() {
       common_vendor.index.showModal({
         title: "退出登录",
@@ -157,12 +191,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: !common_vendor.unref(userStore).isLogin
       }, !common_vendor.unref(userStore).isLogin ? {
         b: common_vendor.unref(guestAvatarSrc),
-        c: common_vendor.o(goLogin, "67"),
-        d: common_vendor.o(goRegister, "82")
+        c: common_vendor.o(goLogin, "88"),
+        d: common_vendor.o(goRegister, "15")
       } : {
         e: common_vendor.unref(userStore).profile.avatar || common_vendor.unref(defaultAvatar),
         f: common_vendor.t(common_vendor.unref(userStore).profile.nickname || "我"),
-        g: common_vendor.f(menuItems.value, (item, k0, i0) => {
+        g: common_vendor.t(profileCompletenessPercent.value),
+        h: `${profileCompletenessPercent.value}%`,
+        i: common_vendor.f(menuItems.value, (item, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.icon),
             b: common_vendor.n(item.iconClass),
@@ -179,10 +215,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }, {
-        h: common_vendor.o(navigateToDiscover, "24"),
-        i: common_vendor.p({
+        j: common_vendor.p({
           active: "mine"
-        })
+        }),
+        k: common_vendor.s(pageTopInsetStyle.value)
       });
     };
   }

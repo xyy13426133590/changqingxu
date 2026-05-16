@@ -15,6 +15,9 @@ import {
   ReportUserDto,
 } from './dto/user.dto';
 
+/** 首页「每日推荐」横滑条服务端返回上限（与用户池体量无关）；池子不足则自然少于该值 */
+const DAILY_RECOMMENDATION_COUNT = 10;
+
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
@@ -185,12 +188,18 @@ export class UsersService {
       userId,
       matchedUserIds,
       false,
-      10,
+      DAILY_RECOMMENDATION_COUNT,
       true,
     );
     let recycled = false;
     if (users.length === 0 && matchedUserIds.length > 0) {
-      users = await this.queryRecommendationUsers(userId, [], false, 10, true);
+      users = await this.queryRecommendationUsers(
+        userId,
+        [],
+        false,
+        DAILY_RECOMMENDATION_COUNT,
+        true,
+      );
       recycled = users.length > 0;
     }
     const userCards = users.map((u) => this.formatUserCard(u, userId));
@@ -433,17 +442,24 @@ export class UsersService {
       gender: user.gender,
       age: user.age,
       height: user.height,
+      weight: user.weight ?? null,
+      hometown: user.hometown || '',
       location: user.location,
       zodiac: user.zodiac,
       zodiacSign: user.zodiacSign,
       mbti: user.mbti,
       riyuan: user.riyuan,
       education: user.education,
+      school: user.school || '',
+      schoolTier: user.schoolTier ?? null,
       occupation: user.occupation,
+      jobLevel: user.jobLevel || '',
+      company: user.company || '',
       income: user.income,
       bio: user.bio,
       hobbies: user.hobbies || [],
       isRealName: user.isRealName,
+      isFaceVerified: user.isFaceVerified,
       isVip: user.isVip,
       matchReason: matchReason,
       matchTagline: matchTagline,

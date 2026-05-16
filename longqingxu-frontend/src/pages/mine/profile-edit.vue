@@ -1,11 +1,12 @@
 <template>
   <view class="page-container gradient-bg">
-    <!-- 顶部导航 -->
-    <view class="profile-header">
-      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
-        <text>‹</text>
+    <view :style="capsuleNavOuterStyle">
+      <view class="profile-header" :style="capsuleNavRowStyle">
+        <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
+          <text>‹</text>
+        </view>
+        <text class="title">完善资料</text>
       </view>
-      <text class="title">完善资料</text>
     </view>
 
     <!-- 表单内容 -->
@@ -191,6 +192,10 @@ import {
 } from '@/utils/date'
 import { apiUpdateProfile } from '@/services/api-user'
 import { navigateBackTo } from '@/utils/navigation'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 function getZodiacEmojiSafe(zodiac: string): string {
   return getZodiacEmojiFromDate(zodiac) || '🐰'

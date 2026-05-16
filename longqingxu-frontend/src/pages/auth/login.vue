@@ -2,12 +2,14 @@
   <view class="page-container gradient-bg auth-page">
     <!-- 流程一：仅微信登录 + 进入手机登录 -->
     <template v-if="!phoneLoginExpanded">
-      <view class="auth-nav glass-row">
-        <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
-          <text class="auth-nav-back">‹</text>
+      <view :style="capsuleNavOuterStyle">
+        <view class="auth-nav glass-row" :style="capsuleNavRowStyle">
+          <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
+            <text class="auth-nav-back">‹</text>
+          </view>
+          <text class="auth-nav-title">登录</text>
+          <view class="auth-nav-placeholder" />
         </view>
-        <text class="auth-nav-title">登录</text>
-        <view class="auth-nav-placeholder" />
       </view>
 
       <scroll-view class="auth-scroll" scroll-y show-scrollbar="false" :enable-flex="true">
@@ -45,12 +47,14 @@
 
     <!-- 流程二：整页切换为手机登录，与微信区完全分离；左上角返回微信登录 -->
     <template v-else>
-      <view class="auth-nav glass-row auth-nav-phone">
-        <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="closePhoneLogin">
-          <text class="auth-nav-back">‹</text>
+      <view :style="capsuleNavOuterStyle">
+        <view class="auth-nav glass-row auth-nav-phone" :style="capsuleNavRowStyle">
+          <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="closePhoneLogin">
+            <text class="auth-nav-back">‹</text>
+          </view>
+          <text class="auth-nav-title">验证码登录</text>
+          <view class="auth-nav-placeholder" />
         </view>
-        <text class="auth-nav-title">验证码登录</text>
-        <view class="auth-nav-placeholder" />
       </view>
 
       <scroll-view class="auth-scroll auth-scroll-phone" scroll-y show-scrollbar="false" :enable-flex="true">
@@ -112,13 +116,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { onBackPress } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import { validatePhone, DEMO_SMS_CODE } from '@/services/auth'
 import { apiSendSms } from '@/services/api-auth'
 import { useDiscoverStore } from '@/stores/discover'
 import { navigateBackTo } from '@/utils/navigation'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const userStore = useUserStore()
 const discoverStore = useDiscoverStore()
@@ -280,8 +288,8 @@ async function submitSms() {
 }
 
 .glass-row {
-  margin: 24rpx 32rpx 0;
-  padding: 20rpx 24rpx;
+  margin: 0 32rpx;
+  padding: 0 24rpx;
   border-radius: 20rpx;
   display: flex;
   align-items: center;

@@ -5,6 +5,7 @@ const services_auth = require("../../services/auth.js");
 const services_apiAuth = require("../../services/api-auth.js");
 const stores_discover = require("../../stores/discover.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -28,6 +29,8 @@ var __async = (__this, __arguments, generator) => {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "login",
   setup(__props) {
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     const userStore = stores_user.useUserStore();
     const discoverStore = stores_discover.useDiscoverStore();
     const phone = common_vendor.ref("");
@@ -176,31 +179,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.e({
         a: !phoneLoginExpanded.value
       }, !phoneLoginExpanded.value ? {
-        b: common_vendor.o(goBack, "35"),
-        c: common_vendor.t(loadingWx.value ? "登录中…" : "微信一键登录"),
-        d: loadingWx.value ? 1 : "",
-        e: loadingWx.value,
-        f: common_vendor.o(onWeChatLogin, "e4"),
-        g: loadingWx.value ? 1 : "",
-        h: loadingWx.value,
-        i: common_vendor.o(openPhoneLogin, "4c")
+        b: common_vendor.o(goBack, "70"),
+        c: common_vendor.s(capsuleNavRowStyle.value),
+        d: common_vendor.s(capsuleNavOuterStyle.value),
+        e: common_vendor.t(loadingWx.value ? "登录中…" : "微信一键登录"),
+        f: loadingWx.value ? 1 : "",
+        g: loadingWx.value,
+        h: common_vendor.o(onWeChatLogin, "23"),
+        i: loadingWx.value ? 1 : "",
+        j: loadingWx.value,
+        k: common_vendor.o(openPhoneLogin, "79")
       } : {
-        j: common_vendor.o(closePhoneLogin, "ea"),
-        k: phone.value,
-        l: common_vendor.o(($event) => phone.value = $event.detail.value, "11"),
-        m: smsCode.value,
-        n: common_vendor.o(($event) => smsCode.value = $event.detail.value, "f7"),
-        o: common_vendor.t(smsCooldown.value > 0 ? `${smsCooldown.value}s` : smsSending.value ? "发送中" : "获取验证码"),
-        p: smsCooldown.value > 0 || smsSending.value ? 1 : "",
-        q: smsCooldown.value > 0 || smsSending.value,
-        r: common_vendor.o(onSendSms, "bb"),
-        s: common_vendor.t(common_vendor.unref(demoSms)),
-        t: common_vendor.t(loadingSms.value ? "登录中…" : "登录"),
-        v: loadingSms.value ? 1 : "",
-        w: loadingSms.value,
-        x: common_vendor.o(submitSms, "5e"),
-        y: common_vendor.o(goRegister, "75"),
-        z: common_vendor.t(common_vendor.unref(demoSms))
+        l: common_vendor.o(closePhoneLogin, "8e"),
+        m: common_vendor.s(capsuleNavRowStyle.value),
+        n: common_vendor.s(capsuleNavOuterStyle.value),
+        o: phone.value,
+        p: common_vendor.o(($event) => phone.value = $event.detail.value, "f9"),
+        q: smsCode.value,
+        r: common_vendor.o(($event) => smsCode.value = $event.detail.value, "31"),
+        s: common_vendor.t(smsCooldown.value > 0 ? `${smsCooldown.value}s` : smsSending.value ? "发送中" : "获取验证码"),
+        t: smsCooldown.value > 0 || smsSending.value ? 1 : "",
+        v: smsCooldown.value > 0 || smsSending.value,
+        w: common_vendor.o(onSendSms, "d0"),
+        x: common_vendor.t(common_vendor.unref(demoSms)),
+        y: common_vendor.t(loadingSms.value ? "登录中…" : "登录"),
+        z: loadingSms.value ? 1 : "",
+        A: loadingSms.value,
+        B: common_vendor.o(submitSms, "e2"),
+        C: common_vendor.o(goRegister, "3a"),
+        D: common_vendor.t(common_vendor.unref(demoSms))
       });
     };
   }

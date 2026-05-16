@@ -1,8 +1,10 @@
 <template>
   <view class="page-container gradient-bg welcome-page">
-    <view class="top-bar">
-      <view class="back-circle" hover-class="btn-press" @tap.stop="goBack">
-        <text class="back-ico">‹</text>
+    <view :style="capsuleNavOuterStyle">
+      <view class="top-bar" :style="capsuleNavRowStyle">
+        <view class="back-circle" hover-class="btn-press" @tap.stop="goBack">
+          <text class="back-ico">‹</text>
+        </view>
       </view>
     </view>
 
@@ -31,8 +33,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import AuthSafetyTips from '@/components/AuthSafetyTips.vue'
 import { navigateBackTo } from '@/utils/navigation'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 function goBack() {
   navigateBackTo('/pages/mine/index')
@@ -55,7 +62,10 @@ function goRegister() {
 }
 
 .top-bar {
-  padding: 24rpx 32rpx 0;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .back-circle {

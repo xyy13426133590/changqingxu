@@ -4,6 +4,7 @@ const stores_messages = require("../../stores/messages.js");
 const stores_user = require("../../stores/user.js");
 const utils_navigation = require("../../utils/navigation.js");
 const utils_tabbar = require("../../utils/tabbar.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -31,6 +32,8 @@ const TabBar = () => "../../components/TabBar.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     const messagesStore = stores_messages.useMessagesStore();
     common_vendor.onShow(() => __async(this, null, function* () {
       utils_tabbar.safeHideNativeTabBar();
@@ -65,10 +68,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "ba"),
-        b: sortedConversations.value.length === 0
+        a: common_vendor.o(goBack, "d2"),
+        b: common_vendor.s(capsuleNavRowStyle.value),
+        c: common_vendor.s(capsuleNavOuterStyle.value),
+        d: sortedConversations.value.length === 0
       }, sortedConversations.value.length === 0 ? {} : {}, {
-        c: common_vendor.f(sortedConversations.value, (conv, k0, i0) => {
+        e: common_vendor.f(sortedConversations.value, (conv, k0, i0) => {
           return common_vendor.e({
             a: conv.avatar,
             b: conv.unreadCount > 0
@@ -83,7 +88,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             i: common_vendor.o(($event) => enterChat(conv), conv.id)
           });
         }),
-        d: common_vendor.p({
+        f: common_vendor.p({
           active: "messages"
         })
       });

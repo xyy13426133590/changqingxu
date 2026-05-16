@@ -1,11 +1,13 @@
 <template>
   <view class="page-container gradient-bg">
-    <!-- 顶部导航 -->
-    <view class="filter-header">
-      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
-        <text>‹</text>
+    <!-- 顶部导航（与微信小程序胶囊垂直对齐） -->
+    <view :style="capsuleNavOuterStyle">
+      <view class="filter-header" :style="capsuleNavRowStyle">
+        <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
+          <text>‹</text>
+        </view>
+        <text class="header-title">筛选条件</text>
       </view>
-      <text class="header-title">筛选条件</text>
     </view>
 
     <!-- 筛选内容区 -->
@@ -124,6 +126,10 @@ import {
 import TabBar from '@/components/TabBar.vue'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
 import { navigateBackTo } from '@/utils/navigation'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 onShow(() => {
   safeHideNativeTabBar()

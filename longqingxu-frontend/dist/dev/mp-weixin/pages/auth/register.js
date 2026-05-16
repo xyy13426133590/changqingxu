@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
 const services_auth = require("../../services/auth.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -30,6 +31,8 @@ const AuthSafetyTips = () => "../../components/AuthSafetyTips.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "register",
   setup(__props) {
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     const userStore = stores_user.useUserStore();
     const phone = common_vendor.ref("");
     common_vendor.onLoad((options) => {
@@ -94,23 +97,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "d0"),
-        b: phone.value,
-        c: common_vendor.o(($event) => phone.value = $event.detail.value, "d0"),
-        d: nickname.value,
-        e: common_vendor.o(($event) => nickname.value = $event.detail.value, "f4"),
-        f: password.value,
-        g: common_vendor.o(($event) => password.value = $event.detail.value, "6a"),
-        h: password2.value,
-        i: common_vendor.o(($event) => password2.value = $event.detail.value, "bc"),
-        j: agreed.value
+        a: common_vendor.o(goBack, "7d"),
+        b: common_vendor.s(capsuleNavRowStyle.value),
+        c: common_vendor.s(capsuleNavOuterStyle.value),
+        d: phone.value,
+        e: common_vendor.o(($event) => phone.value = $event.detail.value, "30"),
+        f: nickname.value,
+        g: common_vendor.o(($event) => nickname.value = $event.detail.value, "53"),
+        h: password.value,
+        i: common_vendor.o(($event) => password.value = $event.detail.value, "65"),
+        j: password2.value,
+        k: common_vendor.o(($event) => password2.value = $event.detail.value, "78"),
+        l: agreed.value
       }, agreed.value ? {} : {}, {
-        k: agreed.value ? 1 : "",
-        l: common_vendor.o(($event) => agreed.value = !agreed.value, "ae"),
-        m: common_vendor.t(loading.value ? "提交中…" : "注 册"),
-        n: loading.value || !agreed.value ? 1 : "",
-        o: common_vendor.o(submit, "aa"),
-        p: common_vendor.o(goLogin, "28")
+        m: agreed.value ? 1 : "",
+        n: common_vendor.o(($event) => agreed.value = !agreed.value, "38"),
+        o: common_vendor.t(loading.value ? "提交中…" : "注 册"),
+        p: loading.value || !agreed.value ? 1 : "",
+        q: common_vendor.o(submit, "58"),
+        r: common_vendor.o(goLogin, "43")
       });
     };
   }

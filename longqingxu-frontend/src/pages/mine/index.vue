@@ -1,5 +1,5 @@
 <template>
-  <view class="page-container gradient-bg">
+  <view class="page-container gradient-bg" :style="pageTopInsetStyle">
     <!-- 未登录 -->
     <template v-if="!userStore.isLogin">
       <view class="guest-wrap">
@@ -35,8 +35,20 @@
             mode="aspectFill"
           />
         </view>
-        <text class="mine-nickname">{{ userStore.profile.nickname || '我' }}</text>
-        <text class="mine-hint">完善资料，提升匹配</text>
+        <view class="mine-header-text">
+          <text class="mine-nickname">{{ userStore.profile.nickname || '我' }}</text>
+          <view class="mine-complete-row">
+            <text class="mine-complete-label">资料完善度</text>
+            <text class="mine-complete-num">{{ profileCompletenessPercent }}%</text>
+          </view>
+          <view class="mine-complete-track">
+            <view
+              class="mine-complete-fill"
+              :style="{ width: `${profileCompletenessPercent}%` }"
+            />
+          </view>
+          <text class="mine-hint">完善资料，提升匹配</text>
+        </view>
       </view>
 
       <scroll-view class="mine-menu-list" scroll-y show-scrollbar="false">
@@ -61,10 +73,6 @@
       </scroll-view>
     </template>
 
-    <view class="mine-footer">
-      <text class="footer-link" @tap="navigateToDiscover">返回首页</text>
-    </view>
-
     <TabBar active="mine" />
   </view>
 </template>
@@ -72,15 +80,57 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { useUserStore } from '@/stores/user'
+import { useUserStore, type UserProfile } from '@/stores/user'
 import TabBar from '@/components/TabBar.vue'
 import { DEMO_AVATARS } from '@/utils/avatar'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
+import { getCapsulePageTopPaddingStyle } from '@/utils/safe-area'
+
+const pageTopInsetStyle = computed(() => getCapsulePageTopPaddingStyle())
 
 const defaultAvatar = DEMO_AVATARS[0]
 const guestAvatarSrc = DEMO_AVATARS[1]
 
 const userStore = useUserStore()
+
+function strFilled(v: string | undefined | null): boolean {
+  return typeof v === 'string' && v.trim().length > 0
+}
+
+function numFilled(v: number | undefined | null): boolean {
+  return v != null && typeof v === 'number' && !Number.isNaN(v)
+}
+
+/** 与编辑资料、资料卡展示字段对齐，均分权重 */
+function computeProfileCompletenessPercent(p: Partial<UserProfile>): number {
+  const checks = [
+    strFilled(p.nickname),
+    strFilled(p.avatar),
+    p.gender === 'male' || p.gender === 'female',
+    strFilled(p.birthday) || numFilled(p.age),
+    numFilled(p.height),
+    numFilled(p.weight),
+    strFilled(p.location),
+    strFilled(p.hometown),
+    strFilled(p.education),
+    strFilled(p.school),
+    strFilled(p.occupation),
+    strFilled(p.jobLevel),
+    strFilled(p.company),
+    strFilled(p.income),
+    strFilled(p.bio),
+    (p.hobbies?.length ?? 0) > 0,
+    strFilled(p.mbti),
+    !!p.isRealName,
+    !!p.isFaceVerified,
+  ]
+  const hit = checks.filter(Boolean).length
+  return Math.min(100, Math.round((hit / checks.length) * 100))
+}
+
+const profileCompletenessPercent = computed(() =>
+  userStore.isLogin ? computeProfileCompletenessPercent(userStore.profile) : 0,
+)
 
 onShow(() => {
   safeHideNativeTabBar()
@@ -173,7 +223,7 @@ function onMenuTap(key: string) {
       goFaceVerify()
       break
     case 'discover':
-      navigateToDiscover()
+      uni.switchTab({ url: '/pages/discover/index' })
       break
     case 'logout':
       onLogout()
@@ -218,10 +268,6 @@ function goFaceVerify() {
 
 function navigateTo(page: string) {
   uni.navigateTo({ url: `/pages/mine/${page}` })
-}
-
-function navigateToDiscover() {
-  uni.switchTab({ url: '/pages/discover/index' })
 }
 
 function onLogout() {

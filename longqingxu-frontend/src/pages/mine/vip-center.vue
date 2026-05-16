@@ -1,10 +1,12 @@
 <template>
   <view class="page-container gradient-bg">
-    <view class="vip-header">
-      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
-        <text>‹</text>
+    <view :style="capsuleNavOuterStyle">
+      <view class="vip-header" :style="capsuleNavRowStyle">
+        <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
+          <text>‹</text>
+        </view>
+        <text class="title">会员中心</text>
       </view>
-      <text class="title">会员中心</text>
     </view>
 
     <scroll-view class="vip-content" scroll-y show-scrollbar="false">
@@ -91,6 +93,10 @@ import { useUserStore } from '@/stores/user'
 import { apiGetVipPlans, apiCreateOrder, type VipPlan } from '@/services/api-vip'
 import { apiGetVipStatus } from '@/services/api-user'
 import { navigateBackTo } from '@/utils/navigation'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const userStore = useUserStore()
 

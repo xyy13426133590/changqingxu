@@ -1,0 +1,1 @@
+"use strict";const e=require("./api.js");exports.apiLikeUser=function(s){return e.post("/matches/like",{targetUserId:s})},exports.apiPassUser=function(s){return e.post("/matches/pass",{targetUserId:s})},exports.apiResetSwipeHistory=function(){return e.post("/matches/reset-swipes",{})},exports.apiSuperLikeUser=function(s){return e.post("/matches/super-like",{targetUserId:s})};

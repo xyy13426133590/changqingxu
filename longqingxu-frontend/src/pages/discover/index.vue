@@ -1,25 +1,27 @@
 <template>
   <view class="page-container gradient-bg">
-    <!-- 顶部导航 -->
-    <view class="header">
-      <view class="header-left">
-        <view class="avatar-ripple-small">
-          <image
-            class="avatar-img"
-            :src="headerAvatarSrc"
-            mode="aspectFill"
-          />
+    <!-- 顶部导航（与微信小程序胶囊垂直对齐） -->
+    <view :style="capsuleNavOuterStyle">
+      <view class="header" :style="capsuleNavRowStyle">
+        <view class="header-left">
+          <view class="avatar-ripple-small">
+            <image
+              class="avatar-img"
+              :src="headerAvatarSrc"
+              mode="aspectFill"
+            />
+          </view>
+          <text class="logo-text font-logo">长情许</text>
         </view>
-        <text class="logo-text font-logo">长情许</text>
-      </view>
-      <view class="header-right">
-        <view class="icon-btn glass btn-press" @click="navigateToFilter">
-          <text class="header-icon" aria-label="筛选">☰</text>
-        </view>
-        <view class="icon-btn glass relative btn-press" @click="navigateToMessages">
-          <text class="header-icon" aria-label="消息">🔔</text>
-          <view v-if="messagesStore.totalUnread > 0" class="badge-dot">
-            {{ messagesStore.totalUnread > 99 ? '99+' : messagesStore.totalUnread }}
+        <view class="header-right">
+          <view class="icon-btn glass btn-press" @click="navigateToFilter">
+            <text class="header-icon" aria-label="筛选">☰</text>
+          </view>
+          <view class="icon-btn glass relative btn-press" @click="navigateToMessages">
+            <text class="header-icon" aria-label="消息">🔔</text>
+            <view v-if="messagesStore.totalUnread > 0" class="badge-dot">
+              {{ messagesStore.totalUnread > 99 ? '99+' : messagesStore.totalUnread }}
+            </view>
           </view>
         </view>
       </view>
@@ -221,6 +223,10 @@ import { getToken } from '@/services/api'
 import { isMpWeixinLocalhostApi, mpWeixinApiHint } from '@/utils/dev-api'
 import { resolveAvatar, DEMO_AVATARS } from '@/utils/avatar'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const discoverStore = useDiscoverStore()
 const userStore = useUserStore()

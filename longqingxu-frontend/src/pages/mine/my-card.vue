@@ -1,11 +1,12 @@
 <template>
   <view class="page-container gradient-bg">
-    <!-- 顶部导航 -->
-    <view class="my-card-header">
-      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
-        <text>‹</text>
+    <view :style="capsuleNavOuterStyle">
+      <view class="my-card-header" :style="capsuleNavRowStyle">
+        <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
+          <text>‹</text>
+        </view>
+        <text class="title">我的资料卡</text>
       </view>
-      <text class="title">我的资料卡</text>
     </view>
 
     <!-- 资料卡展示 -->
@@ -90,6 +91,10 @@ import {
   getRiyuanEmoji,
 } from '@/utils/date'
 import { navigateBackTo } from '@/utils/navigation'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const userStore = useUserStore()
 

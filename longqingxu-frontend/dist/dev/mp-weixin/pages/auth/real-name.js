@@ -6,7 +6,8 @@ const utils_safeArea = require("../../utils/safe-area.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "real-name",
   setup(__props) {
-    const pageSafeStyle = utils_safeArea.getPageSafeTopStyle();
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     const userStore = stores_user.useUserStore();
     const legalName = common_vendor.ref("");
     const idCard = common_vendor.ref("");
@@ -57,15 +58,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "2f"),
-        b: legalName.value,
-        c: common_vendor.o(($event) => legalName.value = $event.detail.value, "77"),
-        d: idCard.value,
-        e: common_vendor.o(($event) => idCard.value = $event.detail.value, "3e"),
-        f: common_vendor.t(submitting.value ? "校验中…" : "下一步：人脸识别"),
-        g: submitting.value ? 1 : "",
-        h: common_vendor.o(onNext, "3f"),
-        i: common_vendor.s(common_vendor.unref(pageSafeStyle))
+        a: common_vendor.o(goBack, "34"),
+        b: common_vendor.s(capsuleNavRowStyle.value),
+        c: common_vendor.s(capsuleNavOuterStyle.value),
+        d: legalName.value,
+        e: common_vendor.o(($event) => legalName.value = $event.detail.value, "ff"),
+        f: idCard.value,
+        g: common_vendor.o(($event) => idCard.value = $event.detail.value, "4b"),
+        h: common_vendor.t(submitting.value ? "校验中…" : "下一步：人脸识别"),
+        i: submitting.value ? 1 : "",
+        j: common_vendor.o(onNext, "cb")
       };
     };
   }

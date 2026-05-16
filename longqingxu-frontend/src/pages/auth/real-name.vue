@@ -1,11 +1,13 @@
 <template>
-  <view class="page-container gradient-bg auth-flow no-tabbar" :style="pageSafeStyle">
-    <view class="auth-top-nav glass-row">
-      <view class="nav-back-wrap" hover-class="btn-press" @tap="goBack">
-        <text class="nav-back">‹</text>
+  <view class="page-container gradient-bg auth-flow no-tabbar">
+    <view :style="capsuleNavOuterStyle">
+      <view class="auth-top-nav glass-row" :style="capsuleNavRowStyle">
+        <view class="nav-back-wrap" hover-class="btn-press" @tap="goBack">
+          <text class="nav-back">‹</text>
+        </view>
+        <text class="nav-title">实名认证</text>
+        <view class="nav-placeholder" />
       </view>
-      <text class="nav-title">实名认证</text>
-      <view class="nav-placeholder" />
     </view>
 
     <!-- 不用 scroll-view：内嵌 input 在 H5/小程序上易出现无法聚焦、无法输入 -->
@@ -55,12 +57,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { navigateBackTo } from '@/utils/navigation'
-import { getPageSafeTopStyle } from '@/utils/safe-area'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
 
-const pageSafeStyle = getPageSafeTopStyle()
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const userStore = useUserStore()
 const legalName = ref('')
@@ -120,8 +123,8 @@ function onNext() {
   position: relative;
   z-index: 50;
   flex-shrink: 0;
-  margin: 24rpx 32rpx 0;
-  padding: 20rpx 24rpx;
+  margin: 0 32rpx;
+  padding: 0 24rpx;
   border-radius: 20rpx;
   display: flex;
   align-items: center;

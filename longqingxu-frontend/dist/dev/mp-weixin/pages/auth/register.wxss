@@ -4,8 +4,8 @@
   flex-direction: column;
 }
 .glass-row.data-v-3d5ab0d5 {
-  margin: 24rpx 32rpx 0;
-  padding: 20rpx 24rpx;
+  margin: 0 32rpx;
+  padding: 0 24rpx;
   border-radius: 20rpx;
   display: flex;
   align-items: center;

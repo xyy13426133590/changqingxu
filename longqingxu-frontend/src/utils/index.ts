@@ -1,5 +1,12 @@
 export { navigateBackSafe, navigateBackTo } from './navigation'
-export { getStatusBarHeight, getPageSafeTopStyle } from './safe-area'
+export {
+  getStatusBarHeight,
+  getPageSafeTopStyle,
+  getCapsuleNavMetrics,
+  getCapsuleNavOuterStyle,
+  getCapsuleNavRowStyle,
+  getCapsulePageTopPaddingStyle,
+} from './safe-area'
 export {
   detectRisk,
   hasContactInfo,

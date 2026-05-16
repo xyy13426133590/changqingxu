@@ -1,18 +1,19 @@
 <template>
   <view class="page-container gradient-bg">
-    <!-- 顶部导航 -->
-    <view class="chat-header">
-      <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
-        <text>‹</text>
-      </view>
-      <image
-        class="peer-avatar"
-        :src="currentConversation?.avatar"
-        mode="aspectFill"
-      />
-      <view class="peer-info">
-        <text class="nickname">{{ currentConversation?.nickname }}</text>
-        <text class="safety-tip">站内信 · 请勿轻信站外转账</text>
+    <view :style="capsuleNavOuterStyle">
+      <view class="chat-header" :style="capsuleNavRowStyle">
+        <view class="back-btn" hover-class="btn-press" @tap.stop="goBack">
+          <text>‹</text>
+        </view>
+        <image
+          class="peer-avatar"
+          :src="currentConversation?.avatar"
+          mode="aspectFill"
+        />
+        <view class="peer-info">
+          <text class="nickname">{{ currentConversation?.nickname }}</text>
+          <text class="safety-tip">站内信 · 请勿轻信站外转账</text>
+        </view>
       </view>
     </view>
 
@@ -131,6 +132,10 @@ import { useUserStore } from '@/stores/user'
 import ChatInputBar from '@/components/ChatInputBar.vue'
 import { connectChatSocket, disconnectChatSocket } from '@/services/chat-socket'
 import { navigateBackTo } from '@/utils/navigation'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const messagesStore = useMessagesStore()
 const userStore = useUserStore()

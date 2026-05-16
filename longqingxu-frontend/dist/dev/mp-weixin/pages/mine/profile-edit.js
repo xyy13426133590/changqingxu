@@ -5,6 +5,7 @@ const utils_avatar = require("../../utils/avatar.js");
 const utils_date = require("../../utils/date.js");
 const services_apiUser = require("../../services/api-user.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
@@ -48,6 +49,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "profile-edit",
   setup(__props) {
     var _a, _b;
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     function getZodiacEmojiSafe(zodiac) {
       return utils_date.getZodiacEmoji(zodiac);
     }
@@ -244,58 +247,60 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "26"),
-        b: formData.avatar,
-        c: common_vendor.o(uploadAvatar, "ee"),
-        d: formData.nickname,
-        e: common_vendor.o(($event) => formData.nickname = $event.detail.value, "e2"),
-        f: common_vendor.t(genderLabel.value),
-        g: genderOptions,
-        h: genderIndex.value,
-        i: common_vendor.o(onGenderChange, "1f"),
-        j: common_vendor.t(formData.birthday || "生日"),
-        k: formData.birthday,
-        l: common_vendor.o(onBirthdayChange, "1f"),
-        m: formData.height,
-        n: common_vendor.o(($event) => formData.height = $event.detail.value, "cc"),
-        o: formData.weight,
-        p: common_vendor.o(($event) => formData.weight = $event.detail.value, "14"),
-        q: common_vendor.t(formData.hometown || "籍贯（省市区）"),
-        r: common_vendor.o(onHometownChange, "9c"),
-        s: common_vendor.t(formData.location || "现居地（省市区）"),
-        t: common_vendor.o(onLocationChange, "66"),
-        v: common_vendor.t(getZodiacEmojiSafe(autoInfo.value.zodiac)),
-        w: common_vendor.t(autoInfo.value.zodiac),
-        x: common_vendor.t(common_vendor.unref(utils_date.getZodiacSignSymbol)(autoInfo.value.zodiacSign)),
-        y: common_vendor.t(autoInfo.value.zodiacSign),
-        z: common_vendor.t(getRiyuanEmojiSafe(autoInfo.value.riyuan)),
-        A: common_vendor.t(autoInfo.value.riyuan),
-        B: common_vendor.t(autoInfo.value.mbti),
-        C: common_vendor.t(formData.education || "学历"),
-        D: educationOptions,
-        E: educationIndex.value,
-        F: common_vendor.o(onEducationChange, "90"),
-        G: formData.schoolTier === "985"
+        a: common_vendor.o(goBack, "d7"),
+        b: common_vendor.s(capsuleNavRowStyle.value),
+        c: common_vendor.s(capsuleNavOuterStyle.value),
+        d: formData.avatar,
+        e: common_vendor.o(uploadAvatar, "86"),
+        f: formData.nickname,
+        g: common_vendor.o(($event) => formData.nickname = $event.detail.value, "a7"),
+        h: common_vendor.t(genderLabel.value),
+        i: genderOptions,
+        j: genderIndex.value,
+        k: common_vendor.o(onGenderChange, "4e"),
+        l: common_vendor.t(formData.birthday || "生日"),
+        m: formData.birthday,
+        n: common_vendor.o(onBirthdayChange, "36"),
+        o: formData.height,
+        p: common_vendor.o(($event) => formData.height = $event.detail.value, "37"),
+        q: formData.weight,
+        r: common_vendor.o(($event) => formData.weight = $event.detail.value, "42"),
+        s: common_vendor.t(formData.hometown || "籍贯（省市区）"),
+        t: common_vendor.o(onHometownChange, "fb"),
+        v: common_vendor.t(formData.location || "现居地（省市区）"),
+        w: common_vendor.o(onLocationChange, "d6"),
+        x: common_vendor.t(getZodiacEmojiSafe(autoInfo.value.zodiac)),
+        y: common_vendor.t(autoInfo.value.zodiac),
+        z: common_vendor.t(common_vendor.unref(utils_date.getZodiacSignSymbol)(autoInfo.value.zodiacSign)),
+        A: common_vendor.t(autoInfo.value.zodiacSign),
+        B: common_vendor.t(getRiyuanEmojiSafe(autoInfo.value.riyuan)),
+        C: common_vendor.t(autoInfo.value.riyuan),
+        D: common_vendor.t(autoInfo.value.mbti),
+        E: common_vendor.t(formData.education || "学历"),
+        F: educationOptions,
+        G: educationIndex.value,
+        H: common_vendor.o(onEducationChange, "39"),
+        I: formData.schoolTier === "985"
       }, formData.schoolTier === "985" ? {} : {}, {
-        H: formData.schoolTier === "211"
+        J: formData.schoolTier === "211"
       }, formData.schoolTier === "211" ? {} : {}, {
-        I: common_vendor.o([($event) => formData.school = $event.detail.value, onSchoolInput], "ce"),
-        J: formData.school,
-        K: common_vendor.t(formData.occupation || "职业"),
-        L: occupationOptions,
-        M: occupationIndex.value,
-        N: common_vendor.o(onOccupationChange, "a1"),
-        O: common_vendor.t(formData.jobLevel || "职级（可选）"),
-        P: jobLevelOptions,
-        Q: jobLevelIndex.value,
-        R: common_vendor.o(onJobLevelChange, "10"),
-        S: formData.company,
-        T: common_vendor.o(($event) => formData.company = $event.detail.value, "72"),
-        U: common_vendor.t(formData.income || "年收入"),
-        V: incomeOptions,
-        W: incomeIndex.value,
-        X: common_vendor.o(onIncomeChange, "4b"),
-        Y: common_vendor.f(hobbyOptions, (hobby, k0, i0) => {
+        K: common_vendor.o([($event) => formData.school = $event.detail.value, onSchoolInput], "ce"),
+        L: formData.school,
+        M: common_vendor.t(formData.occupation || "职业"),
+        N: occupationOptions,
+        O: occupationIndex.value,
+        P: common_vendor.o(onOccupationChange, "aa"),
+        Q: common_vendor.t(formData.jobLevel || "职级（可选）"),
+        R: jobLevelOptions,
+        S: jobLevelIndex.value,
+        T: common_vendor.o(onJobLevelChange, "03"),
+        U: formData.company,
+        V: common_vendor.o(($event) => formData.company = $event.detail.value, "a6"),
+        W: common_vendor.t(formData.income || "年收入"),
+        X: incomeOptions,
+        Y: incomeIndex.value,
+        Z: common_vendor.o(onIncomeChange, "ef"),
+        aa: common_vendor.f(hobbyOptions, (hobby, k0, i0) => {
           return {
             a: common_vendor.t(hobby),
             b: hobby,
@@ -303,10 +308,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => toggleHobby(hobby), hobby)
           };
         }),
-        Z: formData.bio,
-        aa: common_vendor.o(($event) => formData.bio = $event.detail.value, "a7"),
-        ab: common_vendor.t(formData.bio.length),
-        ac: common_vendor.o(saveProfile, "af")
+        ab: formData.bio,
+        ac: common_vendor.o(($event) => formData.bio = $event.detail.value, "44"),
+        ad: common_vendor.t(formData.bio.length),
+        ae: common_vendor.o(saveProfile, "42")
       });
     };
   }

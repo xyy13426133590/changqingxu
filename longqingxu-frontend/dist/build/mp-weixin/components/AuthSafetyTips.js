@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js"),t=e.defineComponent({__name:"AuthSafetyTips",setup(t){const n=["建议完成实名认证与人脸识别，提升信任与匹配质量","请勿轻信涉及金钱、投资、借贷的请求","首次见面请选择公共场所，并告知亲友行踪","发现可疑行为请立即举报，平台将依规处理"];return(t,o)=>({a:e.f(n,(t,n,o)=>({a:e.t(t),b:n}))})}}),n=e._export_sfc(t,[["__scopeId","data-v-06281f9b"]]);wx.createComponent(n);

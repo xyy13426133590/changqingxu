@@ -4,7 +4,10 @@
   flex-direction: column;
 }
 .top-bar.data-v-1c4424d0 {
-  padding: 24rpx 32rpx 0;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 .back-circle.data-v-1c4424d0 {
   width: 72rpx;

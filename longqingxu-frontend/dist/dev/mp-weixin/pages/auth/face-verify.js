@@ -6,7 +6,8 @@ const utils_safeArea = require("../../utils/safe-area.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "face-verify",
   setup(__props) {
-    const pageSafeStyle = utils_safeArea.getPageSafeTopStyle();
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     const userStore = stores_user.useUserStore();
     const onlyFace = common_vendor.ref(false);
     const running = common_vendor.ref(false);
@@ -79,26 +80,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "5f"),
-        b: onlyFace.value
+        a: common_vendor.o(goBack, "98"),
+        b: common_vendor.s(capsuleNavRowStyle.value),
+        c: common_vendor.s(capsuleNavOuterStyle.value),
+        d: onlyFace.value
       }, onlyFace.value ? {} : !hasDraft.value ? {
-        d: common_vendor.o(goRealName, "ba")
+        f: common_vendor.o(goRealName, "d6")
       } : {}, {
-        c: !hasDraft.value,
-        e: common_vendor.t(stepEmoji.value),
-        f: common_vendor.t(stepTitle.value),
-        g: common_vendor.t(stepDesc.value),
-        h: common_vendor.f(actionHints, (a, i, i0) => {
+        e: !hasDraft.value,
+        g: common_vendor.t(stepEmoji.value),
+        h: common_vendor.t(stepTitle.value),
+        i: common_vendor.t(stepDesc.value),
+        j: common_vendor.f(actionHints, (a, i, i0) => {
           return {
             a: common_vendor.t(a.icon),
             b: common_vendor.t(a.label),
             c: i
           };
         }),
-        i: common_vendor.t(running.value ? "识别中…" : "开始识别"),
-        j: running.value || !canStart.value ? 1 : "",
-        k: common_vendor.o(onStart, "2b"),
-        l: common_vendor.s(common_vendor.unref(pageSafeStyle))
+        k: common_vendor.t(running.value ? "识别中…" : "开始识别"),
+        l: running.value || !canStart.value ? 1 : "",
+        m: common_vendor.o(onStart, "b7")
       });
     };
   }

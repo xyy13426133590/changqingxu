@@ -44,17 +44,24 @@ export interface UserCard {
   gender: string
   age: number
   height: number
+  weight?: number | null
+  hometown?: string
   location: string
   zodiac: string
   zodiacSign: string
   mbti: string
   riyuan: string
   education: string
+  school?: string
+  schoolTier?: '985' | '211' | null
   occupation: string
+  jobLevel?: string
+  company?: string
   income: string
   bio: string
   hobbies: string[]
   isRealName: boolean
+  isFaceVerified: boolean
   isVip: boolean
   matchReason: string
   matchTagline: string

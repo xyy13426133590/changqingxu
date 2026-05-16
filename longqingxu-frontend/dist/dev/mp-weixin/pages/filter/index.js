@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const stores_discover = require("../../stores/discover.js");
 const utils_tabbar = require("../../utils/tabbar.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -30,6 +31,8 @@ const TabBar = () => "../../components/TabBar.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     common_vendor.onShow(() => {
       utils_tabbar.safeHideNativeTabBar();
       discoverStore.repairFiltersState();
@@ -88,8 +91,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "47"),
-        b: common_vendor.f(zodiacOptions, (opt, k0, i0) => {
+        a: common_vendor.o(goBack, "6e"),
+        b: common_vendor.s(capsuleNavRowStyle.value),
+        c: common_vendor.s(capsuleNavOuterStyle.value),
+        d: common_vendor.f(zodiacOptions, (opt, k0, i0) => {
           return common_vendor.e({
             a: common_vendor.t(opt.label),
             b: opt.desc
@@ -101,10 +106,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: common_vendor.o(($event) => setZodiacMatch(opt.value), opt.value)
           });
         }),
-        c: ageMaxDisplay.value,
-        d: common_vendor.o(onAgeChange, "9e"),
-        e: common_vendor.t(ageMaxDisplay.value),
-        f: common_vendor.f(distanceOptions, (opt, k0, i0) => {
+        e: ageMaxDisplay.value,
+        f: common_vendor.o(onAgeChange, "c2"),
+        g: common_vendor.t(ageMaxDisplay.value),
+        h: common_vendor.f(distanceOptions, (opt, k0, i0) => {
           return {
             a: common_vendor.t(opt.label),
             b: opt.value,
@@ -112,7 +117,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => setDistance(opt.value), opt.value)
           };
         }),
-        g: common_vendor.f(educationOptions, (opt, k0, i0) => {
+        i: common_vendor.f(educationOptions, (opt, k0, i0) => {
           return {
             a: common_vendor.t(opt),
             b: opt,
@@ -120,7 +125,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => setEducation(opt), opt)
           };
         }),
-        h: common_vendor.f(incomeOptions, (opt, k0, i0) => {
+        j: common_vendor.f(incomeOptions, (opt, k0, i0) => {
           return {
             a: common_vendor.t(opt),
             b: opt,
@@ -128,8 +133,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => setIncome(opt), opt)
           };
         }),
-        i: common_vendor.o(applyFilters, "38"),
-        j: common_vendor.p({
+        k: common_vendor.o(applyFilters, "82"),
+        l: common_vendor.p({
           active: "filter"
         })
       };

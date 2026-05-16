@@ -7,9 +7,9 @@
   position: relative;
   z-index: 50;
   flex-shrink: 0;
-  margin: 12rpx 32rpx 0;
-  padding: 16rpx 20rpx;
-  min-height: 88rpx;
+  margin: 0 32rpx;
+  padding: 0 20rpx;
+  min-height: 0;
   border-radius: 20rpx;
   display: flex;
   align-items: center;

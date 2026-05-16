@@ -19,6 +19,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("../../database/entities/user.entity");
 const match_entity_1 = require("../../database/entities/match.entity");
+const DAILY_RECOMMENDATION_COUNT = 10;
 let UsersService = UsersService_1 = class UsersService {
     constructor(userRepository, matchRepository) {
         this.userRepository = userRepository;
@@ -118,10 +119,10 @@ let UsersService = UsersService_1 = class UsersService {
     }
     async getDailyRecommendations(userId) {
         const matchedUserIds = await this.getMatchedUserIds(userId);
-        let users = await this.queryRecommendationUsers(userId, matchedUserIds, false, 10, true);
+        let users = await this.queryRecommendationUsers(userId, matchedUserIds, false, DAILY_RECOMMENDATION_COUNT, true);
         let recycled = false;
         if (users.length === 0 && matchedUserIds.length > 0) {
-            users = await this.queryRecommendationUsers(userId, [], false, 10, true);
+            users = await this.queryRecommendationUsers(userId, [], false, DAILY_RECOMMENDATION_COUNT, true);
             recycled = users.length > 0;
         }
         const userCards = users.map((u) => this.formatUserCard(u, userId));
@@ -277,17 +278,24 @@ let UsersService = UsersService_1 = class UsersService {
             gender: user.gender,
             age: user.age,
             height: user.height,
+            weight: user.weight ?? null,
+            hometown: user.hometown || '',
             location: user.location,
             zodiac: user.zodiac,
             zodiacSign: user.zodiacSign,
             mbti: user.mbti,
             riyuan: user.riyuan,
             education: user.education,
+            school: user.school || '',
+            schoolTier: user.schoolTier ?? null,
             occupation: user.occupation,
+            jobLevel: user.jobLevel || '',
+            company: user.company || '',
             income: user.income,
             bio: user.bio,
             hobbies: user.hobbies || [],
             isRealName: user.isRealName,
+            isFaceVerified: user.isFaceVerified,
             isVip: user.isVip,
             matchReason: matchReason,
             matchTagline: matchTagline,

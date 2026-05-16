@@ -1,11 +1,13 @@
 <template>
   <view class="page-container gradient-bg auth-page">
-    <view class="auth-nav glass-row">
-      <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
-        <text class="auth-nav-back">‹</text>
+    <view :style="capsuleNavOuterStyle">
+      <view class="auth-nav glass-row" :style="capsuleNavRowStyle">
+        <view class="auth-nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
+          <text class="auth-nav-back">‹</text>
+        </view>
+        <text class="auth-nav-title">注册</text>
+        <view class="auth-nav-placeholder" />
       </view>
-      <text class="auth-nav-title">注册</text>
-      <view class="auth-nav-placeholder" />
     </view>
 
     <scroll-view class="auth-scroll" scroll-y show-scrollbar="false">
@@ -61,12 +63,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import AuthSafetyTips from '@/components/AuthSafetyTips.vue'
 import { useUserStore } from '@/stores/user'
 import { validatePhone, validatePassword } from '@/services/auth'
 import { navigateBackTo } from '@/utils/navigation'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 
 const userStore = useUserStore()
 const phone = ref('')
@@ -143,8 +149,8 @@ async function submit() {
 }
 
 .glass-row {
-  margin: 24rpx 32rpx 0;
-  padding: 20rpx 24rpx;
+  margin: 0 32rpx;
+  padding: 0 24rpx;
   border-radius: 20rpx;
   display: flex;
   align-items: center;

@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 if (!Math) {
   AuthSafetyTips();
 }
@@ -8,6 +9,8 @@ const AuthSafetyTips = () => "../../components/AuthSafetyTips.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "welcome",
   setup(__props) {
+    const capsuleNavOuterStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavOuterStyle());
+    const capsuleNavRowStyle = common_vendor.computed(() => utils_safeArea.getCapsuleNavRowStyle());
     function goBack() {
       utils_navigation.navigateBackTo("/pages/mine/index");
     }
@@ -19,9 +22,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "b0"),
-        b: common_vendor.o(goLogin, "9b"),
-        c: common_vendor.o(goRegister, "e1")
+        a: common_vendor.o(goBack, "82"),
+        b: common_vendor.s(capsuleNavRowStyle.value),
+        c: common_vendor.s(capsuleNavOuterStyle.value),
+        d: common_vendor.o(goLogin, "21"),
+        e: common_vendor.o(goRegister, "71")
       };
     };
   }
