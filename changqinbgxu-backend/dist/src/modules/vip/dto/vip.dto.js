@@ -16,9 +16,11 @@ class CreateOrderDto {
 }
 exports.CreateOrderDto = CreateOrderDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: '套餐ID', example: 'uuid-string' }),
-    (0, class_validator_1.IsUUID)('4', { message: '套餐ID格式错误' }),
+    (0, swagger_1.ApiProperty)({ description: '套餐ID', example: 'plan-1-month' }),
+    (0, class_validator_1.IsString)({ message: '套餐ID格式错误' }),
     (0, class_validator_1.IsNotEmpty)({ message: '套餐ID不能为空' }),
+    (0, class_validator_1.MaxLength)(36, { message: '套餐ID格式错误' }),
+    (0, class_validator_1.Matches)(/^[a-zA-Z0-9_-]+$/, { message: '套餐ID格式错误' }),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "planId", void 0);
 __decorate([

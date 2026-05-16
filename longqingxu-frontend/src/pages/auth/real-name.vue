@@ -1,7 +1,7 @@
 <template>
-  <view class="page-container gradient-bg auth-flow no-tabbar">
-    <view class="nav glass-row">
-      <view class="nav-back-wrap" hover-class="btn-press" @tap.stop="goBack">
+  <view class="page-container gradient-bg auth-flow no-tabbar" :style="pageSafeStyle">
+    <view class="auth-top-nav glass-row">
+      <view class="nav-back-wrap" hover-class="btn-press" @tap="goBack">
         <text class="nav-back">‹</text>
       </view>
       <text class="nav-title">实名认证</text>
@@ -58,6 +58,9 @@
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { navigateBackTo } from '@/utils/navigation'
+import { getPageSafeTopStyle } from '@/utils/safe-area'
+
+const pageSafeStyle = getPageSafeTopStyle()
 
 const userStore = useUserStore()
 const legalName = ref('')
@@ -144,9 +147,12 @@ function onNext() {
 }
 
 .nav-title {
+  flex: 1;
+  text-align: center;
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
+  line-height: 1.2;
 }
 
 .nav-placeholder {

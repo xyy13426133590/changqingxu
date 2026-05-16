@@ -2,9 +2,11 @@
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "face-verify",
   setup(__props) {
+    const pageSafeStyle = utils_safeArea.getPageSafeTopStyle();
     const userStore = stores_user.useUserStore();
     const onlyFace = common_vendor.ref(false);
     const running = common_vendor.ref(false);
@@ -77,10 +79,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "42"),
+        a: common_vendor.o(goBack, "5f"),
         b: onlyFace.value
       }, onlyFace.value ? {} : !hasDraft.value ? {
-        d: common_vendor.o(goRealName, "f0")
+        d: common_vendor.o(goRealName, "ba")
       } : {}, {
         c: !hasDraft.value,
         e: common_vendor.t(stepEmoji.value),
@@ -95,7 +97,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         i: common_vendor.t(running.value ? "识别中…" : "开始识别"),
         j: running.value || !canStart.value ? 1 : "",
-        k: common_vendor.o(onStart, "25")
+        k: common_vendor.o(onStart, "2b"),
+        l: common_vendor.s(common_vendor.unref(pageSafeStyle))
       });
     };
   }

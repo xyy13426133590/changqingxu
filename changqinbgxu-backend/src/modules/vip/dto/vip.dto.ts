@@ -1,10 +1,12 @@
-import { IsUUID, IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, MaxLength, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateOrderDto {
-  @ApiProperty({ description: '套餐ID', example: 'uuid-string' })
-  @IsUUID('4', { message: '套餐ID格式错误' })
+  @ApiProperty({ description: '套餐ID', example: 'plan-1-month' })
+  @IsString({ message: '套餐ID格式错误' })
   @IsNotEmpty({ message: '套餐ID不能为空' })
+  @MaxLength(36, { message: '套餐ID格式错误' })
+  @Matches(/^[a-zA-Z0-9_-]+$/, { message: '套餐ID格式错误' })
   planId: string;
 
   @ApiPropertyOptional({ description: '支付方式', example: 'wechat' })

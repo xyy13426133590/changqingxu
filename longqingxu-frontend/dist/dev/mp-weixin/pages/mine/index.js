@@ -3,20 +3,111 @@ const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
 const utils_avatar = require("../../utils/avatar.js");
 const utils_tabbar = require("../../utils/tabbar.js");
+var __defProp = Object.defineProperty;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
 if (!Math) {
   TabBar();
 }
 const TabBar = () => "../../components/TabBar.js";
+const AUTH_TAG_PENDING = "未认证";
+const AUTH_TAG_DONE = "已认证";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
     const defaultAvatar = utils_avatar.DEMO_AVATARS[0];
     const guestAvatarSrc = utils_avatar.DEMO_AVATARS[1];
+    const userStore = stores_user.useUserStore();
     common_vendor.onShow(() => {
       utils_tabbar.safeHideNativeTabBar();
       void userStore.hydrateProfile();
     });
-    const userStore = stores_user.useUserStore();
+    function authMenuTag(done) {
+      return done ? { tag: AUTH_TAG_DONE, tagTone: "done" } : { tag: AUTH_TAG_PENDING, tagTone: "pending" };
+    }
+    const menuItems = common_vendor.computed(() => [
+      {
+        key: "profile-edit",
+        label: "编辑资料",
+        icon: "✎",
+        iconClass: "purple"
+      },
+      {
+        key: "my-card",
+        label: "我的资料卡",
+        icon: "🪪",
+        iconClass: "orange"
+      },
+      {
+        key: "vip-center",
+        label: "会员中心",
+        icon: "👑",
+        iconClass: "amber"
+      },
+      __spreadValues({
+        key: "real-name",
+        label: "实名认证",
+        icon: "🪪",
+        iconClass: "green"
+      }, authMenuTag(!!userStore.profile.isRealName)),
+      __spreadValues({
+        key: "face-verify",
+        label: "人脸认证",
+        icon: "👤",
+        iconClass: "cyan"
+      }, authMenuTag(!!userStore.profile.isFaceVerified)),
+      {
+        key: "discover",
+        label: "去发现",
+        icon: "🧭",
+        iconClass: "purple"
+      },
+      {
+        key: "logout",
+        label: "退出登录",
+        icon: "⎋",
+        iconClass: "gray",
+        textClass: "logout-text"
+      }
+    ]);
+    function onMenuTap(key) {
+      switch (key) {
+        case "profile-edit":
+          navigateTo("profile-edit");
+          break;
+        case "my-card":
+          navigateTo("my-card");
+          break;
+        case "vip-center":
+          navigateTo("vip-center");
+          break;
+        case "real-name":
+          goRealName();
+          break;
+        case "face-verify":
+          goFaceVerify();
+          break;
+        case "discover":
+          navigateToDiscover();
+          break;
+        case "logout":
+          onLogout();
+          break;
+      }
+    }
     function goLogin() {
       common_vendor.index.navigateTo({ url: "/pages/auth/welcome" });
     }
@@ -30,13 +121,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!userStore.profile.isRealName) {
         common_vendor.index.showModal({
           title: "提示",
-          content: "建议先完成实名认证，再进行人脸核验。演示环境也可跳过证件仅体验人脸页。",
+          content: "建议先完成实名认证，再进行人脸核验。演示环境也可跳过证件，仅体验人脸页。",
           confirmText: "去实名",
-          cancelText: "仅演示人脸",
+          cancelText: "仅演示",
           success(res) {
             if (res.confirm) {
               common_vendor.index.navigateTo({ url: "/pages/auth/real-name" });
-            } else {
+            } else if (res.cancel) {
               common_vendor.index.navigateTo({ url: "/pages/auth/face-verify?onlyFace=1" });
             }
           }
@@ -66,25 +157,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: !common_vendor.unref(userStore).isLogin
       }, !common_vendor.unref(userStore).isLogin ? {
         b: common_vendor.unref(guestAvatarSrc),
-        c: common_vendor.o(goLogin, "9b"),
-        d: common_vendor.o(goRegister, "05")
-      } : common_vendor.e({
+        c: common_vendor.o(goLogin, "67"),
+        d: common_vendor.o(goRegister, "82")
+      } : {
         e: common_vendor.unref(userStore).profile.avatar || common_vendor.unref(defaultAvatar),
         f: common_vendor.t(common_vendor.unref(userStore).profile.nickname || "我"),
-        g: common_vendor.o(($event) => navigateTo("profile-edit"), "f5"),
-        h: common_vendor.o(($event) => navigateTo("my-card"), "4d"),
-        i: common_vendor.o(($event) => navigateTo("vip-center"), "dc"),
-        j: common_vendor.unref(userStore).profile.isRealName
-      }, common_vendor.unref(userStore).profile.isRealName ? {} : {}, {
-        k: common_vendor.o(goRealName, "33"),
-        l: common_vendor.unref(userStore).profile.isFaceVerified
-      }, common_vendor.unref(userStore).profile.isFaceVerified ? {} : {}, {
-        m: common_vendor.o(goFaceVerify, "6c"),
-        n: common_vendor.o(navigateToDiscover, "24"),
-        o: common_vendor.o(onLogout, "06")
-      }), {
-        p: common_vendor.o(navigateToDiscover, "ab"),
-        q: common_vendor.p({
+        g: common_vendor.f(menuItems.value, (item, k0, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(item.icon),
+            b: common_vendor.n(item.iconClass),
+            c: common_vendor.t(item.label),
+            d: common_vendor.n(item.textClass),
+            e: item.tag
+          }, item.tag ? {
+            f: common_vendor.t(item.tag),
+            g: common_vendor.n(item.tagTone)
+          } : {}, {
+            h: item.key,
+            i: item.key === "logout" ? 1 : "",
+            j: common_vendor.o(($event) => onMenuTap(item.key), item.key)
+          });
+        })
+      }, {
+        h: common_vendor.o(navigateToDiscover, "24"),
+        i: common_vendor.p({
           active: "mine"
         })
       });

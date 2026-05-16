@@ -1,4 +1,5 @@
 export { navigateBackSafe, navigateBackTo } from './navigation'
+export { getStatusBarHeight, getPageSafeTopStyle } from './safe-area'
 export {
   detectRisk,
   hasContactInfo,

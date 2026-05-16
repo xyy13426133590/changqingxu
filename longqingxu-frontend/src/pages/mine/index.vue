@@ -14,10 +14,10 @@
           <text class="guest-title">欢迎来到长情许</text>
           <text class="guest-desc">登录后可编辑资料、查看消息与匹配推荐</text>
           <view class="guest-actions">
-            <view class="guest-btn primary" @click="goLogin">
+            <view class="guest-btn primary" hover-class="btn-press" @tap="goLogin">
               <text>登录</text>
             </view>
-            <view class="guest-btn outline" @click="goRegister">
+            <view class="guest-btn outline" hover-class="btn-press" @tap="goRegister">
               <text>注册账号</text>
             </view>
           </view>
@@ -40,72 +40,29 @@
       </view>
 
       <scroll-view class="mine-menu-list" scroll-y show-scrollbar="false">
-        <view class="mine-menu-item" @click="navigateTo('profile-edit')">
+        <view
+          v-for="item in menuItems"
+          :key="item.key"
+          class="mine-menu-item"
+          :class="{ logout: item.key === 'logout' }"
+          hover-class="mine-menu-item--press"
+          @tap.stop="onMenuTap(item.key)"
+        >
           <view class="menu-left">
-            <text class="menu-icon purple">✎</text>
-            <text class="menu-text">编辑资料</text>
+            <text class="menu-icon" :class="item.iconClass">{{ item.icon }}</text>
+            <text class="menu-text" :class="item.textClass">{{ item.label }}</text>
           </view>
-          <text class="menu-arrow">›</text>
-        </view>
-
-        <view class="mine-menu-item" @click="navigateTo('my-card')">
-          <view class="menu-left">
-            <text class="menu-icon orange">🪪</text>
-            <text class="menu-text">我的资料卡</text>
-          </view>
-          <text class="menu-arrow">›</text>
-        </view>
-
-        <view class="mine-menu-item" @click="navigateTo('vip-center')">
-          <view class="menu-left">
-            <text class="menu-icon amber">👑</text>
-            <text class="menu-text">会员中心</text>
-          </view>
-          <text class="menu-arrow">›</text>
-        </view>
-
-        <view class="mine-menu-item" @click="goRealName">
-          <view class="menu-left">
-            <text class="menu-icon green">🪪</text>
-            <text class="menu-text">实名认证</text>
-          </view>
-          <view class="menu-right">
-            <text v-if="userStore.profile.isRealName" class="menu-tag on">已认证</text>
+          <view v-if="item.tag" class="menu-right">
+            <text class="menu-tag" :class="item.tagTone">{{ item.tag }}</text>
             <text class="menu-arrow">›</text>
           </view>
-        </view>
-
-        <view class="mine-menu-item" @click="goFaceVerify">
-          <view class="menu-left">
-            <text class="menu-icon cyan">👤</text>
-            <text class="menu-text">人脸认证</text>
-          </view>
-          <view class="menu-right">
-            <text v-if="userStore.profile.isFaceVerified" class="menu-tag on">已认证</text>
-            <text class="menu-arrow">›</text>
-          </view>
-        </view>
-
-        <view class="mine-menu-item" @click="navigateToDiscover">
-          <view class="menu-left">
-            <text class="menu-icon purple">🧭</text>
-            <text class="menu-text">去发现</text>
-          </view>
-          <text class="menu-arrow">›</text>
-        </view>
-
-        <view class="mine-menu-item logout" @click="onLogout">
-          <view class="menu-left">
-            <text class="menu-icon gray">⎋</text>
-            <text class="menu-text logout-text">退出登录</text>
-          </view>
-          <text class="menu-arrow">›</text>
+          <text v-else class="menu-arrow">›</text>
         </view>
       </scroll-view>
     </template>
 
     <view class="mine-footer">
-      <text class="footer-link" @click="navigateToDiscover">返回首页</text>
+      <text class="footer-link" @tap="navigateToDiscover">返回首页</text>
     </view>
 
     <TabBar active="mine" />
@@ -113,6 +70,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import TabBar from '@/components/TabBar.vue'
@@ -122,12 +80,108 @@ import { safeHideNativeTabBar } from '@/utils/tabbar'
 const defaultAvatar = DEMO_AVATARS[0]
 const guestAvatarSrc = DEMO_AVATARS[1]
 
+const userStore = useUserStore()
+
 onShow(() => {
   safeHideNativeTabBar()
   void userStore.hydrateProfile()
 })
 
-const userStore = useUserStore()
+/** 认证角标：统一三字——未完成「未认证」、已完成「已认证」 */
+const AUTH_TAG_PENDING = '未认证'
+const AUTH_TAG_DONE = '已认证'
+
+type MenuItem = {
+  key: string
+  label: string
+  icon: string
+  iconClass: string
+  textClass?: string
+  tag?: string
+  tagTone?: 'pending' | 'done'
+}
+
+function authMenuTag(done: boolean): Pick<MenuItem, 'tag' | 'tagTone'> {
+  return done
+    ? { tag: AUTH_TAG_DONE, tagTone: 'done' }
+    : { tag: AUTH_TAG_PENDING, tagTone: 'pending' }
+}
+
+const menuItems = computed<MenuItem[]>(() => [
+  {
+    key: 'profile-edit',
+    label: '编辑资料',
+    icon: '✎',
+    iconClass: 'purple',
+  },
+  {
+    key: 'my-card',
+    label: '我的资料卡',
+    icon: '🪪',
+    iconClass: 'orange',
+  },
+  {
+    key: 'vip-center',
+    label: '会员中心',
+    icon: '👑',
+    iconClass: 'amber',
+  },
+  {
+    key: 'real-name',
+    label: '实名认证',
+    icon: '🪪',
+    iconClass: 'green',
+    ...authMenuTag(!!userStore.profile.isRealName),
+  },
+  {
+    key: 'face-verify',
+    label: '人脸认证',
+    icon: '👤',
+    iconClass: 'cyan',
+    ...authMenuTag(!!userStore.profile.isFaceVerified),
+  },
+  {
+    key: 'discover',
+    label: '去发现',
+    icon: '🧭',
+    iconClass: 'purple',
+  },
+  {
+    key: 'logout',
+    label: '退出登录',
+    icon: '⎋',
+    iconClass: 'gray',
+    textClass: 'logout-text',
+  },
+])
+
+function onMenuTap(key: string) {
+  switch (key) {
+    case 'profile-edit':
+      navigateTo('profile-edit')
+      break
+    case 'my-card':
+      navigateTo('my-card')
+      break
+    case 'vip-center':
+      navigateTo('vip-center')
+      break
+    case 'real-name':
+      goRealName()
+      break
+    case 'face-verify':
+      goFaceVerify()
+      break
+    case 'discover':
+      navigateToDiscover()
+      break
+    case 'logout':
+      onLogout()
+      break
+    default:
+      break
+  }
+}
 
 function goLogin() {
   uni.navigateTo({ url: '/pages/auth/welcome' })
@@ -146,13 +200,13 @@ function goFaceVerify() {
   if (!userStore.profile.isRealName) {
     uni.showModal({
       title: '提示',
-      content: '建议先完成实名认证，再进行人脸核验。演示环境也可跳过证件仅体验人脸页。',
+      content: '建议先完成实名认证，再进行人脸核验。演示环境也可跳过证件，仅体验人脸页。',
       confirmText: '去实名',
-      cancelText: '仅演示人脸',
+      cancelText: '仅演示',
       success(res) {
         if (res.confirm) {
           uni.navigateTo({ url: '/pages/auth/real-name' })
-        } else {
+        } else if (res.cancel) {
           uni.navigateTo({ url: '/pages/auth/face-verify?onlyFace=1' })
         }
       },
@@ -277,14 +331,8 @@ function onLogout() {
   }
 }
 
-.mine-menu-item.logout {
-  margin-top: 16rpx;
-  border-top: 1rpx solid rgba(229, 231, 235, 0.6);
-  padding-top: 24rpx;
-}
-
-.menu-icon.gray {
-  opacity: 0.55;
+.mine-menu-item--press {
+  opacity: 0.92;
 }
 
 .logout-text {

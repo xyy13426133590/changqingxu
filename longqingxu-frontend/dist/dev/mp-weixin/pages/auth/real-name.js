@@ -2,9 +2,11 @@
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
 const utils_navigation = require("../../utils/navigation.js");
+const utils_safeArea = require("../../utils/safe-area.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "real-name",
   setup(__props) {
+    const pageSafeStyle = utils_safeArea.getPageSafeTopStyle();
     const userStore = stores_user.useUserStore();
     const legalName = common_vendor.ref("");
     const idCard = common_vendor.ref("");
@@ -55,14 +57,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "6e"),
+        a: common_vendor.o(goBack, "2f"),
         b: legalName.value,
-        c: common_vendor.o(($event) => legalName.value = $event.detail.value, "c8"),
+        c: common_vendor.o(($event) => legalName.value = $event.detail.value, "77"),
         d: idCard.value,
-        e: common_vendor.o(($event) => idCard.value = $event.detail.value, "b2"),
+        e: common_vendor.o(($event) => idCard.value = $event.detail.value, "3e"),
         f: common_vendor.t(submitting.value ? "校验中…" : "下一步：人脸识别"),
         g: submitting.value ? 1 : "",
-        h: common_vendor.o(onNext, "26")
+        h: common_vendor.o(onNext, "3f"),
+        i: common_vendor.s(common_vendor.unref(pageSafeStyle))
       };
     };
   }
