@@ -1,1 +1,1 @@
-"use strict";const r=require("./api.js");exports.apiCreateOrder=function(e){return r.post("/vip/orders",e)},exports.apiGetVipPlans=function(){return r.get("/vip/plans")};
+"use strict";const e=require("./api.js");exports.apiCreateOrder=function(r){return e.post("/vip/orders",r)},exports.apiGetOrder=function(r){return e.get(`/vip/orders/${encodeURIComponent(r)}`)},exports.apiGetVipPlans=function(){return e.get("/vip/plans")},exports.apiMockPayOrder=function(r){return e.post(`/vip/orders/${encodeURIComponent(r)}/mock-pay`,{})};

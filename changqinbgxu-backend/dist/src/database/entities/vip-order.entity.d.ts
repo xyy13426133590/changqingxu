@@ -10,6 +10,9 @@ export declare class VipOrder {
     payMethod: string;
     payTime: Date;
     expiresAt: Date;
+    outTradeNo: string | null;
+    wechatPrepayId: string | null;
+    wechatTransactionId: string | null;
     createdAt: Date;
     updatedAt: Date;
     user: User;

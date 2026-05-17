@@ -11,6 +11,7 @@ if (!Math) {
   "./pages/mine/profile-edit.js";
   "./pages/mine/my-card.js";
   "./pages/mine/vip-center.js";
+  "./pages/legal/member-agreement.js";
   "./pages/user/detail.js";
   "./pages/auth/welcome.js";
   "./pages/auth/login.js";

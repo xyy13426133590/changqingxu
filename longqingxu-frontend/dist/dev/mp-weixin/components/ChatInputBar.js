@@ -41,8 +41,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const recordStartTime = common_vendor.ref(0);
     const recordDuration = common_vendor.ref(0);
     const recordTimer = common_vendor.ref(null);
-    const recordFilePath = common_vendor.ref("");
     const editingImage = common_vendor.ref("");
+    let pendingVoiceStop = null;
+    let recorderManagerInited = false;
     const voiceBtnText = common_vendor.computed(() => {
       if (isRecording.value)
         return willCancel.value ? "松开取消" : "录音中…";
@@ -82,15 +83,85 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return;
       inputText.value = str.slice(0, -1);
     }
+    function ensureRecordPermission() {
+      return new Promise((resolve) => {
+        common_vendor.index.getSetting({
+          success(setting) {
+            var _a;
+            if (((_a = setting.authSetting) == null ? void 0 : _a["scope.record"]) === true) {
+              resolve(true);
+              return;
+            }
+            common_vendor.index.authorize({
+              scope: "scope.record",
+              success() {
+                resolve(true);
+              },
+              fail() {
+                common_vendor.index.showModal({
+                  title: "需要录音权限",
+                  content: "请在设置中允许「麦克风/录音」，以便发送语音。",
+                  cancelText: "取消",
+                  confirmText: "去设置",
+                  success(r) {
+                    if (r.confirm)
+                      common_vendor.index.openSetting({});
+                  }
+                });
+                resolve(false);
+              }
+            });
+          },
+          fail() {
+            resolve(false);
+          }
+        });
+      });
+    }
+    function toastRecorderError(err) {
+      console.warn("[RecorderManager]", err);
+      const msg = (err.errMsg || "").toLowerCase();
+      let title = "录音失败";
+      if (msg.includes("auth") || msg.includes("denied") || msg.includes("authorize") || msg.includes("privacy")) {
+        title = "未获得录音权限，请去设置开启";
+      } else if (msg.includes("not supported") || msg.includes("not support") || msg.includes("simulate") || msg.includes("simulator")) {
+        title = "开发者工具可能无麦克风，请用真机试";
+      } else if (msg.includes("frequency") || msg.includes("bitrate") || msg.includes("samplerate")) {
+        title = "当前设备不支持该录音参数，可在真机再试";
+      } else if (msg.length > 3 && msg.length <= 56) {
+        title = msg;
+      }
+      common_vendor.index.showToast({ title, icon: "none", duration: 2800 });
+    }
+    function recorderStartMp3Compatible(rm) {
+      rm.start({
+        duration: 6e4,
+        format: "mp3",
+        sampleRate: 16e3,
+        numberOfChannels: 1
+      });
+    }
     function onVoiceStart() {
-      isRecording.value = true;
-      willCancel.value = false;
-      recordStartTime.value = Date.now();
-      recordDuration.value = 0;
-      recordTimer.value = setInterval(() => {
-        recordDuration.value = Date.now() - recordStartTime.value;
-      }, 100);
-      startRecord();
+      return __async(this, null, function* () {
+        var _a;
+        const permitted = yield ensureRecordPermission();
+        if (!permitted)
+          return;
+        initRecorderManagerOnce();
+        const rm = (_a = common_vendor.index.getRecorderManager) == null ? void 0 : _a.call(common_vendor.index);
+        if (!rm) {
+          common_vendor.index.showToast({ title: "录音组件不可用", icon: "none" });
+          return;
+        }
+        isRecording.value = true;
+        willCancel.value = false;
+        recordStartTime.value = Date.now();
+        recordDuration.value = 0;
+        recordTimer.value = setInterval(() => {
+          recordDuration.value = Date.now() - recordStartTime.value;
+        }, 100);
+        startRecord();
+      });
     }
     function onVoiceMove(e) {
       if (!isRecording.value)
@@ -103,46 +174,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       willCancel.value = deltaY > 100;
     }
     function onVoiceEnd() {
+      var _a, _b;
       if (!isRecording.value)
         return;
-      stopRecord();
-      if (willCancel.value) {
-        cancelRecord();
-      } else {
-        const duration = Date.now() - recordStartTime.value;
-        if (duration < 1e3) {
-          common_vendor.index.showToast({ title: "录音时间太短", icon: "none" });
-        } else {
-          emit("sendVoice", duration, recordFilePath.value || "temp://voice.mp3");
-        }
-      }
-      resetRecordState();
-    }
-    function onVoiceCancel() {
-      cancelRecord();
-      resetRecordState();
-    }
-    function startRecord() {
-      var _a;
-      const recorder = (_a = common_vendor.index.getRecorderManager) == null ? void 0 : _a.call(common_vendor.index);
-      if (recorder) {
-        recorder.onStop((res) => {
-          recordFilePath.value = res.tempFilePath;
-        });
-        recorder.start({ duration: 6e4, format: "mp3" });
-      }
-    }
-    function stopRecord() {
-      var _a, _b;
-      (_b = (_a = common_vendor.index.getRecorderManager) == null ? void 0 : _a.call(common_vendor.index)) == null ? void 0 : _b.stop();
+      const cancelled = willCancel.value;
+      const startMs = recordStartTime.value;
+      pendingVoiceStop = { cancelled, startMs };
       if (recordTimer.value) {
         clearInterval(recordTimer.value);
         recordTimer.value = null;
       }
-    }
-    function cancelRecord() {
-      var _a, _b;
+      isRecording.value = false;
+      willCancel.value = false;
+      recordDuration.value = 0;
       (_b = (_a = common_vendor.index.getRecorderManager) == null ? void 0 : _a.call(common_vendor.index)) == null ? void 0 : _b.stop();
+    }
+    function onVoiceCancel() {
+      var _a, _b;
+      if (!isRecording.value)
+        return;
+      pendingVoiceStop = { cancelled: true, startMs: recordStartTime.value };
+      if (recordTimer.value) {
+        clearInterval(recordTimer.value);
+        recordTimer.value = null;
+      }
+      isRecording.value = false;
+      willCancel.value = false;
+      recordDuration.value = 0;
+      (_b = (_a = common_vendor.index.getRecorderManager) == null ? void 0 : _a.call(common_vendor.index)) == null ? void 0 : _b.stop();
+    }
+    function startRecord() {
+      var _a;
+      initRecorderManagerOnce();
+      const rm = (_a = common_vendor.index.getRecorderManager) == null ? void 0 : _a.call(common_vendor.index);
+      if (!rm)
+        return;
+      recorderStartMp3Compatible(rm);
     }
     function resetRecordState() {
       isRecording.value = false;
@@ -153,6 +220,51 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         recordTimer.value = null;
       }
     }
+    function initRecorderManagerOnce() {
+      var _a;
+      if (recorderManagerInited)
+        return;
+      const rm = (_a = common_vendor.index.getRecorderManager) == null ? void 0 : _a.call(common_vendor.index);
+      if (!rm)
+        return;
+      recorderManagerInited = true;
+      rm.onStop((res) => {
+        if (recordTimer.value) {
+          clearInterval(recordTimer.value);
+          recordTimer.value = null;
+        }
+        const pend = pendingVoiceStop;
+        pendingVoiceStop = null;
+        if (!pend) {
+          resetRecordState();
+          return;
+        }
+        if (pend.cancelled) {
+          resetRecordState();
+          return;
+        }
+        const duration = Date.now() - pend.startMs;
+        const path = (res.tempFilePath || "").trim();
+        resetRecordState();
+        if (duration < 1e3) {
+          common_vendor.index.showToast({ title: "录音时间太短", icon: "none" });
+          return;
+        }
+        if (!path) {
+          common_vendor.index.showToast({ title: "未获取录音文件", icon: "none" });
+          return;
+        }
+        emit("sendVoice", duration, path);
+      });
+      rm.onError((err) => {
+        pendingVoiceStop = null;
+        resetRecordState();
+        toastRecorderError(err || {});
+      });
+    }
+    common_vendor.onMounted(() => {
+      initRecorderManagerOnce();
+    });
     function waveStyle(index) {
       const height = isRecording.value ? 20 + Math.sin(Date.now() / 100 + index) * 20 : 10;
       return {

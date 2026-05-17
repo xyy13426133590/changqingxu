@@ -8,6 +8,7 @@
     "pages/mine/profile-edit",
     "pages/mine/my-card",
     "pages/mine/vip-center",
+    "pages/legal/member-agreement",
     "pages/user/detail",
     "pages/auth/welcome",
     "pages/auth/login",
@@ -50,6 +51,9 @@
   "permission": {
     "scope.userLocation": {
       "desc": "用于匹配附近的人"
+    },
+    "scope.record": {
+      "desc": "用于在聊天中录制并发送语音消息"
     }
   },
   "requiredPrivateInfos": [

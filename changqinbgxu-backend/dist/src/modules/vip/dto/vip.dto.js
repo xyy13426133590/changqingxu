@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VipOrderResponseDto = exports.VipPlanResponseDto = exports.CreateOrderDto = void 0;
+exports.CreateOrderResultDto = exports.MiniProgramPaymentDto = exports.VipOrderResponseDto = exports.VipPlanResponseDto = exports.CreateOrderDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 class CreateOrderDto {
@@ -35,4 +35,10 @@ exports.VipPlanResponseDto = VipPlanResponseDto;
 class VipOrderResponseDto {
 }
 exports.VipOrderResponseDto = VipOrderResponseDto;
+class MiniProgramPaymentDto {
+}
+exports.MiniProgramPaymentDto = MiniProgramPaymentDto;
+class CreateOrderResultDto {
+}
+exports.CreateOrderResultDto = CreateOrderResultDto;
 //# sourceMappingURL=vip.dto.js.map

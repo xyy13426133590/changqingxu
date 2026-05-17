@@ -38,3 +38,19 @@ export class VipOrderResponseDto {
   createdAt: Date;
   plan?: VipPlanResponseDto;
 }
+
+/** 小程序调起支付参数 */
+export class MiniProgramPaymentDto {
+  timeStamp: string;
+  nonceStr: string;
+  package: string;
+  signType: 'RSA';
+  paySign: string;
+}
+
+/** 创建订单接口返回 */
+export class CreateOrderResultDto {
+  order: VipOrderResponseDto;
+  payment?: MiniProgramPaymentDto;
+  paymentMode: 'live' | 'mock';
+}

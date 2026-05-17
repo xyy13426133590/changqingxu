@@ -32,6 +32,9 @@ let VipController = class VipController {
     async getOrder(orderId, userId) {
         return this.vipService.getOrder(userId, orderId);
     }
+    async mockPay(orderId, userId) {
+        return this.vipService.mockCompleteOrder(userId, orderId);
+    }
 };
 exports.VipController = VipController;
 __decorate([
@@ -68,6 +71,18 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], VipController.prototype, "getOrder", null);
+__decorate([
+    (0, common_1.Post)('orders/:id/mock-pay'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: '模拟支付成功（开发）' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: '模拟成功' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], VipController.prototype, "mockPay", null);
 exports.VipController = VipController = __decorate([
     (0, swagger_1.ApiTags)('VIP'),
     (0, common_1.Controller)('vip'),

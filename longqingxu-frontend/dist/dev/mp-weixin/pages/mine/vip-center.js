@@ -81,6 +81,49 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     }
     common_vendor.onMounted(() => void load());
+    function pollOrderPaid(orderId, maxAttempts = 10, intervalMs = 500) {
+      return __async(this, null, function* () {
+        for (let i = 0; i < maxAttempts; i++) {
+          try {
+            const o = yield services_apiVip.apiGetOrder(orderId);
+            if (o.status === "paid")
+              return true;
+          } catch (e) {
+          }
+          yield new Promise((r) => setTimeout(r, intervalMs));
+        }
+        return false;
+      });
+    }
+    function requestWxPayment(payment) {
+      return new Promise((resolve, reject) => {
+        common_vendor.index.requestPayment({
+          provider: "wxpay",
+          timeStamp: payment.timeStamp,
+          nonceStr: payment.nonceStr,
+          package: payment.package,
+          signType: payment.signType,
+          paySign: payment.paySign,
+          success: () => resolve(),
+          fail: (err) => reject(err)
+        });
+      });
+    }
+    function afterPayFlow(orderId) {
+      return __async(this, null, function* () {
+        yield pollOrderPaid(orderId);
+        yield userStore.hydrateProfile();
+        vipStatus.value = yield services_apiUser.apiGetVipStatus();
+        common_vendor.index.showModal({
+          title: "开通成功",
+          content: "会员权益已生效，祝您使用愉快。",
+          showCancel: false
+        });
+      });
+    }
+    function openAgreement() {
+      void common_vendor.index.navigateTo({ url: "/pages/legal/member-agreement" });
+    }
     function buyVip() {
       return __async(this, null, function* () {
         if (!selectedPlan.value) {
@@ -89,10 +132,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         common_vendor.index.showLoading({ title: "创建订单…", mask: true });
         try {
-          yield services_apiVip.apiCreateOrder({ planId: selectedPlan.value, payMethod: "wechat" });
-          common_vendor.index.showToast({ title: "订单已创建（演示环境未完成支付闭环）", icon: "none", duration: 2200 });
-          yield userStore.hydrateProfile();
-          vipStatus.value = yield services_apiUser.apiGetVipStatus();
+          const result = yield services_apiVip.apiCreateOrder({ planId: selectedPlan.value, payMethod: "wechat" });
+          common_vendor.index.hideLoading();
+          if (result.paymentMode === "live" && result.payment) {
+            common_vendor.index.showLoading({ title: "拉起支付…", mask: true });
+            try {
+              yield requestWxPayment(result.payment);
+            } catch (e) {
+              common_vendor.index.hideLoading();
+              const msg = e && typeof e === "object" && "errMsg" in e ? String(e.errMsg) : "";
+              if (msg.includes("cancel") || msg.includes("取消")) {
+                common_vendor.index.showToast({ title: "已取消支付", icon: "none" });
+              } else {
+                common_vendor.index.showToast({ title: "支付未完成", icon: "none" });
+              }
+              return;
+            }
+            common_vendor.index.hideLoading();
+            yield afterPayFlow(result.order.id);
+            return;
+          }
+          common_vendor.index.showModal({
+            title: "演示模式",
+            content: "当前未走真实微信支付（商户号未配置或为 mock）。开发者可在后端设置 VIP_MOCK_PAY=1 后点此模拟开通以测试会员状态。",
+            confirmText: "尝试模拟开通",
+            cancelText: "知道了",
+            success: (res) => __async(this, null, function* () {
+              if (!res.confirm)
+                return;
+              common_vendor.index.showLoading({ title: "处理中…", mask: true });
+              try {
+                yield services_apiVip.apiMockPayOrder(result.order.id);
+                yield afterPayFlow(result.order.id);
+              } catch (e) {
+                common_vendor.index.showToast({ title: "模拟支付不可用（需 NODE_ENV=development 且 VIP_MOCK_PAY=1）", icon: "none", duration: 3e3 });
+              } finally {
+                common_vendor.index.hideLoading();
+              }
+            })
+          });
         } catch (e) {
         } finally {
           common_vendor.index.hideLoading();
@@ -154,7 +232,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         l: common_vendor.t(buyButtonLabel.value),
-        m: common_vendor.o(buyVip, "63")
+        m: common_vendor.o(buyVip, "63"),
+        n: common_vendor.o(openAgreement, "2e")
       });
     };
   }

@@ -65,7 +65,9 @@ __decorate([
     __param(1, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
         validators: [
             new common_1.MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }),
-            new common_1.FileTypeValidator({ fileType: /(mp3|wav|m4a|aac)$/ }),
+            new common_1.FileTypeValidator({
+                fileType: /(mpeg|aac|wav|mp4|m4a|opus|ogg|caf|ms-wma|x-aac|x-m4a|x-wav|3gpp|amr)/i,
+            }),
         ],
     }))),
     __metadata("design:type", Function),

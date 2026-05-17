@@ -1,0 +1,1 @@
+"use strict";const e=require("../../common/vendor.js"),n=require("../../utils/navigation.js"),a=e.defineComponent({__name:"member-agreement",setup(a){function t(){n.navigateBackTo("/pages/mine/vip-center")}return(n,a)=>({a:e.o(t,"ba")})}}),t=e._export_sfc(a,[["__scopeId","data-v-157a4219"]]);wx.createPage(t);

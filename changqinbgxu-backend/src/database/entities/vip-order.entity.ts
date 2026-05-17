@@ -45,6 +45,16 @@ export class VipOrder {
   @Column({ name: 'expires_at', type: 'datetime', nullable: true })
   expiresAt: Date;
 
+  /** 微信支付商户单号，≤32 字符；历史订单可能为空 */
+  @Column({ name: 'out_trade_no', length: 32, unique: true, nullable: true })
+  outTradeNo: string | null;
+
+  @Column({ name: 'wechat_prepay_id', length: 128, nullable: true })
+  wechatPrepayId: string | null;
+
+  @Column({ name: 'wechat_transaction_id', length: 64, nullable: true, unique: true })
+  wechatTransactionId: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

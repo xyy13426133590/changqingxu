@@ -49,4 +49,14 @@ export class VipController {
   ) {
     return this.vipService.getOrder(userId, orderId);
   }
+
+  /** 开发联调：仅 development + VIP_MOCK_PAY=1 时模拟支付成功 */
+  @Post('orders/:id/mock-pay')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '模拟支付成功（开发）' })
+  @ApiResponse({ status: 200, description: '模拟成功' })
+  async mockPay(@Param('id') orderId: string, @CurrentUser('id') userId: string) {
+    return this.vipService.mockCompleteOrder(userId, orderId);
+  }
 }

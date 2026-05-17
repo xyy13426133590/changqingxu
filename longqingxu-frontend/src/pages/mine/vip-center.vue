@@ -82,7 +82,7 @@
       <view class="vip-buy-btn" @click="buyVip">
         <text>{{ buyButtonLabel }}</text>
       </view>
-      <text class="vip-agreement">开通即表示同意《会员服务协议》</text>
+      <text class="vip-agreement" @tap.stop="openAgreement">开通即表示同意《会员服务协议》</text>
     </view>
   </view>
 </template>
@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { apiGetVipPlans, apiCreateOrder, type VipPlan } from '@/services/api-vip'
+import { apiGetVipPlans, apiCreateOrder, apiGetOrder, apiMockPayOrder, type VipPlan, type CreateOrderResult } from '@/services/api-vip'
 import { apiGetVipStatus } from '@/services/api-user'
 import { navigateBackTo } from '@/utils/navigation'
 import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
@@ -154,6 +154,49 @@ async function load() {
 
 onMounted(() => void load())
 
+async function pollOrderPaid(orderId: string, maxAttempts = 10, intervalMs = 500): Promise<boolean> {
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      const o = await apiGetOrder(orderId)
+      if (o.status === 'paid') return true
+    } catch {
+      /* ignore */
+    }
+    await new Promise((r) => setTimeout(r, intervalMs))
+  }
+  return false
+}
+
+function requestWxPayment(payment: NonNullable<CreateOrderResult['payment']>): Promise<void> {
+  return new Promise((resolve, reject) => {
+    uni.requestPayment({
+      provider: 'wxpay',
+      timeStamp: payment.timeStamp,
+      nonceStr: payment.nonceStr,
+      package: payment.package,
+      signType: payment.signType,
+      paySign: payment.paySign,
+      success: () => resolve(),
+      fail: (err) => reject(err),
+    })
+  })
+}
+
+async function afterPayFlow(orderId: string) {
+  await pollOrderPaid(orderId)
+  await userStore.hydrateProfile()
+  vipStatus.value = await apiGetVipStatus()
+  uni.showModal({
+    title: '开通成功',
+    content: '会员权益已生效，祝您使用愉快。',
+    showCancel: false,
+  })
+}
+
+function openAgreement() {
+  void uni.navigateTo({ url: '/pages/legal/member-agreement' })
+}
+
 async function buyVip() {
   if (!selectedPlan.value) {
     uni.showToast({ title: '请先选择套餐', icon: 'none' })
@@ -161,12 +204,49 @@ async function buyVip() {
   }
   uni.showLoading({ title: '创建订单…', mask: true })
   try {
-    await apiCreateOrder({ planId: selectedPlan.value, payMethod: 'wechat' })
-    uni.showToast({ title: '订单已创建（演示环境未完成支付闭环）', icon: 'none', duration: 2200 })
-    await userStore.hydrateProfile()
-    vipStatus.value = await apiGetVipStatus()
+    const result = await apiCreateOrder({ planId: selectedPlan.value, payMethod: 'wechat' })
+    uni.hideLoading()
+
+    if (result.paymentMode === 'live' && result.payment) {
+      uni.showLoading({ title: '拉起支付…', mask: true })
+      try {
+        await requestWxPayment(result.payment)
+      } catch (e: unknown) {
+        uni.hideLoading()
+        const msg = e && typeof e === 'object' && 'errMsg' in e ? String((e as { errMsg?: string }).errMsg) : ''
+        if (msg.includes('cancel') || msg.includes('取消')) {
+          uni.showToast({ title: '已取消支付', icon: 'none' })
+        } else {
+          uni.showToast({ title: '支付未完成', icon: 'none' })
+        }
+        return
+      }
+      uni.hideLoading()
+      await afterPayFlow(result.order.id)
+      return
+    }
+
+    uni.showModal({
+      title: '演示模式',
+      content:
+        '当前未走真实微信支付（商户号未配置或为 mock）。开发者可在后端设置 VIP_MOCK_PAY=1 后点此模拟开通以测试会员状态。',
+      confirmText: '尝试模拟开通',
+      cancelText: '知道了',
+      success: async (res) => {
+        if (!res.confirm) return
+        uni.showLoading({ title: '处理中…', mask: true })
+        try {
+          await apiMockPayOrder(result.order.id)
+          await afterPayFlow(result.order.id)
+        } catch {
+          uni.showToast({ title: '模拟支付不可用（需 NODE_ENV=development 且 VIP_MOCK_PAY=1）', icon: 'none', duration: 3000 })
+        } finally {
+          uni.hideLoading()
+        }
+      },
+    })
   } catch {
-    /* toast handled in api.ts */
+    /* api 层已 toast */
   } finally {
     uni.hideLoading()
   }

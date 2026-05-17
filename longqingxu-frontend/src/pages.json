@@ -64,6 +64,13 @@
       }
     },
     {
+      "path": "pages/legal/member-agreement",
+      "style": {
+        "navigationBarTitleText": "会员服务协议",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/user/detail",
       "style": {
         "navigationBarTitleText": "用户详情",

@@ -5,6 +5,7 @@ const stores_user = require("../../stores/user.js");
 const services_chatSocket = require("../../services/chat-socket.js");
 const utils_navigation = require("../../utils/navigation.js");
 const utils_safeArea = require("../../utils/safe-area.js");
+const utils_mediaUrl = require("../../utils/media-url.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -39,6 +40,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const showRiskBanner = common_vendor.ref(true);
     const conversationId = common_vendor.ref("");
     const playingVoiceId = common_vendor.ref("");
+    let voicePlayer = null;
+    function stopVoicePlayback() {
+      playingVoiceId.value = "";
+      if (!voicePlayer)
+        return;
+      try {
+        voicePlayer.stop();
+        voicePlayer.destroy();
+      } catch (e) {
+      }
+      voicePlayer = null;
+    }
     function isFromMe(msg) {
       const my = userStore.profile.id;
       return msg.senderId === "__local__" || !!my && msg.senderId === my;
@@ -62,6 +75,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     }));
     common_vendor.onUnload(() => {
+      stopVoicePlayback();
       void services_chatSocket.disconnectChatSocket();
     });
     function goBack() {
@@ -79,12 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: tempFilePath,
         duration
       });
-      messagesStore.sendMessage(voiceData, "voice");
-      const messages = messagesStore.currentMessages;
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg) {
-        lastMsg.duration = duration;
-      }
+      messagesStore.sendMessage(voiceData, "voice", { duration });
       scrollToBottom();
     }
     function onSendImage(tempFilePath) {
@@ -102,30 +111,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         current: url
       });
     }
-    function playVoice(content) {
-      try {
-        const data = JSON.parse(content);
-        const voiceUrl = data.url || content;
-        const messages = messagesStore.currentMessages;
-        const msg = messages.find((m) => m.content === content && m.type === "voice");
-        if (msg) {
-          playingVoiceId.value = msg.id;
-        }
-        const innerAudioContext = common_vendor.index.createInnerAudioContext();
-        innerAudioContext.src = voiceUrl;
-        innerAudioContext.play();
-        innerAudioContext.onEnded(() => {
-          playingVoiceId.value = "";
-          innerAudioContext.destroy();
-        });
-        innerAudioContext.onError(() => {
-          playingVoiceId.value = "";
-          common_vendor.index.showToast({ title: "播放失败", icon: "none" });
-          innerAudioContext.destroy();
-        });
-      } catch (_e2) {
-        common_vendor.index.showToast({ title: "语音解析失败", icon: "none" });
+    function playVoice(msg) {
+      if (msg.type !== "voice")
+        return;
+      if (playingVoiceId.value === msg.id) {
+        stopVoicePlayback();
+        return;
       }
+      let rawUrl = "";
+      try {
+        const data = JSON.parse(msg.content);
+        rawUrl = (data.url || "").trim();
+      } catch (e) {
+        rawUrl = (msg.content || "").trim();
+      }
+      const voiceUrl = utils_mediaUrl.resolveVoicePlaySrc(rawUrl);
+      if (!voiceUrl || voiceUrl === "[语音]") {
+        common_vendor.index.showToast({ title: "暂无可用音频", icon: "none" });
+        return;
+      }
+      stopVoicePlayback();
+      playingVoiceId.value = msg.id;
+      const ctx = common_vendor.index.createInnerAudioContext();
+      voicePlayer = ctx;
+      ctx.obeyMuteSwitch = false;
+      ctx.src = voiceUrl;
+      ctx.play();
+      ctx.onEnded(() => {
+        stopVoicePlayback();
+      });
+      ctx.onError((err) => {
+        console.warn("[InnerAudio]", err, voiceUrl);
+        stopVoicePlayback();
+        common_vendor.index.showToast({ title: "播放失败", icon: "none" });
+      });
     }
     function formatDuration(duration) {
       if (!duration)
@@ -187,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             x: msg.status === "sent"
           }) : {}, {
             y: common_vendor.n(isFromMe(msg) ? "me" : "other"),
-            z: common_vendor.o(($event) => playVoice(msg.content), msg.id)
+            z: common_vendor.o(($event) => playVoice(msg), msg.id)
           }) : msg.type === "emoji" ? common_vendor.e({
             B: common_vendor.t(msg.content),
             C: isFromMe(msg)
@@ -208,9 +227,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }),
         i: lastMessageId.value,
-        j: common_vendor.o(onSendText, "ef"),
-        k: common_vendor.o(onSendVoice, "29"),
-        l: common_vendor.o(onSendImage, "36"),
+        j: common_vendor.o(onSendText, "e2"),
+        k: common_vendor.o(onSendVoice, "d0"),
+        l: common_vendor.o(onSendImage, "46"),
         m: common_vendor.p({
           placeholder: "文明发言，涉及站外引导将提示风险…"
         })

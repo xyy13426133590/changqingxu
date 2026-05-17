@@ -107,6 +107,42 @@ function put(url, data, config) {
     data
   }, config));
 }
+function uploadFile(url, filePath, name = "file", formData) {
+  return new Promise((resolve, reject) => {
+    const token = getToken();
+    common_vendor.index.uploadFile({
+      url: `${API_BASE_URL}${url}`,
+      filePath,
+      name,
+      formData,
+      header: token ? { Authorization: `Bearer ${token}` } : {},
+      success: (res) => {
+        const raw = res.data;
+        const statusOk = typeof res.statusCode === "number" && res.statusCode >= 200 && res.statusCode < 300;
+        try {
+          const data = JSON.parse(raw);
+          if (!statusOk || data.code !== "SUCCESS") {
+            const hint = (data == null ? void 0 : data.message) || (statusOk ? "上传失败" : `上传失败 (${res.statusCode})`);
+            common_vendor.index.showToast({ title: hint, icon: "none" });
+            reject(new Error(hint));
+            return;
+          }
+          resolve(data.data);
+        } catch (e) {
+          if (!statusOk) {
+            const hint = typeof raw === "string" ? `上传失败 (${res.statusCode})` : "上传失败";
+            common_vendor.index.showToast({ title: hint, icon: "none" });
+            reject(new Error(hint));
+            return;
+          }
+          common_vendor.index.showToast({ title: "上传响应异常", icon: "none" });
+          reject(new Error("INVALID_UPLOAD_RESPONSE"));
+        }
+      },
+      fail: reject
+    });
+  });
+}
 exports.API_BASE_URL = API_BASE_URL;
 exports.WS_BASE_URL = WS_BASE_URL;
 exports.clearToken = clearToken;
@@ -115,3 +151,4 @@ exports.getToken = getToken;
 exports.post = post;
 exports.put = put;
 exports.setToken = setToken;
+exports.uploadFile = uploadFile;

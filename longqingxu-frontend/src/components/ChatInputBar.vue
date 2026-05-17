@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import EmojiPanel from './EmojiPanel.vue'
 // #ifndef MP-WEIXIN
 import { cropCenterSquareToDataUrl } from '@/utils/image-crop'
@@ -124,9 +124,14 @@ const willCancel = ref(false)
 const recordStartTime = ref(0)
 const recordDuration = ref(0)
 const recordTimer = ref<ReturnType<typeof setInterval> | null>(null)
-const recordFilePath = ref('')
-
 const editingImage = ref('')
+
+// #ifdef MP-WEIXIN
+/** 与 RecorderManager.onStop 对齐：stop() 后才会有 tempFilePath */
+type PendingVoiceStop = { cancelled: boolean; startMs: number }
+let pendingVoiceStop: PendingVoiceStop | null = null
+let recorderManagerInited = false
+// #endif
 
 const voiceBtnText = computed(() => {
   if (isRecording.value) return willCancel.value ? '松开取消' : '录音中…'
@@ -171,7 +176,90 @@ function onEmojiDelete() {
   inputText.value = str.slice(0, -1)
 }
 
-function onVoiceStart() {
+// #ifdef MP-WEIXIN
+/** 申请录音权限；需在 manifest 「scope.record」中声明用途，否则易出现「录音失败」 */
+function ensureRecordPermission(): Promise<boolean> {
+  return new Promise((resolve) => {
+    uni.getSetting({
+      success(setting) {
+        if (setting.authSetting?.['scope.record'] === true) {
+          resolve(true)
+          return
+        }
+        uni.authorize({
+          scope: 'scope.record',
+          success() {
+            resolve(true)
+          },
+          fail() {
+            uni.showModal({
+              title: '需要录音权限',
+              content: '请在设置中允许「麦克风/录音」，以便发送语音。',
+              cancelText: '取消',
+              confirmText: '去设置',
+              success(r) {
+                if (r.confirm) uni.openSetting({})
+              },
+            })
+            resolve(false)
+          },
+        })
+      },
+      fail() {
+        resolve(false)
+      },
+    })
+  })
+}
+
+function toastRecorderError(err: { errMsg?: string }): void {
+  console.warn('[RecorderManager]', err)
+  const msg = (err.errMsg || '').toLowerCase()
+  let title = '录音失败'
+  if (msg.includes('auth') || msg.includes('denied') || msg.includes('authorize') || msg.includes('privacy')) {
+    title = '未获得录音权限，请去设置开启'
+  } else if (
+    msg.includes('not supported') ||
+    msg.includes('not support') ||
+    msg.includes('simulate') ||
+    msg.includes('simulator')
+  ) {
+    title = '开发者工具可能无麦克风，请用真机试'
+  } else if (msg.includes('frequency') || msg.includes('bitrate') || msg.includes('samplerate')) {
+    title = '当前设备不支持该录音参数，可在真机再试'
+  } else if (msg.length > 3 && msg.length <= 56) {
+    title = msg
+  }
+  uni.showToast({ title, icon: 'none', duration: 2800 })
+}
+
+function recorderStartMp3Compatible(rm: UniApp.RecorderManager): void {
+  rm.start({
+    duration: 60000,
+    format: 'mp3',
+    sampleRate: 16000,
+    numberOfChannels: 1,
+  })
+}
+
+// #endif
+
+async function onVoiceStart() {
+  // #ifndef MP-WEIXIN
+  uni.showToast({ title: '语音录制仅支持微信小程序', icon: 'none' })
+  return
+  // #endif
+  // #ifdef MP-WEIXIN
+  const permitted = await ensureRecordPermission()
+  if (!permitted) return
+
+  initRecorderManagerOnce()
+  const rm = uni.getRecorderManager?.()
+  if (!rm) {
+    uni.showToast({ title: '录音组件不可用', icon: 'none' })
+    return
+  }
+
   isRecording.value = true
   willCancel.value = false
   recordStartTime.value = Date.now()
@@ -180,6 +268,7 @@ function onVoiceStart() {
     recordDuration.value = Date.now() - recordStartTime.value
   }, 100)
   startRecord()
+  // #endif
 }
 
 function onVoiceMove(e: TouchEvent) {
@@ -194,50 +283,42 @@ function onVoiceMove(e: TouchEvent) {
 
 function onVoiceEnd() {
   if (!isRecording.value) return
-  stopRecord()
-  if (willCancel.value) {
-    cancelRecord()
-  } else {
-    const duration = Date.now() - recordStartTime.value
-    if (duration < 1000) {
-      uni.showToast({ title: '录音时间太短', icon: 'none' })
-    } else {
-      emit('sendVoice', duration, recordFilePath.value || 'temp://voice.mp3')
-    }
-  }
-  resetRecordState()
-}
-
-function onVoiceCancel() {
-  cancelRecord()
-  resetRecordState()
-}
-
-function startRecord() {
   // #ifdef MP-WEIXIN
-  const recorder = uni.getRecorderManager?.()
-  if (recorder) {
-    recorder.onStop((res) => {
-      recordFilePath.value = res.tempFilePath
-    })
-    recorder.start({ duration: 60000, format: 'mp3' })
-  }
-  // #endif
-}
-
-function stopRecord() {
-  // #ifdef MP-WEIXIN
-  uni.getRecorderManager?.()?.stop()
-  // #endif
+  const cancelled = willCancel.value
+  const startMs = recordStartTime.value
+  pendingVoiceStop = { cancelled, startMs }
   if (recordTimer.value) {
     clearInterval(recordTimer.value)
     recordTimer.value = null
   }
+  isRecording.value = false
+  willCancel.value = false
+  recordDuration.value = 0
+  uni.getRecorderManager?.()?.stop()
+  // #endif
 }
 
-function cancelRecord() {
+function onVoiceCancel() {
   // #ifdef MP-WEIXIN
+  if (!isRecording.value) return
+  pendingVoiceStop = { cancelled: true, startMs: recordStartTime.value }
+  if (recordTimer.value) {
+    clearInterval(recordTimer.value)
+    recordTimer.value = null
+  }
+  isRecording.value = false
+  willCancel.value = false
+  recordDuration.value = 0
   uni.getRecorderManager?.()?.stop()
+  // #endif
+}
+
+function startRecord() {
+  // #ifdef MP-WEIXIN
+  initRecorderManagerOnce()
+  const rm = uni.getRecorderManager?.()
+  if (!rm) return
+  recorderStartMp3Compatible(rm)
   // #endif
 }
 
@@ -250,6 +331,59 @@ function resetRecordState() {
     recordTimer.value = null
   }
 }
+
+// #ifdef MP-WEIXIN
+function initRecorderManagerOnce() {
+  if (recorderManagerInited) return
+  const rm = uni.getRecorderManager?.()
+  if (!rm) return
+  recorderManagerInited = true
+  rm.onStop((res) => {
+    if (recordTimer.value) {
+      clearInterval(recordTimer.value)
+      recordTimer.value = null
+    }
+    const pend = pendingVoiceStop
+    pendingVoiceStop = null
+
+    if (!pend) {
+      resetRecordState()
+      return
+    }
+
+    if (pend.cancelled) {
+      resetRecordState()
+      return
+    }
+
+    const duration = Date.now() - pend.startMs
+    const path = (res.tempFilePath || '').trim()
+    resetRecordState()
+
+    if (duration < 1000) {
+      uni.showToast({ title: '录音时间太短', icon: 'none' })
+      return
+    }
+    if (!path) {
+      uni.showToast({ title: '未获取录音文件', icon: 'none' })
+      return
+    }
+    emit('sendVoice', duration, path)
+  })
+
+  rm.onError((err: { errMsg?: string }) => {
+    pendingVoiceStop = null
+    resetRecordState()
+    toastRecorderError(err || {})
+  })
+}
+// #endif
+
+onMounted(() => {
+  // #ifdef MP-WEIXIN
+  initRecorderManagerOnce()
+  // #endif
+})
 
 function waveStyle(index: number) {
   const height = isRecording.value

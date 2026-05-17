@@ -54,7 +54,10 @@ export class UploadController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB
-          new FileTypeValidator({ fileType: /(mp3|wav|m4a|aac)$/ }),
+          // file-type 返回的是 MIME（如 audio/mpeg、audio/mp4），不是扩展名
+          new FileTypeValidator({
+            fileType: /(mpeg|aac|wav|mp4|m4a|opus|ogg|caf|ms-wma|x-aac|x-m4a|x-wav|3gpp|amr)/i,
+          }),
         ],
       }),
     )

@@ -192,16 +192,29 @@ export function uploadFile(
       formData,
       header: token ? { Authorization: `Bearer ${token}` } : {},
       success: (res) => {
+        const raw = res.data as string
+        const statusOk = typeof res.statusCode === 'number' && res.statusCode >= 200 && res.statusCode < 300
+
         try {
-          const data = JSON.parse(res.data) as ApiResponse
-          if (data.code === 'SUCCESS') {
-            resolve(data.data)
-          } else {
-            uni.showToast({ title: data.message || '上传失败', icon: 'none' })
-            reject(new Error(data.message))
+          const data = JSON.parse(raw) as ApiResponse
+
+          if (!statusOk || data.code !== 'SUCCESS') {
+            const hint = data?.message || (statusOk ? '上传失败' : `上传失败 (${res.statusCode})`)
+            uni.showToast({ title: hint, icon: 'none' })
+            reject(new Error(hint))
+            return
           }
+
+          resolve(data.data)
         } catch {
-          resolve(res.data)
+          if (!statusOk) {
+            const hint = typeof raw === 'string' ? `上传失败 (${res.statusCode})` : '上传失败'
+            uni.showToast({ title: hint, icon: 'none' })
+            reject(new Error(hint))
+            return
+          }
+          uni.showToast({ title: '上传响应异常', icon: 'none' })
+          reject(new Error('INVALID_UPLOAD_RESPONSE'))
         }
       },
       fail: reject,

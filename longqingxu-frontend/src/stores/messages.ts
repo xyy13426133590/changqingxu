@@ -10,6 +10,7 @@ import {
 } from '@/services/api-conversation'
 import type { NewMessagePayload } from '@/services/chat-socket'
 import { resolveAvatar } from '@/utils/avatar'
+import { apiUploadVoice } from '@/services/api-upload'
 
 export interface Message {
   id: string
@@ -210,6 +211,55 @@ export const useMessagesStore = defineStore('messages', () => {
 
     conv.lastMessage = summarizeLast(type, content)
     conv.lastMessageTime = optimistic.createdAt
+
+    if (type === 'voice') {
+      let filePath = ''
+      let durationMs = extra?.duration ?? 0
+      try {
+        const o = JSON.parse(content) as { url?: string; duration?: number }
+        if (o.url) filePath = o.url.trim()
+        if (typeof o.duration === 'number' && o.duration > 0) durationMs = o.duration
+      } catch {
+        /* ignore */
+      }
+      if (!filePath) {
+        const arrFail = messages.value[cid]?.filter((m) => m.id !== tempId) || []
+        messages.value = { ...messages.value, [cid]: arrFail }
+        uni.showToast({ title: '语音文件无效', icon: 'none' })
+        return
+      }
+
+      try {
+        const { url } = (await apiUploadVoice(filePath)) as { url: string }
+        const durationSec = Math.max(1, Math.ceil(durationMs / 1000))
+        const saved = await apiSendMessage({
+          conversationId: cid,
+          receiverId: conv.userId,
+          type: 'voice',
+          content: '[语音]',
+          mediaUrl: url,
+          mediaDuration: durationSec,
+        })
+        const mapped = mapApiMessage(saved)
+        const arr = messages.value[cid]?.filter((m) => m.id !== tempId) || []
+        messages.value = {
+          ...messages.value,
+          [cid]: [...arr, mapped].sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+          ),
+        }
+        const lc = conversations.value.find((c) => c.id === cid)
+        if (lc) {
+          lc.lastMessage = summarizeLast(mapped.type, mapped.content)
+          lc.lastMessageTime = mapped.createdAt
+        }
+      } catch {
+        const arrFail = messages.value[cid]?.filter((m) => m.id !== tempId) || []
+        messages.value = { ...messages.value, [cid]: arrFail }
+        uni.showToast({ title: '语音发送失败', icon: 'none' })
+      }
+      return
+    }
 
     if (type !== 'text') {
       const finalList =

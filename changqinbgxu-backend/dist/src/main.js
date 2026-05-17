@@ -6,6 +6,8 @@ const swagger_1 = require("@nestjs/swagger");
 const config_1 = require("@nestjs/config");
 const helmet_1 = require("helmet");
 const compression = require("compression");
+const fs_1 = require("fs");
+const path_1 = require("path");
 const app_module_1 = require("./app.module");
 const transform_interceptor_1 = require("./common/interceptors/transform.interceptor");
 const http_exception_filter_1 = require("./common/filters/http-exception.filter");
@@ -13,10 +15,18 @@ async function bootstrap() {
     const logger = new common_1.Logger('Bootstrap');
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
         logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+        rawBody: true,
     });
     const configService = app.get(config_1.ConfigService);
     const port = configService.get('PORT', 3000);
     const apiPrefix = configService.get('API_PREFIX', 'api');
+    const uploadsRoot = (0, path_1.join)(process.cwd(), 'uploads');
+    if (!(0, fs_1.existsSync)(uploadsRoot)) {
+        (0, fs_1.mkdirSync)(uploadsRoot, { recursive: true });
+    }
+    app.useStaticAssets(uploadsRoot, {
+        prefix: `/${apiPrefix}/upload-static/`,
+    });
     app.use((0, helmet_1.default)());
     app.use(compression());
     app.enableCors({

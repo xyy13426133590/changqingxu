@@ -2,22 +2,27 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as OSS from 'ali-oss';
 import * as crypto from 'crypto';
+import { promises as fs } from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class UploadService {
   private readonly logger = new Logger(UploadService.name);
-  private ossClient: OSS;
+  /** 未填写 AK/SK 时保持为空，不走 OSS */
+  private ossClient?: OSS | null;
 
   constructor(private readonly configService: ConfigService) {
-    // 初始化 OSS 客户端
     const ossConfig = this.configService.get('oss');
-    if (ossConfig && ossConfig.accessKeyId && ossConfig.accessKeySecret) {
+    if (ossConfig?.accessKeyId && ossConfig?.accessKeySecret && ossConfig?.bucket) {
       this.ossClient = new OSS({
         region: ossConfig.region,
         accessKeyId: ossConfig.accessKeyId,
         accessKeySecret: ossConfig.accessKeySecret,
         bucket: ossConfig.bucket,
       });
+    } else {
+      this.ossClient = undefined;
+      this.logger.warn('OSS AK/SK 或 Bucket 未配置，上传将直接使用本地磁盘');
     }
   }
 
@@ -60,32 +65,67 @@ export class UploadService {
     file: Express.Multer.File,
     folder: string,
   ): Promise<{ url: string; fileName: string }> {
-    // 生成文件名
-    const ext = file.originalname.split('.').pop();
+    // 生成文件名（小程序上传可能不带扩展名，需兜底）
+    const baseName = file.originalname || '';
+    const extFromName =
+      baseName.includes('.') && baseName.length > 0
+        ? (baseName.split('.').pop() || '').toLowerCase()
+        : '';
+    const allowed = new Set([
+      'mp3',
+      'wav',
+      'm4a',
+      'aac',
+      'mp4',
+      'mpeg',
+      'caf',
+      'amr',
+      '3gp',
+    ]);
+    const ext = extFromName && allowed.has(extFromName) ? extFromName : 'aac';
     const hash = crypto.randomBytes(8).toString('hex');
     const fileName = `${folder}/${userId}/${Date.now()}_${hash}.${ext}`;
 
-    // 如果没有配置 OSS，使用本地存储（仅开发环境）
+    const buffer = file.buffer;
+    if (!buffer?.length) {
+      throw new Error('上传文件内容为空');
+    }
+
+    /** 写入项目根 uploads/ 并用 PUBLIC_BASE_URL 拼出符合 @IsUrl 的绝对地址 */
+    const persistLocal = async (): Promise<{ url: string; fileName: string }> => {
+      const uploadsRoot = path.join(process.cwd(), 'uploads');
+      const diskPath = path.join(uploadsRoot, ...fileName.split('/'));
+      await fs.mkdir(path.dirname(diskPath), { recursive: true });
+      await fs.writeFile(diskPath, buffer);
+      const apiPrefix = (
+        this.configService.get<string>('app.apiPrefix') ??
+        process.env.API_PREFIX ??
+        'api'
+      ).replace(/^\/+|\/+$/g, '');
+      const publicBase = (
+        this.configService.get<string>('app.publicBaseUrl') ??
+        `http://127.0.0.1:${this.configService.get<number>('app.port', 3000)}`
+      ).replace(/\/+$/, '');
+      const absoluteUrl = `${publicBase}/${apiPrefix}/upload-static/${fileName}`;
+      this.logger.warn(`本地存储已写入 ${diskPath}`);
+      return { url: absoluteUrl, fileName };
+    };
+
     if (!this.ossClient) {
-      this.logger.warn('OSS 未配置，使用本地存储');
-      // 这里可以实现本地文件系统存储
-      // 演示环境直接返回一个模拟 URL
-      const mockUrl = `https://example.com/${fileName}`;
-      return { url: mockUrl, fileName };
+      return persistLocal();
     }
 
     try {
-      // 上传到 OSS
-      const result = await this.ossClient.put(fileName, file.buffer);
+      const result = await this.ossClient.put(fileName, buffer);
       const domain = this.configService.get<string>('oss.domain') || result.url;
-      const url = domain.includes('http') ? `${domain}/${fileName}` : `https://${domain}/${fileName}`;
-
-      this.logger.log(`文件上传成功: ${fileName}`);
-
-      return { url: result.url || url, fileName };
-    } catch (error) {
-      this.logger.error(`文件上传失败: ${error.message}`);
-      throw new Error('文件上传失败');
+      const composed = domain.includes('http') ? `${domain}/${fileName}` : `https://${domain}/${fileName}`;
+      const url = result.url || composed;
+      this.logger.log(`文件上传成功(OSS): ${fileName}`);
+      return { url, fileName };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`OSS 上传失败，降级为本地存储: ${message}`);
+      return persistLocal();
     }
   }
 }

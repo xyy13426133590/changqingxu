@@ -24,3 +24,15 @@ export declare class VipOrderResponseDto {
     createdAt: Date;
     plan?: VipPlanResponseDto;
 }
+export declare class MiniProgramPaymentDto {
+    timeStamp: string;
+    nonceStr: string;
+    package: string;
+    signType: 'RSA';
+    paySign: string;
+}
+export declare class CreateOrderResultDto {
+    order: VipOrderResponseDto;
+    payment?: MiniProgramPaymentDto;
+    paymentMode: 'live' | 'mock';
+}

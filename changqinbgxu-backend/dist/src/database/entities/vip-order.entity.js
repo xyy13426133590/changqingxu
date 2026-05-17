@@ -53,6 +53,18 @@ __decorate([
     __metadata("design:type", Date)
 ], VipOrder.prototype, "expiresAt", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'out_trade_no', length: 32, unique: true, nullable: true }),
+    __metadata("design:type", String)
+], VipOrder.prototype, "outTradeNo", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'wechat_prepay_id', length: 128, nullable: true }),
+    __metadata("design:type", String)
+], VipOrder.prototype, "wechatPrepayId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'wechat_transaction_id', length: 64, nullable: true, unique: true }),
+    __metadata("design:type", String)
+], VipOrder.prototype, "wechatTransactionId", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
     __metadata("design:type", Date)
 ], VipOrder.prototype, "createdAt", void 0);

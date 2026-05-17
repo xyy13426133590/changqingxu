@@ -23,6 +23,7 @@ const database_config_1 = require("./config/database.config");
 const redis_config_1 = require("./config/redis.config");
 const oss_config_1 = require("./config/oss.config");
 const wechat_config_1 = require("./config/wechat.config");
+const wechat_pay_config_1 = require("./config/wechat-pay.config");
 const jwt_config_1 = require("./config/jwt.config");
 let AppModule = class AppModule {
 };
@@ -33,7 +34,7 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 envFilePath: '.env',
-                load: [app_config_1.appConfig, database_config_1.databaseConfig, redis_config_1.redisConfig, oss_config_1.ossConfig, wechat_config_1.wechatConfig, jwt_config_1.jwtConfig],
+                load: [app_config_1.appConfig, database_config_1.databaseConfig, redis_config_1.redisConfig, oss_config_1.ossConfig, wechat_config_1.wechatConfig, wechat_pay_config_1.wechatPayConfig, jwt_config_1.jwtConfig],
             }),
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],

@@ -22,6 +22,10 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler<T>,
   ): Observable<Response<T>> {
+    const req = context.switchToHttp().getRequest<{ url?: string }>();
+    if (typeof req.url === 'string' && req.url.includes('payment/wechat-notify')) {
+      return next.handle() as Observable<Response<T>>;
+    }
     return next.handle().pipe(
       map((data) => ({
         code: 'SUCCESS',

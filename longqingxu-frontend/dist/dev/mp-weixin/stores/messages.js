@@ -2,6 +2,7 @@
 const common_vendor = require("../common/vendor.js");
 const services_apiConversation = require("../services/api-conversation.js");
 const utils_avatar = require("../utils/avatar.js");
+const services_apiUpload = require("../services/api-upload.js");
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
@@ -173,7 +174,7 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
   }
   function sendMessage(content, type = "text", extra) {
     return __async(this, null, function* () {
-      var _a, _b, _c;
+      var _a, _b, _c, _d, _e, _f, _g;
       const cid = currentConversationId.value;
       const conv = conversations.value.find((c) => c.id === cid);
       if (!cid || !conv)
@@ -192,8 +193,55 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
       messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: [...messages.value[cid] || [], optimistic] });
       conv.lastMessage = summarizeLast(type, content);
       conv.lastMessageTime = optimistic.createdAt;
+      if (type === "voice") {
+        let filePath = "";
+        let durationMs = (_a = extra == null ? void 0 : extra.duration) != null ? _a : 0;
+        try {
+          const o = JSON.parse(content);
+          if (o.url)
+            filePath = o.url.trim();
+          if (typeof o.duration === "number" && o.duration > 0)
+            durationMs = o.duration;
+        } catch (e) {
+        }
+        if (!filePath) {
+          const arrFail = ((_b = messages.value[cid]) == null ? void 0 : _b.filter((m) => m.id !== tempId)) || [];
+          messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: arrFail });
+          common_vendor.index.showToast({ title: "语音文件无效", icon: "none" });
+          return;
+        }
+        try {
+          const { url } = yield services_apiUpload.apiUploadVoice(filePath);
+          const durationSec = Math.max(1, Math.ceil(durationMs / 1e3));
+          const saved = yield services_apiConversation.apiSendMessage({
+            conversationId: cid,
+            receiverId: conv.userId,
+            type: "voice",
+            content: "[语音]",
+            mediaUrl: url,
+            mediaDuration: durationSec
+          });
+          const mapped = mapApiMessage(saved);
+          const arr = ((_c = messages.value[cid]) == null ? void 0 : _c.filter((m) => m.id !== tempId)) || [];
+          messages.value = __spreadProps(__spreadValues({}, messages.value), {
+            [cid]: [...arr, mapped].sort(
+              (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            )
+          });
+          const lc = conversations.value.find((c) => c.id === cid);
+          if (lc) {
+            lc.lastMessage = summarizeLast(mapped.type, mapped.content);
+            lc.lastMessageTime = mapped.createdAt;
+          }
+        } catch (e) {
+          const arrFail = ((_d = messages.value[cid]) == null ? void 0 : _d.filter((m) => m.id !== tempId)) || [];
+          messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: arrFail });
+          common_vendor.index.showToast({ title: "语音发送失败", icon: "none" });
+        }
+        return;
+      }
       if (type !== "text") {
-        const finalList = ((_a = messages.value[cid]) == null ? void 0 : _a.map(
+        const finalList = ((_e = messages.value[cid]) == null ? void 0 : _e.map(
           (m) => m.id === tempId ? __spreadProps(__spreadValues({}, m), { status: "sent" }) : m
         )) || [];
         messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: finalList });
@@ -209,7 +257,7 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
       try {
         const saved = yield services_apiConversation.apiSendMessage(payload);
         const mapped = mapApiMessage(saved);
-        const arr = ((_b = messages.value[cid]) == null ? void 0 : _b.filter((m) => m.id !== tempId)) || [];
+        const arr = ((_f = messages.value[cid]) == null ? void 0 : _f.filter((m) => m.id !== tempId)) || [];
         messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: [...arr, mapped].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) });
         const lc = conversations.value.find((c) => c.id === cid);
         if (lc) {
@@ -217,7 +265,7 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
           lc.lastMessageTime = mapped.createdAt;
         }
       } catch (e) {
-        const arr = ((_c = messages.value[cid]) == null ? void 0 : _c.filter((m) => m.id !== tempId)) || [];
+        const arr = ((_g = messages.value[cid]) == null ? void 0 : _g.filter((m) => m.id !== tempId)) || [];
         messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: arr });
       }
     });

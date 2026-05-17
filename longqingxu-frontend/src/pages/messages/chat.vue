@@ -82,7 +82,7 @@
           v-else-if="msg.type === 'voice'"
           class="message-bubble voice-bubble"
           :class="isFromMe(msg) ? 'me' : 'other'"
-          @click="playVoice(msg.content)"
+          @click.stop="playVoice(msg)"
         >
           <view class="voice-content">
             <text class="voice-icon">{{ playingVoiceId === msg.id ? '🔊' : '▶️' }}</text>
@@ -127,12 +127,13 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
 import { onLoad, onUnload } from '@dcloudio/uni-app'
-import { useMessagesStore } from '@/stores/messages'
+import { useMessagesStore, type Message } from '@/stores/messages'
 import { useUserStore } from '@/stores/user'
 import ChatInputBar from '@/components/ChatInputBar.vue'
 import { connectChatSocket, disconnectChatSocket } from '@/services/chat-socket'
 import { navigateBackTo } from '@/utils/navigation'
 import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
+import { resolveVoicePlaySrc } from '@/utils/media-url'
 
 const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
 const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
@@ -142,6 +143,20 @@ const userStore = useUserStore()
 const showRiskBanner = ref(true)
 const conversationId = ref('')
 const playingVoiceId = ref('')
+
+let voicePlayer: UniApp.InnerAudioContext | null = null
+
+function stopVoicePlayback(): void {
+  playingVoiceId.value = ''
+  if (!voicePlayer) return
+  try {
+    voicePlayer.stop()
+    voicePlayer.destroy()
+  } catch {
+    /* ignore */
+  }
+  voicePlayer = null
+}
 
 function isFromMe(msg: { senderId: string }): boolean {
   const my = userStore.profile.id
@@ -168,6 +183,7 @@ onLoad(async (options) => {
 })
 
 onUnload(() => {
+  stopVoicePlayback()
   void disconnectChatSocket()
 })
 
@@ -192,13 +208,7 @@ function onSendVoice(duration: number, tempFilePath: string) {
     url: tempFilePath,
     duration: duration,
   })
-  messagesStore.sendMessage(voiceData, 'voice')
-  // 设置语音消息的持续时间
-  const messages = messagesStore.currentMessages
-  const lastMsg = messages[messages.length - 1]
-  if (lastMsg) {
-    lastMsg.duration = duration
-  }
+  messagesStore.sendMessage(voiceData, 'voice', { duration })
   scrollToBottom()
 }
 
@@ -227,36 +237,46 @@ function previewImage(url: string) {
 }
 
 // 播放语音
-function playVoice(content: string) {
-  try {
-    const data = JSON.parse(content)
-    const voiceUrl = data.url || content
+function playVoice(msg: Message) {
+  if (msg.type !== 'voice') return
 
-    // 设置当前播放的语音ID
-    const messages = messagesStore.currentMessages
-    const msg = messages.find(m => m.content === content && m.type === 'voice')
-    if (msg) {
-      playingVoiceId.value = msg.id
-    }
-
-    // 使用 uni 播放语音
-    const innerAudioContext = uni.createInnerAudioContext()
-    innerAudioContext.src = voiceUrl
-    innerAudioContext.play()
-
-    innerAudioContext.onEnded(() => {
-      playingVoiceId.value = ''
-      innerAudioContext.destroy()
-    })
-
-    innerAudioContext.onError(() => {
-      playingVoiceId.value = ''
-      uni.showToast({ title: '播放失败', icon: 'none' })
-      innerAudioContext.destroy()
-    })
-  } catch (_e) {
-    uni.showToast({ title: '语音解析失败', icon: 'none' })
+  if (playingVoiceId.value === msg.id) {
+    stopVoicePlayback()
+    return
   }
+
+  let rawUrl = ''
+  try {
+    const data = JSON.parse(msg.content) as { url?: string }
+    rawUrl = (data.url || '').trim()
+  } catch {
+    rawUrl = (msg.content || '').trim()
+  }
+
+  const voiceUrl = resolveVoicePlaySrc(rawUrl)
+  if (!voiceUrl || voiceUrl === '[语音]') {
+    uni.showToast({ title: '暂无可用音频', icon: 'none' })
+    return
+  }
+
+  stopVoicePlayback()
+
+  playingVoiceId.value = msg.id
+  const ctx = uni.createInnerAudioContext()
+  voicePlayer = ctx
+  ctx.obeyMuteSwitch = false
+  ctx.src = voiceUrl
+  ctx.play()
+
+  ctx.onEnded(() => {
+    stopVoicePlayback()
+  })
+
+  ctx.onError((err) => {
+    console.warn('[InnerAudio]', err, voiceUrl)
+    stopVoicePlayback()
+    uni.showToast({ title: '播放失败', icon: 'none' })
+  })
 }
 
 // 格式化语音时长

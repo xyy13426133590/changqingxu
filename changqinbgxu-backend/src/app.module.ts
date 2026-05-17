@@ -18,6 +18,7 @@ import { databaseConfig } from './config/database.config';
 import { redisConfig } from './config/redis.config';
 import { ossConfig } from './config/oss.config';
 import { wechatConfig } from './config/wechat.config';
+import { wechatPayConfig } from './config/wechat-pay.config';
 import { jwtConfig } from './config/jwt.config';
 
 @Module({
@@ -26,7 +27,7 @@ import { jwtConfig } from './config/jwt.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      load: [appConfig, databaseConfig, redisConfig, ossConfig, wechatConfig, jwtConfig],
+      load: [appConfig, databaseConfig, redisConfig, ossConfig, wechatConfig, wechatPayConfig, jwtConfig],
     }),
 
     // 数据库模块

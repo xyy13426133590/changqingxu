@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 export declare class UploadService {
     private readonly configService;
     private readonly logger;
-    private ossClient;
+    private ossClient?;
     constructor(configService: ConfigService);
     uploadImage(userId: string, file: Express.Multer.File): Promise<{
         url: string;
