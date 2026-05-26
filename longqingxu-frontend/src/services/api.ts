@@ -3,6 +3,8 @@
  * 长情许交友小程序 - 后端 API 对接
  */
 
+export const USE_CLOUD = import.meta.env.VITE_USE_CLOUD === 'true'
+
 // API 基础地址
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
 

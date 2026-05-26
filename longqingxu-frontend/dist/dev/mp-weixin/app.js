@@ -2,6 +2,7 @@
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 const stores_user = require("./stores/user.js");
+const services_cloud = require("./services/cloud.js");
 if (!Math) {
   "./pages/discover/index.js";
   "./pages/filter/index.js";
@@ -26,6 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       console.log("App Launch");
       const userStore = stores_user.useUserStore();
       userStore.init();
+      services_cloud.initCloud();
     });
     common_vendor.onShow(() => {
       console.log("App Show");

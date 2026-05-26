@@ -58,6 +58,7 @@ async function bootstrap() {
         .addTag('消息', '实时消息')
         .addTag('VIP', '会员套餐')
         .addTag('上传', '文件上传')
+        .addTag('增长', '新人礼包 / 搭讪配额 / 邀请与首触归因')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('docs', app, document, {

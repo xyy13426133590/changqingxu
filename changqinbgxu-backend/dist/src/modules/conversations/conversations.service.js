@@ -12,6 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 var ConversationsService_1;
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConversationsService = void 0;
 const common_1 = require("@nestjs/common");
@@ -20,11 +21,13 @@ const typeorm_2 = require("typeorm");
 const conversation_entity_1 = require("../../database/entities/conversation.entity");
 const message_entity_1 = require("../../database/entities/message.entity");
 const user_entity_1 = require("../../database/entities/user.entity");
+const greeting_quota_service_1 = require("../growth/greeting-quota.service");
 let ConversationsService = ConversationsService_1 = class ConversationsService {
-    constructor(conversationRepository, messageRepository, userRepository) {
+    constructor(conversationRepository, messageRepository, userRepository, greetingQuotaService) {
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.greetingQuotaService = greetingQuotaService;
         this.logger = new common_1.Logger(ConversationsService_1.name);
     }
     async getConversations(userId) {
@@ -55,6 +58,7 @@ let ConversationsService = ConversationsService_1 = class ConversationsService {
         if (existingConversation) {
             return this.formatConversationResponse(existingConversation, userId);
         }
+        await this.greetingQuotaService.consumeOneQuota(userId);
         const conversation = this.conversationRepository.create({
             userId1: userId,
             userId2: targetUserId,
@@ -161,6 +165,6 @@ exports.ConversationsService = ConversationsService = ConversationsService_1 = _
     __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository, typeof (_a = typeof greeting_quota_service_1.GreetingQuotaService !== "undefined" && greeting_quota_service_1.GreetingQuotaService) === "function" ? _a : Object])
 ], ConversationsService);
 //# sourceMappingURL=conversations.service.js.map

@@ -18,6 +18,7 @@ const conversations_module_1 = require("./modules/conversations/conversations.mo
 const messages_module_1 = require("./modules/messages/messages.module");
 const vip_module_1 = require("./modules/vip/vip.module");
 const upload_module_1 = require("./modules/upload/upload.module");
+const growth_module_1 = require("./modules/growth/growth.module");
 const app_config_1 = require("./config/app.config");
 const database_config_1 = require("./config/database.config");
 const redis_config_1 = require("./config/redis.config");
@@ -77,6 +78,7 @@ exports.AppModule = AppModule = __decorate([
             messages_module_1.MessagesModule,
             vip_module_1.VipModule,
             upload_module_1.UploadModule,
+            growth_module_1.GrowthModule,
         ],
     })
 ], AppModule);

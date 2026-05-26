@@ -15,12 +15,13 @@ const conversation_entity_1 = require("../../database/entities/conversation.enti
 const message_entity_1 = require("../../database/entities/message.entity");
 const user_entity_1 = require("../../database/entities/user.entity");
 const users_module_1 = require("../users/users.module");
+const growth_module_1 = require("../growth/growth.module");
 let ConversationsModule = class ConversationsModule {
 };
 exports.ConversationsModule = ConversationsModule;
 exports.ConversationsModule = ConversationsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([conversation_entity_1.Conversation, message_entity_1.Message, user_entity_1.User]), users_module_1.UsersModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([conversation_entity_1.Conversation, message_entity_1.Message, user_entity_1.User]), users_module_1.UsersModule, growth_module_1.GrowthModule],
         controllers: [conversations_controller_1.ConversationsController],
         providers: [conversations_service_1.ConversationsService],
         exports: [conversations_service_1.ConversationsService],
