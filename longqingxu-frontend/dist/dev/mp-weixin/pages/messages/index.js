@@ -68,7 +68,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "af"),
+        a: common_vendor.o(goBack, "d2"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
         d: sortedConversations.value.length === 0

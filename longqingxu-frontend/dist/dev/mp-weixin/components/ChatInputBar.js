@@ -362,29 +362,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.e({
         a: common_vendor.t(mode.value === "voice" ? "⌨️" : "🎙️"),
         b: mode.value === "voice" ? 1 : "",
-        c: common_vendor.o(($event) => toggleMode("voice"), "72"),
+        c: common_vendor.o(($event) => toggleMode("voice"), "47"),
         d: showEmoji.value ? 1 : "",
-        e: common_vendor.o(toggleEmoji, "35"),
-        f: common_vendor.o(chooseAlbum, "6a"),
-        g: common_vendor.o(chooseImage, "d4"),
-        h: common_vendor.o(takeScreenshot, "b4"),
+        e: common_vendor.o(toggleEmoji, "f9"),
+        f: common_vendor.o(chooseAlbum, "09"),
+        g: common_vendor.o(chooseImage, "7c"),
+        h: common_vendor.o(takeScreenshot, "50"),
         i: mode.value === "voice"
       }, mode.value === "voice" ? {
         j: common_vendor.t(voiceBtnText.value),
         k: isRecording.value ? 1 : "",
         l: willCancel.value ? 1 : "",
-        m: common_vendor.o(onVoiceStart, "87"),
-        n: common_vendor.o(onVoiceMove, "4f"),
-        o: common_vendor.o(onVoiceEnd, "b4"),
-        p: common_vendor.o(onVoiceCancel, "34")
+        m: common_vendor.o(onVoiceStart, "f2"),
+        n: common_vendor.o(onVoiceMove, "d7"),
+        o: common_vendor.o(onVoiceEnd, "63"),
+        p: common_vendor.o(onVoiceCancel, "a3")
       } : {
         q: _ctx.placeholder,
-        r: common_vendor.o(sendText, "b3"),
-        s: common_vendor.o(onFocus, "39"),
+        r: common_vendor.o(sendText, "e3"),
+        s: common_vendor.o(onFocus, "dd"),
         t: inputText.value,
-        v: common_vendor.o(($event) => inputText.value = $event.detail.value, "a2"),
+        v: common_vendor.o(($event) => inputText.value = $event.detail.value, "98"),
         w: canSend.value ? 1 : "",
-        x: common_vendor.o(sendText, "a1")
+        x: common_vendor.o(sendText, "61")
       }, {
         y: isRecording.value
       }, isRecording.value ? {
@@ -400,21 +400,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         D: showEmoji.value
       }, showEmoji.value ? {
-        E: common_vendor.o(onEmojiSelect, "ba"),
-        F: common_vendor.o(onEmojiDelete, "22"),
+        E: common_vendor.o(onEmojiSelect, "be"),
+        F: common_vendor.o(onEmojiDelete, "b5"),
         G: common_vendor.p({
           visible: showEmoji.value
         })
       } : {}, {
         H: editingImage.value
       }, editingImage.value ? {
-        I: common_vendor.o(cancelEdit, "79"),
-        J: common_vendor.o(confirmEdit, "af"),
+        I: common_vendor.o(cancelEdit, "9e"),
+        J: common_vendor.o(confirmEdit, "5a"),
         K: editingImage.value,
-        L: common_vendor.o(rotateImage, "5d"),
-        M: common_vendor.o(cropImage, "3e"),
-        N: common_vendor.o(addText, "39"),
-        O: common_vendor.o(addMosaic, "06")
+        L: common_vendor.o(rotateImage, "91"),
+        M: common_vendor.o(cropImage, "00"),
+        N: common_vendor.o(addText, "6d"),
+        O: common_vendor.o(addMosaic, "51")
       } : {});
     };
   }

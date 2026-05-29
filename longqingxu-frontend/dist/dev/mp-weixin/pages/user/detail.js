@@ -169,7 +169,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       var _a, _b;
       return common_vendor.e({
-        a: common_vendor.o(goBack, "e7"),
+        a: common_vendor.o(goBack, "95"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
         d: loading.value

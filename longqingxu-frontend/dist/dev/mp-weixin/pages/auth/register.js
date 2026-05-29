@@ -97,25 +97,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "bd"),
+        a: common_vendor.o(goBack, "7d"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
         d: phone.value,
-        e: common_vendor.o(($event) => phone.value = $event.detail.value, "1f"),
+        e: common_vendor.o(($event) => phone.value = $event.detail.value, "30"),
         f: nickname.value,
-        g: common_vendor.o(($event) => nickname.value = $event.detail.value, "a8"),
+        g: common_vendor.o(($event) => nickname.value = $event.detail.value, "53"),
         h: password.value,
-        i: common_vendor.o(($event) => password.value = $event.detail.value, "60"),
+        i: common_vendor.o(($event) => password.value = $event.detail.value, "65"),
         j: password2.value,
-        k: common_vendor.o(($event) => password2.value = $event.detail.value, "de"),
+        k: common_vendor.o(($event) => password2.value = $event.detail.value, "78"),
         l: agreed.value
       }, agreed.value ? {} : {}, {
         m: agreed.value ? 1 : "",
-        n: common_vendor.o(($event) => agreed.value = !agreed.value, "73"),
+        n: common_vendor.o(($event) => agreed.value = !agreed.value, "38"),
         o: common_vendor.t(loading.value ? "提交中…" : "注 册"),
         p: loading.value || !agreed.value ? 1 : "",
-        q: common_vendor.o(submit, "45"),
-        r: common_vendor.o(goLogin, "9e")
+        q: common_vendor.o(submit, "58"),
+        r: common_vendor.o(goLogin, "43")
       });
     };
   }

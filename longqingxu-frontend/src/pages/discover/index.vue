@@ -277,7 +277,8 @@ const emptyHint = computed(() => {
     return '登录后可查看推荐用户；本地可先执行后端 seed:dev 写入演示账号。'
   }
   if (discoverStore.loadError) {
-    return discoverStore.loadError
+    // 隐藏技术性报错，显示友好提示
+    return '推荐列表暂时无法加载，请点「重新加载」重试。'
   }
   if (discoverStore.recommendationsRecycled) {
     return '本地演示账号较少，你已滑完一轮；系统已重新展示推荐。继续滑卡会再次看完，可点「重新浏览」清空记录。'

@@ -1,4 +1,4 @@
-import { clearToken, getToken } from './api'
+import { getToken } from './api'
 
 type ApiResponse<T> = {
   code: string
@@ -11,21 +11,20 @@ type CallCloudOptions = {
   skipAuth?: boolean
 }
 
+export class CloudUnauthorizedError extends Error {
+  readonly code = 'UNAUTHORIZED'
+  constructor(message = '请先登录') {
+    super(message)
+    this.name = 'CloudUnauthorizedError'
+  }
+}
+
 const DEFAULT_CLOUD_ENV = 'cloud1-d6g7211of923bfddc'
 
 export const USE_CLOUD = import.meta.env.VITE_USE_CLOUD === 'true'
 export const CLOUD_ENV = import.meta.env.VITE_CLOUD_ENV || DEFAULT_CLOUD_ENV
 
 let cloudInitialized = false
-
-function redirectToLogin(): void {
-  clearToken()
-  try {
-    uni.reLaunch({ url: '/pages/auth/login' })
-  } catch {
-    // ignore route failure in non-page context
-  }
-}
 
 export function initCloud(): void {
   if (!USE_CLOUD || cloudInitialized) return
@@ -73,7 +72,7 @@ export async function callCloud<T>(
   }
 
   if (result.code === 'UNAUTHORIZED') {
-    redirectToLogin()
+    throw new CloudUnauthorizedError(result.message)
   }
   throw new Error(result.message || '云函数调用失败')
   // #endif

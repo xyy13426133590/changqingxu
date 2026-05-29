@@ -140,8 +140,8 @@ export const useUserStore = defineStore('user', () => {
       token.value = t
       return true
     } catch (e) {
+      // 仅鉴权失效时清登录态；网络抖动、云函数未部署等不应把刚登录用户踢下线
       const msg = e instanceof Error ? e.message : ''
-      // 仅鉴权失效时清登录态；网络抖动等不应把刚登录用户踢下线
       if (
         msg.includes('401') ||
         msg.includes('未授权') ||

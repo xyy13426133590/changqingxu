@@ -8,6 +8,8 @@ if (!Math) {
   "./pages/filter/index.js";
   "./pages/messages/index.js";
   "./pages/messages/chat.js";
+  "./pages/circle/index.js";
+  "./pages/circle/publish.js";
   "./pages/mine/index.js";
   "./pages/mine/profile-edit.js";
   "./pages/mine/my-card.js";

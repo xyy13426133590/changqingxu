@@ -80,12 +80,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "bb"),
+        a: common_vendor.o(goBack, "87"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
         d: onlyFace.value
       }, onlyFace.value ? {} : !hasDraft.value ? {
-        f: common_vendor.o(goRealName, "75")
+        f: common_vendor.o(goRealName, "02")
       } : {}, {
         e: !hasDraft.value,
         g: common_vendor.t(stepEmoji.value),
@@ -100,7 +100,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         k: common_vendor.t(running.value ? "识别中…" : "开始识别"),
         l: running.value || !canStart.value ? 1 : "",
-        m: common_vendor.o(onStart, "d3")
+        m: common_vendor.o(onStart, "aa")
       });
     };
   }

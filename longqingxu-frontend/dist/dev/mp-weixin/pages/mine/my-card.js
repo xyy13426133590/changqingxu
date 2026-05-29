@@ -39,7 +39,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       var _a, _b;
       return common_vendor.e({
-        a: common_vendor.o(goBack, "fe"),
+        a: common_vendor.o(goBack, "d7"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
         d: common_vendor.unref(userStore).profile.avatar,
@@ -68,8 +68,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         v: common_vendor.unref(userStore).profile.isRealName
       }, common_vendor.unref(userStore).profile.isRealName ? {} : {}, {
-        w: common_vendor.o(goBack, "81"),
-        x: common_vendor.o(goToMessages, "6f")
+        w: common_vendor.o(goBack, "a1"),
+        x: common_vendor.o(goToMessages, "06")
       });
     };
   }

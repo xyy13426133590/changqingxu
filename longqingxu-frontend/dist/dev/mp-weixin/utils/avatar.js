@@ -1,5 +1,4 @@
 "use strict";
-require("../common/vendor.js");
 require("../services/api.js");
 const common_assets = require("../common/assets.js");
 const DEMO_AVATARS = [common_assets.demo0, common_assets.demo1, common_assets.demo2, common_assets.demo3, common_assets.demo4];

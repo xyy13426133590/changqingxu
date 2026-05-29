@@ -73,7 +73,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return "登录后可查看推荐用户；本地可先执行后端 seed:dev 写入演示账号。";
       }
       if (discoverStore.loadError) {
-        return discoverStore.loadError;
+        return "推荐列表暂时无法加载，请点「重新加载」重试。";
       }
       if (discoverStore.recommendationsRecycled) {
         return "本地演示账号较少，你已滑完一轮；系统已重新展示推荐。继续滑卡会再次看完，可点「重新浏览」清空记录。";
@@ -361,7 +361,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(messagesStore).totalUnread > 0 ? {
         d: common_vendor.t(common_vendor.unref(messagesStore).totalUnread > 99 ? "99+" : common_vendor.unref(messagesStore).totalUnread)
       } : {}, {
-        e: common_vendor.o(navigateToMessages, "17"),
+        e: common_vendor.o(navigateToMessages, "93"),
         f: common_vendor.s(capsuleNavRowStyle.value),
         g: common_vendor.s(capsuleNavOuterStyle.value),
         h: common_vendor.f(dailyUsers.value, (user, k0, i0) => {
@@ -381,27 +381,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         m: common_vendor.t(emptyHint.value),
         n: common_vendor.unref(userStore).isLogin
       }, common_vendor.unref(userStore).isLogin ? {
-        o: common_vendor.o(resetDiscoverSwipes, "41")
+        o: common_vendor.o(resetDiscoverSwipes, "83")
       } : {}, {
         p: !common_vendor.unref(userStore).isLogin ? 1 : "",
-        q: common_vendor.o(reloadDiscover, "83"),
+        q: common_vendor.o(reloadDiscover, "bf"),
         r: !common_vendor.unref(userStore).isLogin
       }, !common_vendor.unref(userStore).isLogin ? {
-        s: common_vendor.o(goLogin, "98")
+        s: common_vendor.o(goLogin, "e6")
       } : {
-        t: common_vendor.o(navigateToFilter, "19")
+        t: common_vendor.o(navigateToFilter, "b5")
       }) : common_vendor.e({
         v: currentUser.value
       }, currentUser.value ? common_vendor.e({
         w: cardAvatarSrc.value,
-        x: common_vendor.o(onCardAvatarError, "99"),
+        x: common_vendor.o(onCardAvatarError, "f1"),
         y: likeOverlayOpacity.value,
         z: passOverlayOpacity.value,
         A: currentUser.value.isRealName
       }, currentUser.value.isRealName ? {} : {}, {
         B: currentUser.value.isVip
       }, currentUser.value.isVip ? {} : {}, {
-        C: common_vendor.o(($event) => openReportFlow("home"), "a0"),
+        C: common_vendor.o(($event) => openReportFlow("home"), "f9"),
         D: common_vendor.t(currentUser.value.nickname),
         E: common_vendor.t(currentUser.value.gender === "female" ? "♀" : "♂"),
         F: common_vendor.n(currentUser.value.gender),
@@ -447,19 +447,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         af: currentUser.value.id
       }) : {}, {
         ag: common_vendor.s(cardStyle.value),
-        ah: common_vendor.o(handleTouchStart, "dc"),
-        ai: common_vendor.o(handleTouchMove, "d4"),
-        aj: common_vendor.o(handleTouchEnd, "d8"),
-        ak: common_vendor.o(handleCardTap, "1f")
+        ah: common_vendor.o(handleTouchStart, "74"),
+        ai: common_vendor.o(handleTouchMove, "3b"),
+        aj: common_vendor.o(handleTouchEnd, "f5"),
+        ak: common_vendor.o(handleCardTap, "e9")
       }), {
         l: !currentUser.value,
         al: currentUser.value && !pageLoading.value
       }, currentUser.value && !pageLoading.value ? {} : {}, {
         am: currentUser.value && !pageLoading.value
       }, currentUser.value && !pageLoading.value ? {
-        an: common_vendor.o(commitPass, "60"),
-        ao: common_vendor.o(handleGreeting, "d5"),
-        ap: common_vendor.o(commitLike, "6b")
+        an: common_vendor.o(commitPass, "c9"),
+        ao: common_vendor.o(handleGreeting, "c1"),
+        ap: common_vendor.o(commitLike, "98")
       } : {}, {
         aq: common_vendor.p({
           active: "discover"

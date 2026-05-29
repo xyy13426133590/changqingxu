@@ -1,5 +1,4 @@
 "use strict";
-require("../common/vendor.js");
 require("../services/api.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {

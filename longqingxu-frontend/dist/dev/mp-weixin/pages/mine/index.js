@@ -191,8 +191,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: !common_vendor.unref(userStore).isLogin
       }, !common_vendor.unref(userStore).isLogin ? {
         b: common_vendor.unref(guestAvatarSrc),
-        c: common_vendor.o(goLogin, "53"),
-        d: common_vendor.o(goRegister, "19")
+        c: common_vendor.o(goLogin, "88"),
+        d: common_vendor.o(goRegister, "15")
       } : {
         e: common_vendor.unref(userStore).profile.avatar || common_vendor.unref(defaultAvatar),
         f: common_vendor.t(common_vendor.unref(userStore).profile.nickname || "我"),

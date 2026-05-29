@@ -1,5 +1,4 @@
 "use strict";
-const common_vendor = require("../common/vendor.js");
 const services_api = require("./api.js");
 var __defProp = Object.defineProperty;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
@@ -16,6 +15,10 @@ var __spreadValues = (a, b) => {
         __defNormalProp(a, prop, b[prop]);
     }
   return a;
+};
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, key + "", value);
+  return value;
 };
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
@@ -37,15 +40,15 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-const CLOUD_ENV = "prod-love-app-d8gn9cxenfb74c1ac";
-let cloudInitialized = false;
-function redirectToLogin() {
-  services_api.clearToken();
-  try {
-    common_vendor.index.reLaunch({ url: "/pages/auth/login" });
-  } catch (e) {
+class CloudUnauthorizedError extends Error {
+  constructor(message = "请先登录") {
+    super(message);
+    __publicField(this, "code", "UNAUTHORIZED");
+    this.name = "CloudUnauthorizedError";
   }
 }
+const CLOUD_ENV = "cloud1-d6g7211of923bfddc";
+let cloudInitialized = false;
 function initCloud() {
   var _a;
   if (cloudInitialized)
@@ -81,7 +84,7 @@ function callCloud(_0) {
       return result.data;
     }
     if (result.code === "UNAUTHORIZED") {
-      redirectToLogin();
+      throw new CloudUnauthorizedError(result.message);
     }
     throw new Error(result.message || "云函数调用失败");
   });
