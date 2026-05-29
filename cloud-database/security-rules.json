@@ -1,0 +1,30 @@
+{
+  "users": {
+    ".read": false,
+    ".write": false
+  },
+  "sms_codes": {
+    ".read": false,
+    ".write": false
+  },
+  "matches": {
+    ".read": false,
+    ".write": false
+  },
+  "conversations": {
+    ".read": "doc.userId1 == auth.openid || doc.userId2 == auth.openid",
+    ".write": false
+  },
+  "messages": {
+    ".read": "doc.senderId == auth.uid || doc.receiverId == auth.uid",
+    ".write": false
+  },
+  "vip_plans": {
+    ".read": true,
+    ".write": false
+  },
+  "vip_orders": {
+    ".read": false,
+    ".write": false
+  }
+}

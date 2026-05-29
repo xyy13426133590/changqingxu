@@ -10,7 +10,7 @@ import {
 } from '@/services/api-conversation'
 import type { NewMessagePayload } from '@/services/chat-socket'
 import { resolveAvatar } from '@/utils/avatar'
-import { apiUploadVoice } from '@/services/api-upload'
+import { apiUploadVoice, apiUploadImage } from '@/services/api-upload'
 
 export interface Message {
   id: string
@@ -261,13 +261,67 @@ export const useMessagesStore = defineStore('messages', () => {
       return
     }
 
-    if (type !== 'text') {
-      const finalList =
-        messages.value[cid]?.map((m) =>
-          m.id === tempId ? { ...m, status: 'sent' as const } : m,
-        ) || []
-      messages.value = { ...messages.value, [cid]: finalList }
-      uni.showToast({ title: '联调默认仅文本走 REST', icon: 'none' })
+    if (type === 'image') {
+      const filePath = content.trim()
+      if (!filePath) {
+        messages.value = { ...messages.value, [cid]: messages.value[cid]?.filter((m) => m.id !== tempId) || [] }
+        uni.showToast({ title: '图片文件无效', icon: 'none' })
+        return
+      }
+      try {
+        const { url } = (await apiUploadImage(filePath)) as { url: string }
+        const saved = await apiSendMessage({
+          conversationId: cid,
+          receiverId: conv.userId,
+          type: 'image',
+          content: url,
+          mediaUrl: url,
+        })
+        const mapped = mapApiMessage(saved)
+        const arr = messages.value[cid]?.filter((m) => m.id !== tempId) || []
+        messages.value = {
+          ...messages.value,
+          [cid]: [...arr, mapped].sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+          ),
+        }
+        const lc = conversations.value.find((c) => c.id === cid)
+        if (lc) {
+          lc.lastMessage = summarizeLast(mapped.type, mapped.content)
+          lc.lastMessageTime = mapped.createdAt
+        }
+      } catch {
+        messages.value = { ...messages.value, [cid]: messages.value[cid]?.filter((m) => m.id !== tempId) || [] }
+        uni.showToast({ title: '图片发送失败', icon: 'none' })
+      }
+      return
+    }
+
+    if (type === 'emoji') {
+      try {
+        const saved = await apiSendMessage({
+          conversationId: cid,
+          receiverId: conv.userId,
+          type: 'emoji',
+          content,
+        })
+        const mapped = mapApiMessage(saved)
+        const arr = messages.value[cid]?.filter((m) => m.id !== tempId) || []
+        messages.value = {
+          ...messages.value,
+          [cid]: [...arr, mapped].sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+          ),
+        }
+        const lc = conversations.value.find((c) => c.id === cid)
+        if (lc) {
+          lc.lastMessage = summarizeLast(mapped.type, mapped.content)
+          lc.lastMessageTime = mapped.createdAt
+        }
+      } catch {
+        messages.value = { ...messages.value, [cid]: messages.value[cid]?.filter((m) => m.id !== tempId) || [] }
+        uni.showToast({ title: '表情发送失败', icon: 'none' })
+      }
       return
     }
 

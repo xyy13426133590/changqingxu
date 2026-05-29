@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "plan-monthly-001",
+    "name": "月度 VIP",
+    "durationMonths": 1,
+    "price": 38,
+    "originalPrice": 58,
+    "features": ["无限喜欢", "查看谁喜欢我", "高级筛选", "专属标识"],
+    "tag": "热门",
+    "sortOrder": 1,
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "_id": "plan-quarterly-001",
+    "name": "季度 VIP",
+    "durationMonths": 3,
+    "price": 98,
+    "originalPrice": 174,
+    "features": ["无限喜欢", "查看谁喜欢我", "高级筛选", "专属标识", "超级喜欢 x5/天"],
+    "tag": "超值",
+    "sortOrder": 2,
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "_id": "plan-yearly-001",
+    "name": "年度 VIP",
+    "durationMonths": 12,
+    "price": 298,
+    "originalPrice": 696,
+    "features": ["无限喜欢", "查看谁喜欢我", "高级筛选", "专属标识", "超级喜欢 x10/天", "优先推荐"],
+    "tag": "最划算",
+    "sortOrder": 3,
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  }
+]

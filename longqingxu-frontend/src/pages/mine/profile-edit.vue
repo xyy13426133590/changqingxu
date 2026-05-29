@@ -191,6 +191,7 @@ import {
   getRiyuanEmoji,
 } from '@/utils/date'
 import { apiUpdateProfile } from '@/services/api-user'
+import { apiUploadAvatar } from '@/services/api-upload'
 import { navigateBackTo } from '@/utils/navigation'
 import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
 
@@ -350,8 +351,18 @@ function toggleHobby(hobby: string) {
 function uploadAvatar() {
   uni.chooseImage({
     count: 1,
-    success: (res) => {
-      formData.avatar = res.tempFilePaths[0]
+    success: async (res) => {
+      const tempPath = res.tempFilePaths[0]
+      formData.avatar = tempPath
+      uni.showLoading({ title: '上传中', mask: true })
+      try {
+        const { url } = await apiUploadAvatar(tempPath)
+        formData.avatar = url
+      } catch {
+        uni.showToast({ title: '头像上传失败', icon: 'none' })
+      } finally {
+        uni.hideLoading()
+      }
     },
   })
 }
@@ -389,8 +400,9 @@ async function saveProfile() {
         : 'unknown'
   uni.showLoading({ title: '保存中', mask: true })
   try {
+    const av = formData.avatar
     const avatarPayload =
-      formData.avatar.startsWith('http') ? formData.avatar : undefined
+      av.startsWith('http') || av.startsWith('cloud://') ? av : undefined
     await apiUpdateProfile({
       ...(avatarPayload ? { avatar: avatarPayload } : {}),
       nickname: formData.nickname,

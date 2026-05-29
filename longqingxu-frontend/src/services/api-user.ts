@@ -2,8 +2,9 @@
  * 用户相关 API
  */
 import { get, put, post } from './api'
+import { USE_CLOUD, callCloud } from './cloud'
+import { CLOUD_API_MAP } from './cloud-api-map'
 
-// 用户信息
 export interface UserProfile {
   id: string
   phone: string
@@ -36,7 +37,6 @@ export interface UserProfile {
   createdAt: string
 }
 
-// 用户卡片（发现页）
 export interface UserCard {
   id: string
   nickname: string
@@ -68,57 +68,62 @@ export interface UserCard {
   matchScore: number
 }
 
-// 获取当前用户资料
 export function apiGetMe(): Promise<UserProfile> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.users.getMe)
   return get<UserProfile>('/users/me')
 }
 
-// 更新用户资料
 export function apiUpdateProfile(params: Partial<UserProfile>): Promise<UserProfile> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.users.updateProfile, params)
   return put<UserProfile>('/users/me', params)
 }
 
-// 更新筛选条件
 export function apiUpdateFilters(params: Record<string, any>): Promise<{ filterSettings: Record<string, any> }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.users.updateFilters, params)
   return put<{ filterSettings: Record<string, any> }>('/users/me/filters', params)
 }
 
-// 获取 VIP 状态
 export function apiGetVipStatus(): Promise<{
   isVip: boolean
   vipExpiry: string
   daysRemaining: number
 }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.users.getVipStatus)
   return get('/users/me/vip')
 }
 
-// 获取我的资料卡
 export function apiGetMyCard(): Promise<UserCard> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.users.getUserCard)
   return get<UserCard>('/users/me/card')
 }
 
-// 获取推荐用户列表
 export function apiGetRecommendations(
   page = 1,
   limit = 10,
 ): Promise<{ users: UserCard[]; total: number; recycled?: boolean }> {
+  if (USE_CLOUD) {
+    return callCloud(CLOUD_API_MAP.users.getRecommendations, { page, limit })
+  }
   return get<{ users: UserCard[]; total: number; recycled?: boolean }>(
     '/users/recommendations',
     { page, limit },
   )
 }
 
-// 获取每日推荐
 export function apiGetDailyRecommendations(): Promise<{ users: UserCard[]; recycled?: boolean }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.users.getDailyRecommendations)
   return get<{ users: UserCard[]; recycled?: boolean }>('/users/daily')
 }
 
-// 获取用户详情
 export function apiGetUserDetail(userId: string): Promise<UserCard> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.users.getUserDetail, { userId })
   return get<UserCard>(`/users/${userId}`)
 }
 
-// 举报用户
-export function apiReportUser(userId: string, params: { reason: string; description?: string; evidence?: string[] }): Promise<{ message: string }> {
+export function apiReportUser(
+  userId: string,
+  params: { reason: string; description?: string; evidence?: string[] },
+): Promise<{ message: string }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.users.reportUser, { userId, ...params })
   return post<{ message: string }>(`/users/${userId}/report`, params)
 }

@@ -1,19 +1,38 @@
-/**
- * 微信云开发 API 封装
- */
-import { getToken, clearToken, type ApiResponse } from './api'
+import { clearToken, getToken } from './api'
+
+type ApiResponse<T> = {
+  code: string
+  message: string
+  data: T
+  timestamp?: string
+}
+
+type CallCloudOptions = {
+  skipAuth?: boolean
+}
+
+const DEFAULT_CLOUD_ENV = 'prod-love-app-d8gn9cxenfb74c1ac'
 
 export const USE_CLOUD = import.meta.env.VITE_USE_CLOUD === 'true'
-export const CLOUD_ENV = import.meta.env.VITE_CLOUD_ENV || 'cloud1-d6g7211of923bfddc'
+export const CLOUD_ENV = import.meta.env.VITE_CLOUD_ENV || DEFAULT_CLOUD_ENV
 
 let cloudInitialized = false
 
+function redirectToLogin(): void {
+  clearToken()
+  try {
+    uni.reLaunch({ url: '/pages/auth/login' })
+  } catch {
+    // ignore route failure in non-page context
+  }
+}
+
 export function initCloud(): void {
   if (!USE_CLOUD || cloudInitialized) return
-
   // #ifdef MP-WEIXIN
-  if (typeof wx !== 'undefined' && wx.cloud) {
-    wx.cloud.init({
+  const wxCloud = (globalThis as any)?.wx?.cloud
+  if (wxCloud) {
+    wxCloud.init({
       env: CLOUD_ENV,
       traceUser: true,
     })
@@ -22,86 +41,65 @@ export function initCloud(): void {
   // #endif
 }
 
-export interface CallCloudOptions {
-  skipAuth?: boolean
-}
-
-/**
- * 调用云函数，返回与 Nest API 相同的 data 字段
- */
-export function callCloud<T = unknown>(
+export async function callCloud<T>(
   name: string,
   data: Record<string, unknown> = {},
   options: CallCloudOptions = {},
 ): Promise<T> {
-  return new Promise((resolve, reject) => {
-    if (!USE_CLOUD) {
-      reject(new Error('VITE_USE_CLOUD 未启用'))
-      return
-    }
+  if (!USE_CLOUD) {
+    throw new Error('VITE_USE_CLOUD 未启用')
+  }
 
-    // #ifdef MP-WEIXIN
-    const token = getToken()
-    const payload: Record<string, unknown> = { ...data }
-    if (token && !options.skipAuth) {
-      payload.token = token
-    }
+  initCloud()
 
-    wx.cloud.callFunction({
-      name,
-      data: payload,
-      success: (res) => {
-        const result = res.result as ApiResponse<T> | null
-        if (!result) {
-          uni.showToast({ title: '云函数无响应', icon: 'none' })
-          reject(new Error('EMPTY_CLOUD_RESPONSE'))
-          return
-        }
+  const payload: Record<string, unknown> = { ...data }
+  if (!options.skipAuth) {
+    const accessToken = getToken()
+    if (accessToken) payload.token = accessToken
+  }
 
-        if (result.code !== 'SUCCESS') {
-          if (result.code === 'UNAUTHORIZED' || (result as { statusCode?: number }).statusCode === 401) {
-            clearToken()
-            uni.reLaunch({ url: '/pages/auth/login' })
-          }
-          uni.showToast({ title: result.message || '操作失败', icon: 'none' })
-          reject(new Error(result.message || '操作失败'))
-          return
-        }
+  // #ifdef MP-WEIXIN
+  const wxCloud = (globalThis as any)?.wx?.cloud
+  if (!wxCloud) throw new Error('当前环境不支持云函数')
 
-        resolve(result.data as T)
-      },
-      fail: (err) => {
-        const hint = err.errMsg || '云函数调用失败'
-        uni.showToast({ title: hint, icon: 'none', duration: 2800 })
-        reject(new Error(hint))
-      },
-    })
-    // #endif
-
-    // #ifndef MP-WEIXIN
-    reject(new Error('云函数仅支持微信小程序端'))
-    // #endif
+  const res = await wxCloud.callFunction({
+    name,
+    data: payload,
   })
+
+  const result = (res?.result || {}) as ApiResponse<T>
+  if (result.code === 'SUCCESS') {
+    return result.data
+  }
+
+  if (result.code === 'UNAUTHORIZED') {
+    redirectToLogin()
+  }
+  throw new Error(result.message || '云函数调用失败')
+  // #endif
+
+  // #ifndef MP-WEIXIN
+  throw new Error('云函数仅支持微信小程序端')
+  // #endif
 }
 
-/**
- * 上传文件到云存储
- */
-export function cloudUploadFile(
-  cloudPath: string,
-  filePath: string,
-): Promise<{ fileID: string; statusCode: number }> {
-  return new Promise((resolve, reject) => {
-    // #ifdef MP-WEIXIN
-    wx.cloud.uploadFile({
-      cloudPath,
-      filePath,
-      success: (res) => resolve({ fileID: res.fileID, statusCode: res.statusCode }),
-      fail: reject,
-    })
-    // #endif
-    // #ifndef MP-WEIXIN
-    reject(new Error('云存储上传仅支持微信小程序端'))
-    // #endif
-  })
+export async function cloudUploadFile(cloudPath: string, filePath: string): Promise<{ fileID: string }> {
+  if (!USE_CLOUD) {
+    throw new Error('VITE_USE_CLOUD 未启用')
+  }
+
+  initCloud()
+
+  // #ifdef MP-WEIXIN
+  const wxCloud = (globalThis as any)?.wx?.cloud
+  if (!wxCloud) throw new Error('当前环境不支持云存储上传')
+  return wxCloud.uploadFile({
+    cloudPath,
+    filePath,
+  }) as Promise<{ fileID: string }>
+  // #endif
+
+  // #ifndef MP-WEIXIN
+  throw new Error('云存储上传仅支持微信小程序端')
+  // #endif
 }

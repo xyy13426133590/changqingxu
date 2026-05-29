@@ -2,8 +2,9 @@
  * 匹配相关 API
  */
 import { post, get } from './api'
+import { USE_CLOUD, callCloud } from './cloud'
+import { CLOUD_API_MAP } from './cloud-api-map'
 
-// 匹配响应
 export interface MatchResponse {
   id: string
   userId: string
@@ -18,27 +19,27 @@ export interface MatchResponse {
   }
 }
 
-// 喜欢用户
 export function apiLikeUser(targetUserId: string): Promise<MatchResponse> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.matches.like, { targetUserId })
   return post<MatchResponse>('/matches/like', { targetUserId })
 }
 
-// 不喜欢用户
 export function apiPassUser(targetUserId: string): Promise<MatchResponse> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.matches.pass, { targetUserId })
   return post<MatchResponse>('/matches/pass', { targetUserId })
 }
 
-// 超级喜欢
 export function apiSuperLikeUser(targetUserId: string): Promise<MatchResponse> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.matches.superLike, { targetUserId })
   return post<MatchResponse>('/matches/super-like', { targetUserId })
 }
 
-// 获取互相喜欢的人
 export function apiGetMutualMatches(): Promise<MatchResponse[]> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.matches.mutual)
   return get<MatchResponse[]>('/matches/mutual')
 }
 
-// 清空当前账号滑卡记录（演示/联调）
 export function apiResetSwipeHistory(): Promise<{ deleted: number }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.matches.resetSwipes)
   return post<{ deleted: number }>('/matches/reset-swipes', {})
 }

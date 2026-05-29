@@ -2,8 +2,9 @@
  * 会话和消息相关 API
  */
 import { get, post, put, del } from './api'
+import { USE_CLOUD, callCloud } from './cloud'
+import { CLOUD_API_MAP } from './cloud-api-map'
 
-// 会话
 export interface Conversation {
   id: string
   userId: string
@@ -25,7 +26,6 @@ export interface Conversation {
   updatedAt: string
 }
 
-// 消息
 export interface Message {
   id: string
   conversationId: string
@@ -39,36 +39,37 @@ export interface Message {
   createdAt: string
 }
 
-// 获取会话列表
 export function apiGetConversations(): Promise<Conversation[]> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.conversations.list)
   return get<Conversation[]>('/conversations')
 }
 
-// 创建会话
 export function apiCreateConversation(targetUserId: string): Promise<Conversation> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.conversations.create, { targetUserId })
   return post<Conversation>('/conversations', { targetUserId })
 }
 
-// 删除会话
 export function apiDeleteConversation(conversationId: string): Promise<{ message: string }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.conversations.delete, { conversationId })
   return del<{ message: string }>(`/conversations/${conversationId}`)
 }
 
-// 置顶/取消置顶会话
 export function apiTogglePinConversation(conversationId: string): Promise<{ isPinned: boolean }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.conversations.togglePin, { conversationId })
   return put<{ isPinned: boolean }>(`/conversations/${conversationId}/top`)
 }
 
-// 获取消息历史
 export function apiGetMessages(
   conversationId: string,
   page = 1,
   limit = 20,
 ): Promise<{ messages: Message[]; total: number }> {
+  if (USE_CLOUD) {
+    return callCloud(CLOUD_API_MAP.conversations.messages, { conversationId, page, limit })
+  }
   return get<{ messages: Message[]; total: number }>(`/conversations/${conversationId}/messages`, { page, limit })
 }
 
-// 发送消息（REST 备选）
 export function apiSendMessage(params: {
   conversationId: string
   receiverId: string
@@ -77,10 +78,11 @@ export function apiSendMessage(params: {
   mediaUrl?: string
   mediaDuration?: number
 }): Promise<Message> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.messages.send, params)
   return post<Message>('/messages', params)
 }
 
-// 标记消息已读
 export function apiMarkMessagesRead(conversationId: string): Promise<{ message: string; clearedCount: number }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.messages.markRead, { conversationId })
   return put<{ message: string; clearedCount: number }>('/messages/read', { conversationId })
 }

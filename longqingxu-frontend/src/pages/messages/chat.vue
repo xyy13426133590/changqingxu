@@ -131,6 +131,8 @@ import { useMessagesStore, type Message } from '@/stores/messages'
 import { useUserStore } from '@/stores/user'
 import ChatInputBar from '@/components/ChatInputBar.vue'
 import { connectChatSocket, disconnectChatSocket } from '@/services/chat-socket'
+import { startMessageWatch, stopMessageWatch } from '@/services/message-watch'
+import { USE_CLOUD } from '@/services/cloud'
 import { navigateBackTo } from '@/utils/navigation'
 import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
 import { resolveVoicePlaySrc } from '@/utils/media-url'
@@ -177,14 +179,24 @@ onLoad(async (options) => {
     await messagesStore.setCurrentConversation(options.conversationId)
     await messagesStore.loadMessages(options.conversationId)
   }
-  await connectChatSocket({
-    onNewMessage: (payload) => messagesStore.applyIncomingMessage(payload as any),
-  })
+  if (USE_CLOUD) {
+    startMessageWatch(conversationId.value, (msg) => {
+      messagesStore.applyIncomingMessage(msg)
+    })
+  } else {
+    await connectChatSocket({
+      onNewMessage: (payload) => messagesStore.applyIncomingMessage(payload as any),
+    })
+  }
 })
 
 onUnload(() => {
   stopVoicePlayback()
-  void disconnectChatSocket()
+  if (USE_CLOUD) {
+    stopMessageWatch()
+  } else {
+    void disconnectChatSocket()
+  }
 })
 
 function goBack() {
@@ -237,7 +249,7 @@ function previewImage(url: string) {
 }
 
 // 播放语音
-function playVoice(msg: Message) {
+async function playVoice(msg: Message) {
   if (msg.type !== 'voice') return
 
   if (playingVoiceId.value === msg.id) {
@@ -253,7 +265,7 @@ function playVoice(msg: Message) {
     rawUrl = (msg.content || '').trim()
   }
 
-  const voiceUrl = resolveVoicePlaySrc(rawUrl)
+  const voiceUrl = await resolveVoicePlaySrc(rawUrl)
   if (!voiceUrl || voiceUrl === '[语音]') {
     uni.showToast({ title: '暂无可用音频', icon: 'none' })
     return

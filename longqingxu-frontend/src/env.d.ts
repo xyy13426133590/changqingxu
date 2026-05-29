@@ -1,12 +1,14 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** NestJS API 根路径，如 http://localhost:3000/api */
-  readonly VITE_API_BASE_URL: string
-  /** WebSocket 根路径，如 ws://localhost:3000/chat */
-  readonly VITE_WS_BASE_URL: string
-  /** 静态资源/OSS 访问域名 */
-  readonly VITE_UPLOAD_DOMAIN?: string
+  /** 是否启用微信云函数模式（true = callFunction，false = NestJS HTTP） */
+  readonly VITE_USE_CLOUD?: string
+  /** 微信云环境 ID */
+  readonly VITE_CLOUD_ENV?: string
+  /** NestJS API 根路径（VITE_USE_CLOUD=false 时使用） */
+  readonly VITE_API_BASE_URL?: string
+  /** WebSocket 根路径（VITE_USE_CLOUD=false 时使用） */
+  readonly VITE_WS_BASE_URL?: string
 }
 
 interface ImportMeta {

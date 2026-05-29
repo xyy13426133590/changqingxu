@@ -2,8 +2,9 @@
  * VIP 相关 API
  */
 import { get, post } from './api'
+import { USE_CLOUD, callCloud } from './cloud'
+import { CLOUD_API_MAP } from './cloud-api-map'
 
-// VIP 套餐
 export interface VipPlan {
   id: string
   name: string
@@ -15,7 +16,6 @@ export interface VipPlan {
   sortOrder: number
 }
 
-// VIP 订单
 export interface VipOrder {
   id: string
   userId: string
@@ -29,7 +29,6 @@ export interface VipOrder {
   plan?: VipPlan
 }
 
-/** 小程序调起微信支付参数 */
 export interface MiniProgramPayment {
   timeStamp: string
   nonceStr: string
@@ -38,29 +37,28 @@ export interface MiniProgramPayment {
   paySign: string
 }
 
-/** 创建订单返回 */
 export interface CreateOrderResult {
   order: VipOrder
   payment?: MiniProgramPayment
   paymentMode: 'live' | 'mock'
 }
 
-// 获取套餐列表
 export function apiGetVipPlans(): Promise<{ plans: VipPlan[] }> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.vip.plans)
   return get<{ plans: VipPlan[] }>('/vip/plans')
 }
 
-// 创建订单（含微信支付参数）
 export function apiCreateOrder(params: { planId: string; payMethod?: string }): Promise<CreateOrderResult> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.vip.createOrder, params)
   return post<CreateOrderResult>('/vip/orders', params)
 }
 
-// 查询订单状态
 export function apiGetOrder(orderId: string): Promise<VipOrder> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.vip.getOrder, { orderId })
   return get<VipOrder>(`/vip/orders/${encodeURIComponent(orderId)}`)
 }
 
-/** 开发联调：模拟支付成功（后端 development + VIP_MOCK_PAY=1） */
 export function apiMockPayOrder(orderId: string): Promise<VipOrder> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.vip.mockPay, { orderId })
   return post<VipOrder>(`/vip/orders/${encodeURIComponent(orderId)}/mock-pay`, {})
 }

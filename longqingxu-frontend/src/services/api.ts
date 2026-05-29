@@ -1,225 +1,130 @@
-/**
- * API 配置和请求工具
- * 长情许交友小程序 - 后端 API 对接
- */
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
-export const USE_CLOUD = import.meta.env.VITE_USE_CLOUD === 'true'
-
-// API 基础地址
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
-
-// WebSocket 地址
-export const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:3000/chat'
-
-// 请求配置
-interface RequestConfig extends Omit<UniApp.RequestOptions, 'success' | 'fail'> {
-  skipAuth?: boolean
-}
-
-// 响应结构
-export interface ApiResponse<T = any> {
+type ApiEnvelope<T> = {
   code: string
   message: string
   data: T
-  timestamp: string
 }
 
-/**
- * 获取存储的 Token
- */
-export function getToken(): string | null {
-  return uni.getStorageSync('token') || null
+const ACCESS_TOKEN_KEY = 'accessToken'
+const REFRESH_TOKEN_KEY = 'refreshToken'
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+export const WS_BASE_URL = (import.meta.env.VITE_WS_BASE_URL || '').replace(/\/$/, '')
+
+export function setToken(accessToken: string, refreshToken?: string): void {
+  uni.setStorageSync(ACCESS_TOKEN_KEY, accessToken)
+  if (refreshToken) {
+    uni.setStorageSync(REFRESH_TOKEN_KEY, refreshToken)
+  }
 }
 
-/**
- * 获取存储的 Refresh Token
- */
-export function getRefreshToken(): string | null {
-  return uni.getStorageSync('refreshToken') || null
+export function getToken(): string {
+  return uni.getStorageSync(ACCESS_TOKEN_KEY) || ''
 }
 
-/**
- * 保存 Token
- */
-export function setToken(token: string, refreshToken: string): void {
-  uni.setStorageSync('token', token)
-  uni.setStorageSync('refreshToken', refreshToken)
+export function getRefreshToken(): string {
+  return uni.getStorageSync(REFRESH_TOKEN_KEY) || ''
 }
 
-/**
- * 清除 Token
- */
 export function clearToken(): void {
-  uni.removeStorageSync('token')
-  uni.removeStorageSync('refreshToken')
+  uni.removeStorageSync(ACCESS_TOKEN_KEY)
+  uni.removeStorageSync(REFRESH_TOKEN_KEY)
 }
 
-/**
- * 统一请求方法
- */
-export function request<T = any>(config: RequestConfig): Promise<T> {
+function buildUrl(path: string): string {
+  if (/^https?:\/\//.test(path)) return path
+  return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
+}
+
+function request<T>(method: HttpMethod, path: string, data?: Record<string, unknown>): Promise<T> {
+  const token = getToken()
   return new Promise((resolve, reject) => {
-    const token = getToken()
-    const header: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...config.header,
-    }
-
-    // 添加认证头
-    if (token && !config.skipAuth) {
-      header['Authorization'] = `Bearer ${token}`
-    }
-
     uni.request({
-      ...config,
-      url: `${API_BASE_URL}${config.url}`,
-      header,
+      url: buildUrl(path),
+      method,
+      data,
+      header: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       success: (res) => {
-        const response = res.data as ApiResponse<T>
-
-        // 处理 HTTP 错误
-        if (res.statusCode >= 400) {
-          uni.showToast({
-            title: response?.message || '请求失败',
-            icon: 'none',
-          })
-          reject(new Error(response?.message || '请求失败'))
+        const statusCode = Number(res.statusCode || 0)
+        const body = (res.data || {}) as Partial<ApiEnvelope<T>>
+        if (statusCode === 401 || body.code === 'UNAUTHORIZED') {
+          clearToken()
+          reject(new Error(body.message || '请先登录'))
           return
         }
-
-        // 处理业务错误
-        if (response.code !== 'SUCCESS') {
-          // 处理 401 未授权
-          if (res.statusCode === 401) {
-            clearToken()
-            uni.reLaunch({ url: '/pages/auth/login' })
-          }
-          uni.showToast({
-            title: response.message || '操作失败',
-            icon: 'none',
-          })
-          reject(new Error(response.message))
+        if (statusCode < 200 || statusCode >= 300) {
+          reject(new Error(body.message || `请求失败: ${statusCode}`))
           return
         }
-
-        resolve(response.data)
+        if (body.code && body.code !== 'SUCCESS') {
+          reject(new Error(body.message || '请求失败'))
+          return
+        }
+        resolve((body.data as T) ?? (res.data as T))
       },
-      fail: () => {
-        const hint = `无法连接服务器，请检查后端是否启动及 .env 中 VITE_API_BASE_URL（当前：${API_BASE_URL}）`
-        uni.showToast({
-          title: '网络请求失败',
-          icon: 'none',
-          duration: 2800,
-        })
-        reject(new Error(hint))
-      },
+      fail: (err) => reject(new Error(err.errMsg || '网络异常')),
     })
   })
 }
 
-/**
- * GET 请求
- */
-export function get<T = any>(url: string, params?: any, config?: Partial<RequestConfig>): Promise<T> {
-  // 构建查询字符串
-  let queryString = ''
-  if (params) {
-    const query = Object.entries(params)
-      .filter(([_, value]) => value !== undefined && value !== null)
-      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
-      .join('&')
-    if (query) {
-      queryString = `?${query}`
-    }
-  }
-
-  return request<T>({
-    method: 'GET',
-    url: `${url}${queryString}`,
-    ...config,
-  })
+export function get<T>(path: string, params?: Record<string, unknown>): Promise<T> {
+  return request<T>('GET', path, params)
 }
 
-/**
- * POST 请求
- */
-export function post<T = any>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<T> {
-  return request<T>({
-    method: 'POST',
-    url,
-    data,
-    ...config,
-  })
+export function post<T>(path: string, data?: Record<string, unknown>): Promise<T> {
+  return request<T>('POST', path, data)
 }
 
-/**
- * PUT 请求
- */
-export function put<T = any>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<T> {
-  return request<T>({
-    method: 'PUT',
-    url,
-    data,
-    ...config,
-  })
+export function put<T>(path: string, data?: Record<string, unknown>): Promise<T> {
+  return request<T>('PUT', path, data)
 }
 
-/**
- * DELETE 请求
- */
-export function del<T = any>(url: string, config?: Partial<RequestConfig>): Promise<T> {
-  return request<T>({
-    method: 'DELETE',
-    url,
-    ...config,
-  })
+export function del<T>(path: string, data?: Record<string, unknown>): Promise<T> {
+  return request<T>('DELETE', path, data)
 }
 
-/**
- * 上传文件
- */
-export function uploadFile(
-  url: string,
+export function uploadFile<T = any>(
+  path: string,
   filePath: string,
-  name: string = 'file',
-  formData?: Record<string, any>,
-): Promise<any> {
+  fieldName = 'file',
+  formData: Record<string, string> = {},
+): Promise<T> {
+  const token = getToken()
   return new Promise((resolve, reject) => {
-    const token = getToken()
-
     uni.uploadFile({
-      url: `${API_BASE_URL}${url}`,
+      url: buildUrl(path),
       filePath,
-      name,
+      name: fieldName,
       formData,
       header: token ? { Authorization: `Bearer ${token}` } : {},
       success: (res) => {
-        const raw = res.data as string
-        const statusOk = typeof res.statusCode === 'number' && res.statusCode >= 200 && res.statusCode < 300
-
+        const statusCode = Number(res.statusCode || 0)
+        let body: any = {}
         try {
-          const data = JSON.parse(raw) as ApiResponse
-
-          if (!statusOk || data.code !== 'SUCCESS') {
-            const hint = data?.message || (statusOk ? '上传失败' : `上传失败 (${res.statusCode})`)
-            uni.showToast({ title: hint, icon: 'none' })
-            reject(new Error(hint))
-            return
-          }
-
-          resolve(data.data)
+          body = res.data ? JSON.parse(res.data) : {}
         } catch {
-          if (!statusOk) {
-            const hint = typeof raw === 'string' ? `上传失败 (${res.statusCode})` : '上传失败'
-            uni.showToast({ title: hint, icon: 'none' })
-            reject(new Error(hint))
-            return
-          }
-          uni.showToast({ title: '上传响应异常', icon: 'none' })
-          reject(new Error('INVALID_UPLOAD_RESPONSE'))
+          reject(new Error('上传响应解析失败'))
+          return
         }
+        if (statusCode === 401 || body.code === 'UNAUTHORIZED') {
+          clearToken()
+          reject(new Error(body.message || '请先登录'))
+          return
+        }
+        if (statusCode < 200 || statusCode >= 300) {
+          reject(new Error(body.message || `上传失败: ${statusCode}`))
+          return
+        }
+        if (body.code && body.code !== 'SUCCESS') {
+          reject(new Error(body.message || '上传失败'))
+          return
+        }
+        resolve((body.data as T) ?? (body as T))
       },
-      fail: reject,
+      fail: (err) => reject(new Error(err.errMsg || '上传失败')),
     })
   })
 }
