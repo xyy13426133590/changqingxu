@@ -4,6 +4,7 @@ const stores_user = require("../../stores/user.js");
 const utils_avatar = require("../../utils/avatar.js");
 const utils_date = require("../../utils/date.js");
 const services_apiUser = require("../../services/api-user.js");
+const services_apiUpload = require("../../services/api-upload.js");
 const utils_navigation = require("../../utils/navigation.js");
 const utils_safeArea = require("../../utils/safe-area.js");
 var __defProp = Object.defineProperty;
@@ -172,9 +173,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function uploadAvatar() {
       common_vendor.index.chooseImage({
         count: 1,
-        success: (res) => {
-          formData.avatar = res.tempFilePaths[0];
-        }
+        success: (res) => __async(this, null, function* () {
+          const tempPath = res.tempFilePaths[0];
+          formData.avatar = tempPath;
+          common_vendor.index.showLoading({ title: "上传中", mask: true });
+          try {
+            const { url } = yield services_apiUpload.apiUploadAvatar(tempPath);
+            formData.avatar = url;
+          } catch (e) {
+            common_vendor.index.showToast({ title: "头像上传失败", icon: "none" });
+          } finally {
+            common_vendor.index.hideLoading();
+          }
+        })
       });
     }
     common_vendor.onMounted(() => __async(this, null, function* () {
@@ -207,7 +218,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const gd = formData.gender === "male" ? "male" : formData.gender === "female" ? "female" : "unknown";
         common_vendor.index.showLoading({ title: "保存中", mask: true });
         try {
-          const avatarPayload = formData.avatar.startsWith("http") ? formData.avatar : void 0;
+          const av = formData.avatar;
+          const avatarPayload = av.startsWith("http") || av.startsWith("cloud://") ? av : void 0;
           yield services_apiUser.apiUpdateProfile(__spreadProps(__spreadValues({}, avatarPayload ? { avatar: avatarPayload } : {}), {
             nickname: formData.nickname,
             gender: gd,
@@ -247,28 +259,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "d7"),
+        a: common_vendor.o(goBack, "fe"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
         d: formData.avatar,
-        e: common_vendor.o(uploadAvatar, "86"),
+        e: common_vendor.o(uploadAvatar, "ad"),
         f: formData.nickname,
-        g: common_vendor.o(($event) => formData.nickname = $event.detail.value, "a7"),
+        g: common_vendor.o(($event) => formData.nickname = $event.detail.value, "32"),
         h: common_vendor.t(genderLabel.value),
         i: genderOptions,
         j: genderIndex.value,
-        k: common_vendor.o(onGenderChange, "4e"),
+        k: common_vendor.o(onGenderChange, "aa"),
         l: common_vendor.t(formData.birthday || "生日"),
         m: formData.birthday,
-        n: common_vendor.o(onBirthdayChange, "36"),
+        n: common_vendor.o(onBirthdayChange, "20"),
         o: formData.height,
-        p: common_vendor.o(($event) => formData.height = $event.detail.value, "37"),
+        p: common_vendor.o(($event) => formData.height = $event.detail.value, "6c"),
         q: formData.weight,
-        r: common_vendor.o(($event) => formData.weight = $event.detail.value, "42"),
+        r: common_vendor.o(($event) => formData.weight = $event.detail.value, "d0"),
         s: common_vendor.t(formData.hometown || "籍贯（省市区）"),
-        t: common_vendor.o(onHometownChange, "fb"),
+        t: common_vendor.o(onHometownChange, "5d"),
         v: common_vendor.t(formData.location || "现居地（省市区）"),
-        w: common_vendor.o(onLocationChange, "d6"),
+        w: common_vendor.o(onLocationChange, "68"),
         x: common_vendor.t(getZodiacEmojiSafe(autoInfo.value.zodiac)),
         y: common_vendor.t(autoInfo.value.zodiac),
         z: common_vendor.t(common_vendor.unref(utils_date.getZodiacSignSymbol)(autoInfo.value.zodiacSign)),
@@ -279,7 +291,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         E: common_vendor.t(formData.education || "学历"),
         F: educationOptions,
         G: educationIndex.value,
-        H: common_vendor.o(onEducationChange, "39"),
+        H: common_vendor.o(onEducationChange, "20"),
         I: formData.schoolTier === "985"
       }, formData.schoolTier === "985" ? {} : {}, {
         J: formData.schoolTier === "211"
@@ -289,17 +301,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         M: common_vendor.t(formData.occupation || "职业"),
         N: occupationOptions,
         O: occupationIndex.value,
-        P: common_vendor.o(onOccupationChange, "aa"),
+        P: common_vendor.o(onOccupationChange, "82"),
         Q: common_vendor.t(formData.jobLevel || "职级（可选）"),
         R: jobLevelOptions,
         S: jobLevelIndex.value,
-        T: common_vendor.o(onJobLevelChange, "03"),
+        T: common_vendor.o(onJobLevelChange, "fb"),
         U: formData.company,
-        V: common_vendor.o(($event) => formData.company = $event.detail.value, "a6"),
+        V: common_vendor.o(($event) => formData.company = $event.detail.value, "e1"),
         W: common_vendor.t(formData.income || "年收入"),
         X: incomeOptions,
         Y: incomeIndex.value,
-        Z: common_vendor.o(onIncomeChange, "ef"),
+        Z: common_vendor.o(onIncomeChange, "9a"),
         aa: common_vendor.f(hobbyOptions, (hobby, k0, i0) => {
           return {
             a: common_vendor.t(hobby),
@@ -309,9 +321,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         ab: formData.bio,
-        ac: common_vendor.o(($event) => formData.bio = $event.detail.value, "44"),
+        ac: common_vendor.o(($event) => formData.bio = $event.detail.value, "0b"),
         ad: common_vendor.t(formData.bio.length),
-        ae: common_vendor.o(saveProfile, "42")
+        ae: common_vendor.o(saveProfile, "23")
       });
     };
   }

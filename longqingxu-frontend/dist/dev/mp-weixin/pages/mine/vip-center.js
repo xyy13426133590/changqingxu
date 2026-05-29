@@ -182,7 +182,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(goBack, "1c"),
+        a: common_vendor.o(goBack, "d7"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
         d: common_vendor.t(common_vendor.unref(userStore).profile.isVip ? "VIP 会员" : "尚未开通 VIP"),
@@ -232,8 +232,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         l: common_vendor.t(buyButtonLabel.value),
-        m: common_vendor.o(buyVip, "63"),
-        n: common_vendor.o(openAgreement, "2e")
+        m: common_vendor.o(buyVip, "89"),
+        n: common_vendor.o(openAgreement, "20")
       });
     };
   }

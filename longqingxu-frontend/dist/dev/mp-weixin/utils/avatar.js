@@ -1,4 +1,6 @@
 "use strict";
+require("../common/vendor.js");
+require("../services/api.js");
 const common_assets = require("../common/assets.js");
 const DEMO_AVATARS = [common_assets.demo0, common_assets.demo1, common_assets.demo2, common_assets.demo3, common_assets.demo4];
 const FALLBACK_AVATAR = DEMO_AVATARS[0];
@@ -28,6 +30,8 @@ function demoAvatarByUserId(userId) {
 }
 function resolveAvatar(remote, userId) {
   const trimmed = (remote != null ? remote : "").trim();
+  if (!trimmed)
+    return demoAvatarByUserId(userId);
   if (trimmed.startsWith("/assets/") || trimmed.includes("/assets/")) {
     return trimmed;
   }
@@ -37,8 +41,11 @@ function resolveAvatar(remote, userId) {
       return DEMO_AVATARS[idx];
     }
   }
+  if (trimmed.startsWith("cloud://")) {
+    return trimmed;
+  }
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    return demoAvatarByUserId(userId);
+    return trimmed;
   }
   return demoAvatarByUserId(userId);
 }

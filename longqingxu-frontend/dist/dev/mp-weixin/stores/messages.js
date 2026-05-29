@@ -174,7 +174,7 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
   }
   function sendMessage(content, type = "text", extra) {
     return __async(this, null, function* () {
-      var _a, _b, _c, _d, _e, _f, _g;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
       const cid = currentConversationId.value;
       const conv = conversations.value.find((c) => c.id === cid);
       if (!cid || !conv)
@@ -240,12 +240,64 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
         }
         return;
       }
-      if (type !== "text") {
-        const finalList = ((_e = messages.value[cid]) == null ? void 0 : _e.map(
-          (m) => m.id === tempId ? __spreadProps(__spreadValues({}, m), { status: "sent" }) : m
-        )) || [];
-        messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: finalList });
-        common_vendor.index.showToast({ title: "联调默认仅文本走 REST", icon: "none" });
+      if (type === "image") {
+        const filePath = content.trim();
+        if (!filePath) {
+          messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: ((_e = messages.value[cid]) == null ? void 0 : _e.filter((m) => m.id !== tempId)) || [] });
+          common_vendor.index.showToast({ title: "图片文件无效", icon: "none" });
+          return;
+        }
+        try {
+          const { url } = yield services_apiUpload.apiUploadImage(filePath);
+          const saved = yield services_apiConversation.apiSendMessage({
+            conversationId: cid,
+            receiverId: conv.userId,
+            type: "image",
+            content: url,
+            mediaUrl: url
+          });
+          const mapped = mapApiMessage(saved);
+          const arr = ((_f = messages.value[cid]) == null ? void 0 : _f.filter((m) => m.id !== tempId)) || [];
+          messages.value = __spreadProps(__spreadValues({}, messages.value), {
+            [cid]: [...arr, mapped].sort(
+              (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            )
+          });
+          const lc = conversations.value.find((c) => c.id === cid);
+          if (lc) {
+            lc.lastMessage = summarizeLast(mapped.type, mapped.content);
+            lc.lastMessageTime = mapped.createdAt;
+          }
+        } catch (e) {
+          messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: ((_g = messages.value[cid]) == null ? void 0 : _g.filter((m) => m.id !== tempId)) || [] });
+          common_vendor.index.showToast({ title: "图片发送失败", icon: "none" });
+        }
+        return;
+      }
+      if (type === "emoji") {
+        try {
+          const saved = yield services_apiConversation.apiSendMessage({
+            conversationId: cid,
+            receiverId: conv.userId,
+            type: "emoji",
+            content
+          });
+          const mapped = mapApiMessage(saved);
+          const arr = ((_h = messages.value[cid]) == null ? void 0 : _h.filter((m) => m.id !== tempId)) || [];
+          messages.value = __spreadProps(__spreadValues({}, messages.value), {
+            [cid]: [...arr, mapped].sort(
+              (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            )
+          });
+          const lc = conversations.value.find((c) => c.id === cid);
+          if (lc) {
+            lc.lastMessage = summarizeLast(mapped.type, mapped.content);
+            lc.lastMessageTime = mapped.createdAt;
+          }
+        } catch (e) {
+          messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: ((_i = messages.value[cid]) == null ? void 0 : _i.filter((m) => m.id !== tempId)) || [] });
+          common_vendor.index.showToast({ title: "表情发送失败", icon: "none" });
+        }
         return;
       }
       const payload = {
@@ -257,7 +309,7 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
       try {
         const saved = yield services_apiConversation.apiSendMessage(payload);
         const mapped = mapApiMessage(saved);
-        const arr = ((_f = messages.value[cid]) == null ? void 0 : _f.filter((m) => m.id !== tempId)) || [];
+        const arr = ((_j = messages.value[cid]) == null ? void 0 : _j.filter((m) => m.id !== tempId)) || [];
         messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: [...arr, mapped].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) });
         const lc = conversations.value.find((c) => c.id === cid);
         if (lc) {
@@ -265,7 +317,7 @@ const useMessagesStore = common_vendor.defineStore("messages", () => {
           lc.lastMessageTime = mapped.createdAt;
         }
       } catch (e) {
-        const arr = ((_g = messages.value[cid]) == null ? void 0 : _g.filter((m) => m.id !== tempId)) || [];
+        const arr = ((_k = messages.value[cid]) == null ? void 0 : _k.filter((m) => m.id !== tempId)) || [];
         messages.value = __spreadProps(__spreadValues({}, messages.value), { [cid]: arr });
       }
     });

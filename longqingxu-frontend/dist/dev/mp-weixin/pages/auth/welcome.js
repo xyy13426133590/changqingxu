@@ -22,11 +22,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(goBack, "82"),
+        a: common_vendor.o(goBack, "7f"),
         b: common_vendor.s(capsuleNavRowStyle.value),
         c: common_vendor.s(capsuleNavOuterStyle.value),
-        d: common_vendor.o(goLogin, "21"),
-        e: common_vendor.o(goRegister, "71")
+        d: common_vendor.o(goLogin, "88"),
+        e: common_vendor.o(goRegister, "8b")
       };
     };
   }

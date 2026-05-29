@@ -1,5 +1,7 @@
 "use strict";
 const services_api = require("./api.js");
+const services_cloud = require("./cloud.js");
+const services_cloudApiMap = require("./cloud-api-map.js");
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -20,37 +22,49 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-function apiRegister(params) {
+function saveAuthResponse(data) {
   return __async(this, null, function* () {
-    const data = yield services_api.post("/auth/register", params);
     services_api.setToken(data.accessToken, data.refreshToken);
     return data;
+  });
+}
+function apiRegister(params) {
+  return __async(this, null, function* () {
+    {
+      const data2 = yield services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.auth.register, params, { skipAuth: true });
+      return saveAuthResponse(data2);
+    }
   });
 }
 function apiLogin(params) {
   return __async(this, null, function* () {
-    const data = yield services_api.post("/auth/login", params);
-    services_api.setToken(data.accessToken, data.refreshToken);
-    return data;
+    {
+      const data2 = yield services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.auth.login, params, { skipAuth: true });
+      return saveAuthResponse(data2);
+    }
   });
 }
 function apiSmsLogin(params) {
   return __async(this, null, function* () {
-    const data = yield services_api.post("/auth/sms-login", params);
-    services_api.setToken(data.accessToken, data.refreshToken);
-    return data;
+    {
+      const data2 = yield services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.auth.smsLogin, params, { skipAuth: true });
+      return saveAuthResponse(data2);
+    }
   });
 }
 function apiSendSms(params) {
   return __async(this, null, function* () {
-    return services_api.post("/auth/send-sms", params);
+    {
+      return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.auth.sendSms, params, { skipAuth: true });
+    }
   });
 }
 function apiWechatLogin(params) {
   return __async(this, null, function* () {
-    const data = yield services_api.post("/auth/wechat-login", params);
-    services_api.setToken(data.accessToken, data.refreshToken);
-    return data;
+    {
+      const data2 = yield services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.auth.wechatLogin, params, { skipAuth: true });
+      return saveAuthResponse(data2);
+    }
   });
 }
 exports.apiLogin = apiLogin;

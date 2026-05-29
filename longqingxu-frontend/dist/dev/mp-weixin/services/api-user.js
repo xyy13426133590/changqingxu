@@ -1,28 +1,29 @@
 "use strict";
-const services_api = require("./api.js");
+require("./api.js");
+const services_cloud = require("./cloud.js");
+const services_cloudApiMap = require("./cloud-api-map.js");
 function apiGetMe() {
-  return services_api.get("/users/me");
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.users.getMe);
 }
 function apiUpdateProfile(params) {
-  return services_api.put("/users/me", params);
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.users.updateProfile, params);
 }
 function apiUpdateFilters(params) {
-  return services_api.put("/users/me/filters", params);
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.users.updateFilters, params);
 }
 function apiGetVipStatus() {
-  return services_api.get("/users/me/vip");
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.users.getVipStatus);
 }
 function apiGetRecommendations(page = 1, limit = 10) {
-  return services_api.get(
-    "/users/recommendations",
-    { page, limit }
-  );
+  {
+    return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.users.getRecommendations, { page, limit });
+  }
 }
 function apiGetDailyRecommendations() {
-  return services_api.get("/users/daily");
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.users.getDailyRecommendations);
 }
 function apiGetUserDetail(userId) {
-  return services_api.get(`/users/${userId}`);
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.users.getUserDetail, { userId });
 }
 exports.apiGetDailyRecommendations = apiGetDailyRecommendations;
 exports.apiGetMe = apiGetMe;

@@ -2,7 +2,8 @@
 const common_vendor = require("../../common/vendor.js");
 const stores_messages = require("../../stores/messages.js");
 const stores_user = require("../../stores/user.js");
-const services_chatSocket = require("../../services/chat-socket.js");
+require("../../services/api.js");
+const services_messageWatch = require("../../services/message-watch.js");
 const utils_navigation = require("../../utils/navigation.js");
 const utils_safeArea = require("../../utils/safe-area.js");
 const utils_mediaUrl = require("../../utils/media-url.js");
@@ -70,13 +71,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         yield messagesStore.setCurrentConversation(options.conversationId);
         yield messagesStore.loadMessages(options.conversationId);
       }
-      yield services_chatSocket.connectChatSocket({
-        onNewMessage: (payload) => messagesStore.applyIncomingMessage(payload)
-      });
+      {
+        services_messageWatch.startMessageWatch(conversationId.value, (msg) => {
+          messagesStore.applyIncomingMessage(msg);
+        });
+      }
     }));
     common_vendor.onUnload(() => {
       stopVoicePlayback();
-      void services_chatSocket.disconnectChatSocket();
+      {
+        services_messageWatch.stopMessageWatch();
+      }
     });
     function goBack() {
       utils_navigation.navigateBackTo("/pages/messages/index");
@@ -112,38 +117,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     }
     function playVoice(msg) {
-      if (msg.type !== "voice")
-        return;
-      if (playingVoiceId.value === msg.id) {
+      return __async(this, null, function* () {
+        if (msg.type !== "voice")
+          return;
+        if (playingVoiceId.value === msg.id) {
+          stopVoicePlayback();
+          return;
+        }
+        let rawUrl = "";
+        try {
+          const data = JSON.parse(msg.content);
+          rawUrl = (data.url || "").trim();
+        } catch (e) {
+          rawUrl = (msg.content || "").trim();
+        }
+        const voiceUrl = yield utils_mediaUrl.resolveVoicePlaySrc(rawUrl);
+        if (!voiceUrl || voiceUrl === "[语音]") {
+          common_vendor.index.showToast({ title: "暂无可用音频", icon: "none" });
+          return;
+        }
         stopVoicePlayback();
-        return;
-      }
-      let rawUrl = "";
-      try {
-        const data = JSON.parse(msg.content);
-        rawUrl = (data.url || "").trim();
-      } catch (e) {
-        rawUrl = (msg.content || "").trim();
-      }
-      const voiceUrl = utils_mediaUrl.resolveVoicePlaySrc(rawUrl);
-      if (!voiceUrl || voiceUrl === "[语音]") {
-        common_vendor.index.showToast({ title: "暂无可用音频", icon: "none" });
-        return;
-      }
-      stopVoicePlayback();
-      playingVoiceId.value = msg.id;
-      const ctx = common_vendor.index.createInnerAudioContext();
-      voicePlayer = ctx;
-      ctx.obeyMuteSwitch = false;
-      ctx.src = voiceUrl;
-      ctx.play();
-      ctx.onEnded(() => {
-        stopVoicePlayback();
-      });
-      ctx.onError((err) => {
-        console.warn("[InnerAudio]", err, voiceUrl);
-        stopVoicePlayback();
-        common_vendor.index.showToast({ title: "播放失败", icon: "none" });
+        playingVoiceId.value = msg.id;
+        const ctx = common_vendor.index.createInnerAudioContext();
+        voicePlayer = ctx;
+        ctx.obeyMuteSwitch = false;
+        ctx.src = voiceUrl;
+        ctx.play();
+        ctx.onEnded(() => {
+          stopVoicePlayback();
+        });
+        ctx.onError((err) => {
+          console.warn("[InnerAudio]", err, voiceUrl);
+          stopVoicePlayback();
+          common_vendor.index.showToast({ title: "播放失败", icon: "none" });
+        });
       });
     }
     function formatDuration(duration) {
@@ -154,14 +161,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       var _a, _b;
       return common_vendor.e({
-        a: common_vendor.o(goBack, "6b"),
+        a: common_vendor.o(goBack, "d2"),
         b: (_a = currentConversation.value) == null ? void 0 : _a.avatar,
         c: common_vendor.t((_b = currentConversation.value) == null ? void 0 : _b.nickname),
         d: common_vendor.s(capsuleNavRowStyle.value),
         e: common_vendor.s(capsuleNavOuterStyle.value),
         f: showRiskBanner.value
       }, showRiskBanner.value ? {
-        g: common_vendor.o(dismissRisk, "ec")
+        g: common_vendor.o(dismissRisk, "c0")
       } : {}, {
         h: common_vendor.f(currentMessages.value, (msg, k0, i0) => {
           var _a2;
@@ -227,9 +234,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }),
         i: lastMessageId.value,
-        j: common_vendor.o(onSendText, "e2"),
-        k: common_vendor.o(onSendVoice, "d0"),
-        l: common_vendor.o(onSendImage, "46"),
+        j: common_vendor.o(onSendText, "5a"),
+        k: common_vendor.o(onSendVoice, "63"),
+        l: common_vendor.o(onSendImage, "07"),
         m: common_vendor.p({
           placeholder: "文明发言，涉及站外引导将提示风险…"
         })

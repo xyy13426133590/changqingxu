@@ -1,16 +1,18 @@
 "use strict";
-const services_api = require("./api.js");
+require("./api.js");
+const services_cloud = require("./cloud.js");
+const services_cloudApiMap = require("./cloud-api-map.js");
 function apiGetVipPlans() {
-  return services_api.get("/vip/plans");
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.vip.plans);
 }
 function apiCreateOrder(params) {
-  return services_api.post("/vip/orders", params);
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.vip.createOrder, params);
 }
 function apiGetOrder(orderId) {
-  return services_api.get(`/vip/orders/${encodeURIComponent(orderId)}`);
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.vip.getOrder, { orderId });
 }
 function apiMockPayOrder(orderId) {
-  return services_api.post(`/vip/orders/${encodeURIComponent(orderId)}/mock-pay`, {});
+  return services_cloud.callCloud(services_cloudApiMap.CLOUD_API_MAP.vip.mockPay, { orderId });
 }
 exports.apiCreateOrder = apiCreateOrder;
 exports.apiGetOrder = apiGetOrder;

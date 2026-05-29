@@ -179,34 +179,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.e({
         a: !phoneLoginExpanded.value
       }, !phoneLoginExpanded.value ? {
-        b: common_vendor.o(goBack, "70"),
+        b: common_vendor.o(goBack, "a4"),
         c: common_vendor.s(capsuleNavRowStyle.value),
         d: common_vendor.s(capsuleNavOuterStyle.value),
         e: common_vendor.t(loadingWx.value ? "登录中…" : "微信一键登录"),
         f: loadingWx.value ? 1 : "",
         g: loadingWx.value,
-        h: common_vendor.o(onWeChatLogin, "23"),
+        h: common_vendor.o(onWeChatLogin, "99"),
         i: loadingWx.value ? 1 : "",
         j: loadingWx.value,
-        k: common_vendor.o(openPhoneLogin, "79")
+        k: common_vendor.o(openPhoneLogin, "a3")
       } : {
-        l: common_vendor.o(closePhoneLogin, "8e"),
+        l: common_vendor.o(closePhoneLogin, "c0"),
         m: common_vendor.s(capsuleNavRowStyle.value),
         n: common_vendor.s(capsuleNavOuterStyle.value),
         o: phone.value,
-        p: common_vendor.o(($event) => phone.value = $event.detail.value, "f9"),
+        p: common_vendor.o(($event) => phone.value = $event.detail.value, "39"),
         q: smsCode.value,
-        r: common_vendor.o(($event) => smsCode.value = $event.detail.value, "31"),
+        r: common_vendor.o(($event) => smsCode.value = $event.detail.value, "4a"),
         s: common_vendor.t(smsCooldown.value > 0 ? `${smsCooldown.value}s` : smsSending.value ? "发送中" : "获取验证码"),
         t: smsCooldown.value > 0 || smsSending.value ? 1 : "",
         v: smsCooldown.value > 0 || smsSending.value,
-        w: common_vendor.o(onSendSms, "d0"),
+        w: common_vendor.o(onSendSms, "df"),
         x: common_vendor.t(common_vendor.unref(demoSms)),
         y: common_vendor.t(loadingSms.value ? "登录中…" : "登录"),
         z: loadingSms.value ? 1 : "",
         A: loadingSms.value,
-        B: common_vendor.o(submitSms, "e2"),
-        C: common_vendor.o(goRegister, "3a"),
+        B: common_vendor.o(submitSms, "65"),
+        C: common_vendor.o(goRegister, "e3"),
         D: common_vendor.t(common_vendor.unref(demoSms))
       });
     };
