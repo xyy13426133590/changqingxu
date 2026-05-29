@@ -4,7 +4,7 @@
 
 | 项目 | 值 |
 |------|-----|
-| 云环境 ID | `prod-love-app-d8gn9cxenfb74c1ac` |
+| 云环境 ID | `cloud1-d6g7211of923bfddc` |
 | Layer 挂载 | `/opt` |
 | 负责人 | |
 | 计划开始 | |
@@ -34,7 +34,7 @@
 
 ### 操作清单
 
-- [ ] 微信开发者工具关联云环境 `prod-love-app-d8gn9cxenfb74c1ac`
+- [ ] 微信开发者工具关联云环境 `cloud1-d6g7211of923bfddc`
 - [ ] 按 [cloud-database/SETUP.md](cloud-database/SETUP.md) 创建 7 个集合与索引
 - [ ] 导入 [cloud-database/seed-vip-plans.json](cloud-database/seed-vip-plans.json)
 - [ ] 粘贴 [cloud-database/security-rules.json](cloud-database/security-rules.json) 安全规则

@@ -11,7 +11,7 @@ type CallCloudOptions = {
   skipAuth?: boolean
 }
 
-const DEFAULT_CLOUD_ENV = 'prod-love-app-d8gn9cxenfb74c1ac'
+const DEFAULT_CLOUD_ENV = 'cloud1-d6g7211of923bfddc'
 
 export const USE_CLOUD = import.meta.env.VITE_USE_CLOUD === 'true'
 export const CLOUD_ENV = import.meta.env.VITE_CLOUD_ENV || DEFAULT_CLOUD_ENV

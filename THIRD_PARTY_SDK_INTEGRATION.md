@@ -10,7 +10,7 @@
 
 | 项 | 说明 |
 |----|------|
-| 云环境 ID | `prod-love-app-d8gn9cxenfb74c1ac` |
+| 云环境 ID | `cloud1-d6g7211of923bfddc` |
 | 运行时 | Node.js 18.15 |
 | Layer | `common-layer` 挂载路径 **`/opt`** |
 | 密钥存放 | 仅云函数环境变量，**禁止**写入前端或 Git |

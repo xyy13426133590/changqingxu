@@ -1,6 +1,6 @@
 # 云数据库初始化步骤（Phase 0）
 
-云环境 ID：`prod-love-app-d8gn9cxenfb74c1ac`
+云环境 ID：`cloud1-d6g7211of923bfddc`
 
 ## 1. 创建集合（7 个）
 

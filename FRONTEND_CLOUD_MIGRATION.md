@@ -45,7 +45,7 @@
 VITE_USE_CLOUD=false
 
 # 微信云环境 ID
-VITE_CLOUD_ENV=prod-love-app-d8gn9cxenfb74c1ac
+VITE_CLOUD_ENV=cloud1-d6g7211of923bfddc
 
 # 以下仅在 VITE_USE_CLOUD=false 时使用
 VITE_API_BASE_URL=http://localhost:3000/api
@@ -73,7 +73,7 @@ VITE_UPLOAD_DOMAIN=https://changqingxu.oss-cn-beijing.aliyuncs.com
 
 ```typescript
 export const USE_CLOUD = import.meta.env.VITE_USE_CLOUD === 'true'
-export const CLOUD_ENV = import.meta.env.VITE_CLOUD_ENV || 'prod-love-app-d8gn9cxenfb74c1ac'
+export const CLOUD_ENV = import.meta.env.VITE_CLOUD_ENV || 'cloud1-d6g7211of923bfddc'
 ```
 
 所有 `api-*.ts` 通过 `USE_CLOUD` 分支，**不要**在页面里直接读 `import.meta.env`。
@@ -116,7 +116,7 @@ export function initCloud(): void {
 
 - [ ] 控制台无「云开发未初始化」报错
 - [ ] `wx.cloud.callFunction` 可正常调用 `auth-login`
-- [ ] 环境 ID 与控制台一致：`prod-love-app-d8gn9cxenfb74c1ac`
+- [ ] 环境 ID 与控制台一致：`cloud1-d6g7211of923bfddc`
 
 ---
 

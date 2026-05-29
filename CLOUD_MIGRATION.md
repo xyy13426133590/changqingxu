@@ -6,7 +6,7 @@
 
 | 配置项 | 值 |
 |--------|-----|
-| 云环境 ID | `prod-love-app-d8gn9cxenfb74c1ac` |
+| 云环境 ID | `cloud1-d6g7211of923bfddc` |
 | 运行时 | Node.js 18.15 |
 | 数据库 | CloudBase 云数据库（7 集合） |
 | 存储 | 云存储（`avatars/`、`images/`、`voices/`） |
@@ -148,7 +148,7 @@ longqingxu-frontend/     # 前端 cloud.ts 双模式切换
 ### 5. 上传业务云函数
 
 1. 微信开发者工具打开小程序项目
-2. 关联云环境 `prod-love-app-d8gn9cxenfb74c1ac`
+2. 关联云环境 `cloud1-d6g7211of923bfddc`
 3. 将 `cloudfunctions/` 下各目录（如 `auth-register/`、`user-getMe/`）右键 → 上传并部署
 4. 各业务函数关联 `common-layer`
 5. `vip-wechatPayNotify` 需开启 **HTTP 访问服务**，将 URL 填入微信支付商户平台
@@ -159,7 +159,7 @@ longqingxu-frontend/     # 前端 cloud.ts 双模式切换
 
 1. 复制 `longqingxu-frontend/.env.example` 为 `.env`
 2. 设置 `VITE_USE_CLOUD=true`
-3. 设置 `VITE_CLOUD_ENV=prod-love-app-d8gn9cxenfb74c1ac`
+3. 设置 `VITE_CLOUD_ENV=cloud1-d6g7211of923bfddc`
 4. 重新编译小程序
 
 ## 前端改造清单
