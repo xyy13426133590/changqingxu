@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长情许 · 圈子动态原型</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1a2e;
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  /* ── 手机外框 ── */
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .screen-label {
+    color: #a5b4fc;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .phone {
+    width: 375px;
+    height: 750px;
+    border-radius: 44px;
+    border: 2px solid rgba(196,181,253,0.3);
+    background: #0f0f1a;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(139,92,246,0.25), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── 渐变背景 ── */
+  .gradient-bg {
+    background: linear-gradient(135deg, #c4b5fd 0%, #a5b4fc 50%, #93c5fd 100%);
+  }
+  .page-bg {
+    background: linear-gradient(180deg, #1e1b4b 0%, #0f0f1a 40%);
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .page-bg::-webkit-scrollbar { display: none; }
+
+  /* ── 状态栏 ── */
+  .status-bar {
+    height: 44px;
+    padding: 12px 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .status-time { color: #fff; font-size: 15px; font-weight: 600; }
+  .status-icons { color: #fff; font-size: 12px; display: flex; gap: 6px; align-items: center; }
+
+  /* ── 顶部导航栏 ── */
+  .nav-bar {
+    height: 56px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .nav-title {
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #c4b5fd, #a5b4fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(196,181,253,0.15);
+    border: 1px solid rgba(196,181,253,0.2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #c4b5fd;
+    font-size: 18px;
+    transition: background 0.2s;
+  }
+  .nav-btn:hover { background: rgba(196,181,253,0.25); }
+
+  /* ── 分类标签行 ── */
+  .tab-pills {
+    padding: 8px 20px 4px;
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .tab-pill {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-pill.active {
+    background: linear-gradient(135deg, #8B5CF6, #6366f1);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(139,92,246,0.4);
+  }
+  .tab-pill.inactive {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .tab-pill.inactive:hover { background: rgba(255,255,255,0.1); }
+
+  /* ── 动态卡片 ── */
+  .feed-list {
+    padding: 12px 16px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .moment-card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 16px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .moment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139,92,246,0.2);
+  }
+
+  /* 作者行 */
+  .author-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid rgba(196,181,253,0.4);
+  }
+  .avatar-placeholder {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    border: 2px solid rgba(196,181,253,0.4);
+  }
+  .author-info { flex: 1; min-width: 0; }
+  .author-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 2px;
+  }
+  .author-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+  }
+  .location-tag {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .badge-public {
+    padding: 1px 8px;
+    background: rgba(139,92,246,0.2);
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 20px;
+    font-size: 10px;
+    color: #c4b5fd;
+  }
+  .badge-login {
+    padding: 1px 8px;
+    background: rgba(245,158,11,0.15);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 20px;
+    font-size: 10px;
+    color: #fbbf24;
+  }
+
+  /* 正文 */
+  .post-content {
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 10px;
+  }
+
+  /* 九宫格图 */
+  .media-grid {
+    display: grid;
+    gap: 3px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .media-grid.grid-1 { grid-template-columns: 1fr; }
+  .media-grid.grid-2, .media-grid.grid-4 { grid-template-columns: 1fr 1fr; }
+  .media-grid.grid-3, .media-grid.grid-6, .media-grid.grid-9 { grid-template-columns: 1fr 1fr 1fr; }
+  .media-grid.grid-5 { grid-template-columns: 1fr 1fr 1fr; }
+  .media-grid img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+  }
+  .media-img-cell {
+    position: relative;
+    background: rgba(255,255,255,0.05);
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .video-cell {
+    position: relative;
+    background: linear-gradient(135deg, #1e1b4b, #2d1b69);
+    aspect-ratio: 16/10;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .video-play-btn {
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  .video-duration {
+    position: absolute;
+    bottom: 8px; right: 10px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 8px;
+  }
+
+  /* 操作行 */
+  .action-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: color 0.2s;
+    user-select: none;
+  }
+  .action-btn:hover { color: rgba(255,255,255,0.8); }
+  .action-btn.liked { color: #f43f5e; }
+  .action-btn .icon { font-size: 16px; }
+
+  /* ── 蒙层卡片（游客敏感内容）── */
+  .masked-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 16px;
+    cursor: pointer;
+  }
+  .masked-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 0 16px;
+    gap: 10px;
+  }
+  .masked-icon { font-size: 32px; opacity: 0.5; }
+  .masked-text {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    line-height: 1.5;
+  }
+  .masked-btn {
+    padding: 8px 24px;
+    background: linear-gradient(135deg, #8B5CF6, #6366f1);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    margin-top: 4px;
+    box-shadow: 0 4px 12px rgba(139,92,246,0.35);
+  }
+
+  /* ── 底部 Tab ── */
+  .tab-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 82px;
+    background: rgba(15,15,26,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: flex-start;
+    padding-top: 10px;
+    z-index: 100;
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 0 4px;
+    transition: all 0.2s;
+  }
+  .tab-icon {
+    font-size: 24px;
+    line-height: 1;
+    transition: transform 0.2s;
+  }
+  .tab-text {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    font-weight: 500;
+  }
+  .tab-item.active .tab-text {
+    background: linear-gradient(135deg, #c4b5fd, #a5b4fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+  }
+  .tab-item.active .tab-icon { transform: scale(1.1); }
+
+  /* Tab 图标 SVG 颜色 */
+  .tab-svg { width: 24px; height: 24px; }
+
+  /* ── 发布 FAB ── */
+  .publish-fab {
+    position: absolute;
+    bottom: 96px;
+    right: 20px;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B5CF6, #6366f1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(139,92,246,0.5);
+    z-index: 50;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .publish-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 28px rgba(139,92,246,0.6);
+  }
+
+  /* ── 发布页 ── */
+  .publish-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: linear-gradient(180deg, #1e1b4b 0%, #0f0f1a 100%);
+  }
+  .publish-header {
+    padding: 0 16px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .publish-back {
+    color: #c4b5fd;
+    font-size: 24px;
+    cursor: pointer;
+    width: 36px;
+  }
+  .publish-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+  .publish-submit-btn {
+    padding: 7px 18px;
+    background: linear-gradient(135deg, #8B5CF6, #6366f1);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 12px rgba(139,92,246,0.35);
+  }
+  .publish-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .publish-body::-webkit-scrollbar { display: none; }
+  .text-area {
+    width: 100%;
+    min-height: 100px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 14px;
+    color: rgba(255,255,255,0.85);
+    font-size: 15px;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .text-area::placeholder { color: rgba(255,255,255,0.25); }
+  .text-area:focus { border-color: rgba(139,92,246,0.5); }
+
+  /* 图片选择区 */
+  .media-picker {
+    margin-bottom: 16px;
+  }
+  .media-picker-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 8px;
+  }
+  .media-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .media-picker-item {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px dashed rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    color: rgba(255,255,255,0.3);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .media-picker-item:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(139,92,246,0.4);
+  }
+  .media-picker-item.has-img { border-style: solid; border-color: rgba(255,255,255,0.1); }
+  .media-picker-item .img-emoji { font-size: 28px; }
+  .media-picker-item .remove-btn {
+    position: absolute;
+    top: 2px; right: 2px;
+    width: 18px; height: 18px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  /* 选项行 */
+  .option-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    gap: 12px;
+  }
+  .option-icon { font-size: 18px; width: 24px; text-align: center; }
+  .option-label { flex: 1; font-size: 14px; color: rgba(255,255,255,0.7); }
+  .option-value { font-size: 13px; color: rgba(139,92,246,0.9); }
+  .option-arrow { color: rgba(255,255,255,0.2); font-size: 14px; }
+
+  /* 可见性选择 */
+  .visibility-section {
+    margin-top: 8px;
+  }
+  .visibility-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 10px;
+  }
+  .visibility-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .visibility-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    gap: 12px;
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.03);
+  }
+  .visibility-option.selected {
+    border-color: rgba(139,92,246,0.5);
+    background: rgba(139,92,246,0.1);
+  }
+  .visibility-option-icon { font-size: 18px; }
+  .visibility-option-info { flex: 1; }
+  .visibility-option-title { font-size: 14px; color: #e2e8f0; font-weight: 600; margin-bottom: 2px; }
+  .visibility-option-desc { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .visibility-radio {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .visibility-radio.selected {
+    border-color: #8B5CF6;
+    background: #8B5CF6;
+  }
+  .visibility-radio.selected::after {
+    content: '';
+    width: 7px; height: 7px;
+    background: #fff;
+    border-radius: 50%;
+  }
+
+  /* ── 登录引导弹窗 ── */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 24px;
+  }
+  .modal-box {
+    width: 100%;
+    background: linear-gradient(160deg, #1e1b4b, #2d1b69);
+    border: 1px solid rgba(196,181,253,0.2);
+    border-radius: 24px;
+    padding: 32px 24px 24px;
+    text-align: center;
+  }
+  .modal-icon { font-size: 52px; margin-bottom: 16px; display: block; }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+  }
+  .modal-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+  .btn-primary {
+    padding: 13px;
+    background: linear-gradient(135deg, #8B5CF6, #6366f1);
+    color: #fff;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 6px 16px rgba(139,92,246,0.4);
+  }
+  .btn-ghost {
+    padding: 13px;
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.5);
+    border-radius: 16px;
+    font-size: 15px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* ── 响应式 ── */
+  @media (max-width: 480px) {
+    body { padding: 10px; gap: 20px; }
+    .phone { width: 340px; height: 680px; border-radius: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     屏幕 1：圈子 Feed（登录用户）
+════════════════════════════════════ -->
+<div class="phone-wrap">
+  <div class="screen-label">① 圈子 Feed（登录用户）</div>
+  <div class="phone">
+    <div class="screen">
+      <!-- 状态栏 -->
+      <div class="status-bar" style="background:transparent;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons"><span>WiFi</span><span>🔋</span></div>
+      </div>
+
+      <!-- 导航栏 -->
+      <div class="nav-bar">
+        <div style="width:36px"></div>
+        <div class="nav-title">✦ 圈子</div>
+        <div class="nav-btn" title="通知">🔔</div>
+      </div>
+
+      <!-- 分类 Tab -->
+      <div class="tab-pills">
+        <div class="tab-pill active">全站广场</div>
+        <div class="tab-pill inactive">关注</div>
+        <div class="tab-pill inactive">同城</div>
+      </div>
+
+      <!-- 动态列表 -->
+      <div class="page-bg">
+        <div class="feed-list">
+
+          <!-- 卡片 1：九宫格图片 -->
+          <div class="moment-card">
+            <div class="author-row">
+              <div class="avatar-placeholder" style="background: linear-gradient(135deg,#f9a8d4,#fda4af);">🌸</div>
+              <div class="author-info">
+                <div class="author-name">小林同学</div>
+                <div class="author-meta">
+                  <span>2分钟前</span>
+                  <div class="location-tag">📍 <span>北京 · 朝阳区</span></div>
+                </div>
+              </div>
+              <div class="badge-public">公开</div>
+            </div>
+            <div class="post-content">周末和闺蜜去爬山啦，风景超美！下次还要去 🏔️</div>
+            <div class="media-grid grid-3">
+              <div class="media-img-cell">🌿</div>
+              <div class="media-img-cell">⛰️</div>
+              <div class="media-img-cell">🌅</div>
+              <div class="media-img-cell">🌸</div>
+              <div class="media-img-cell">🦋</div>
+              <div class="media-img-cell">☁️</div>
+            </div>
+            <div class="action-row">
+              <div class="action-btn liked" onclick="toggleLike(this)">
+                <span class="icon">❤️</span><span class="count">24</span>
+              </div>
+              <div class="action-btn" onclick="openComment()">
+                <span class="icon">💬</span><span>8</span>
+              </div>
+              <div style="flex:1"></div>
+              <div class="action-btn">⋯</div>
+            </div>
+          </div>
+
+          <!-- 卡片 2：视频 -->
+          <div class="moment-card">
+            <div class="author-row">
+              <div class="avatar-placeholder" style="background: linear-gradient(135deg,#93c5fd,#a5b4fc);">🎸</div>
+              <div class="author-info">
+                <div class="author-name">弹吉他的阿远</div>
+                <div class="author-meta">
+                  <span>1小时前</span>
+                  <div class="location-tag">📍 <span>上海 · 静安区</span></div>
+                </div>
+              </div>
+              <div class="badge-public">公开</div>
+            </div>
+            <div class="post-content">练了一个月终于弹顺了，献给喜欢音乐的你 🎵</div>
+            <div class="video-cell">
+              <div class="video-play-btn">▶</div>
+              <div class="video-duration">0:42</div>
+            </div>
+            <div class="action-row">
+              <div class="action-btn" onclick="toggleLike(this)">
+                <span class="icon">🤍</span><span class="count">156</span>
+              </div>
+              <div class="action-btn">
+                <span class="icon">💬</span><span>31</span>
+              </div>
+              <div style="flex:1"></div>
+              <div class="action-btn">⋯</div>
+            </div>
+          </div>
+
+          <!-- 卡片 3：仅登录可见（已登录，可正常显示）-->
+          <div class="moment-card">
+            <div class="author-row">
+              <div class="avatar-placeholder" style="background: linear-gradient(135deg,#bbf7d0,#6ee7b7);">🌙</div>
+              <div class="author-info">
+                <div class="author-name">月亮姑娘</div>
+                <div class="author-meta">
+                  <span>3小时前</span>
+                  <div class="location-tag">📍 <span>杭州 · 西湖区</span></div>
+                </div>
+              </div>
+              <div class="badge-login">仅登录可见</div>
+            </div>
+            <div class="post-content">今天收到了一束意想不到的花，有点小心动 🌷 不知道是谁送的…</div>
+            <div class="media-grid grid-1">
+              <div class="media-img-cell" style="aspect-ratio: 4/3; border-radius:12px;">💐</div>
+            </div>
+            <div class="action-row">
+              <div class="action-btn" onclick="toggleLike(this)">
+                <span class="icon">🤍</span><span class="count">89</span>
+              </div>
+              <div class="action-btn">
+                <span class="icon">💬</span><span>17</span>
+              </div>
+              <div style="flex:1"></div>
+              <div class="action-btn">⋯</div>
+            </div>
+          </div>
+
+          <!-- 卡片 4：纯文字 -->
+          <div class="moment-card">
+            <div class="author-row">
+              <div class="avatar-placeholder" style="background: linear-gradient(135deg,#fde68a,#fbbf24);">☕</div>
+              <div class="author-info">
+                <div class="author-name">咖啡星人</div>
+                <div class="author-meta">
+                  <span>昨天</span>
+                </div>
+              </div>
+              <div class="badge-public">公开</div>
+            </div>
+            <div class="post-content">找一个愿意每天早上一起喝咖啡的人，哪怕只是云喝咖啡也好 ☕ 在吗？</div>
+            <div class="action-row">
+              <div class="action-btn" onclick="toggleLike(this)">
+                <span class="icon">🤍</span><span class="count">203</span>
+              </div>
+              <div class="action-btn">
+                <span class="icon">💬</span><span>44</span>
+              </div>
+              <div style="flex:1"></div>
+              <div class="action-btn">⋯</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 发布 FAB -->
+      <div class="publish-fab" title="发布动态">✦</div>
+
+      <!-- 底部 Tab -->
+      <div class="tab-bar">
+        <div class="tab-item">
+          <div class="tab-icon">🔍</div>
+          <div class="tab-text">发现</div>
+        </div>
+        <div class="tab-item">
+          <div class="tab-icon">⚡</div>
+          <div class="tab-text">筛选</div>
+        </div>
+        <div class="tab-item active">
+          <div class="tab-icon">✦</div>
+          <div class="tab-text">圈子</div>
+        </div>
+        <div class="tab-item">
+          <div class="tab-icon">💬</div>
+          <div class="tab-text">消息</div>
+        </div>
+        <div class="tab-item">
+          <div class="tab-icon">👤</div>
+          <div class="tab-text">我的</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     屏幕 2：发布页
+════════════════════════════════════ -->
+<div class="phone-wrap">
+  <div class="screen-label">② 发布动态</div>
+  <div class="phone">
+    <div class="screen">
+      <div class="publish-page">
+        <!-- 状态栏 -->
+        <div class="status-bar" style="background:transparent;">
+          <span class="status-time">9:41</span>
+          <div class="status-icons"><span>WiFi</span><span>🔋</span></div>
+        </div>
+
+        <!-- 顶部栏 -->
+        <div class="publish-header">
+          <div class="publish-back">‹</div>
+          <div class="publish-title">发布动态</div>
+          <button class="publish-submit-btn" onclick="submitPost()">发布</button>
+        </div>
+
+        <!-- 内容区 -->
+        <div class="publish-body">
+          <!-- 文本输入 -->
+          <textarea class="text-area" placeholder="分享你的生活故事…" rows="4">今天的夕阳真的太美了，愿意一起看夕阳的人在哪里 🌇</textarea>
+
+          <!-- 媒体选择 -->
+          <div class="media-picker">
+            <div class="media-picker-label">添加图片（最多9张）</div>
+            <div class="media-picker-grid">
+              <!-- 已选 3 张 -->
+              <div class="media-picker-item has-img">
+                <div class="img-emoji">🌇</div>
+                <div class="remove-btn">✕</div>
+              </div>
+              <div class="media-picker-item has-img">
+                <div class="img-emoji">🌆</div>
+                <div class="remove-btn">✕</div>
+              </div>
+              <div class="media-picker-item has-img">
+                <div class="img-emoji">🌃</div>
+                <div class="remove-btn">✕</div>
+              </div>
+              <!-- 添加按钮 -->
+              <div class="media-picker-item" onclick="addImage()">＋</div>
+            </div>
+          </div>
+
+          <!-- 选项行：位置 -->
+          <div class="option-row">
+            <div class="option-icon">📍</div>
+            <div class="option-label">位置</div>
+            <div class="option-value">上海市浦东新区</div>
+            <div class="option-arrow">›</div>
+          </div>
+
+          <!-- 选项行：视频（互斥，图片已选时灰显）-->
+          <div class="option-row" style="opacity:0.4;">
+            <div class="option-icon">🎬</div>
+            <div class="option-label">添加视频</div>
+            <div class="option-value" style="font-size:11px;color:rgba(255,255,255,0.3)">已选图片，不可同时添加</div>
+          </div>
+
+          <!-- 可见性 -->
+          <div class="visibility-section">
+            <div class="visibility-label">谁可以看</div>
+            <div class="visibility-options">
+              <div class="visibility-option selected" onclick="selectVisibility(this)">
+                <div class="visibility-option-icon">🌏</div>
+                <div class="visibility-option-info">
+                  <div class="visibility-option-title">公开</div>
+                  <div class="visibility-option-desc">所有人（包括未登录游客）均可浏览</div>
+                </div>
+                <div class="visibility-radio selected"></div>
+              </div>
+              <div class="visibility-option" onclick="selectVisibility(this)">
+                <div class="visibility-option-icon">🔐</div>
+                <div class="visibility-option-info">
+                  <div class="visibility-option-title">仅登录可见</div>
+                  <div class="visibility-option-desc">游客看到占位卡，需登录后查看内容</div>
+                </div>
+                <div class="visibility-radio"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     屏幕 3：游客态（含登录引导）
+════════════════════════════════════ -->
+<div class="phone-wrap">
+  <div class="screen-label">③ 游客态 · 点赞触发登录引导</div>
+  <div class="phone">
+    <div class="screen">
+      <!-- 状态栏 -->
+      <div class="status-bar" style="background:transparent;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons"><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <!-- 导航栏 -->
+      <div class="nav-bar">
+        <div style="width:36px"></div>
+        <div class="nav-title">✦ 圈子</div>
+        <div class="nav-btn">👤</div>
+      </div>
+      <!-- 分类 Tab -->
+      <div class="tab-pills">
+        <div class="tab-pill active">全站广场</div>
+        <div class="tab-pill inactive">关注</div>
+        <div class="tab-pill inactive">同城</div>
+      </div>
+
+      <div class="page-bg">
+        <div class="feed-list">
+
+          <!-- 公开帖（游客可见） -->
+          <div class="moment-card">
+            <div class="author-row">
+              <div class="avatar-placeholder" style="background: linear-gradient(135deg,#f9a8d4,#fda4af);">🌸</div>
+              <div class="author-info">
+                <div class="author-name">小林同学</div>
+                <div class="author-meta"><span>2分钟前</span><div class="location-tag">📍 <span>北京</span></div></div>
+              </div>
+              <div class="badge-public">公开</div>
+            </div>
+            <div class="post-content">周末和闺蜜去爬山啦，风景超美！</div>
+            <div class="media-grid grid-3">
+              <div class="media-img-cell">🌿</div>
+              <div class="media-img-cell">⛰️</div>
+              <div class="media-img-cell">🌅</div>
+            </div>
+            <div class="action-row">
+              <!-- 游客点赞 → 触发登录弹窗 -->
+              <div class="action-btn" onclick="showLoginModal()">
+                <span class="icon">🤍</span><span>24</span>
+              </div>
+              <div class="action-btn" onclick="showLoginModal()">
+                <span class="icon">💬</span><span>8</span>
+              </div>
+              <div style="flex:1"></div>
+              <div class="action-btn">⋯</div>
+            </div>
+          </div>
+
+          <!-- 敏感帖：蒙层卡片 -->
+          <div class="masked-card" onclick="showLoginModal()">
+            <div class="author-row">
+              <div class="avatar-placeholder" style="background: linear-gradient(135deg,#bbf7d0,#6ee7b7);">🌙</div>
+              <div class="author-info">
+                <div class="author-name">月亮姑娘</div>
+                <div class="author-meta"><span>3小时前</span></div>
+              </div>
+              <div class="badge-login">仅登录可见</div>
+            </div>
+            <div class="masked-content">
+              <div class="masked-icon">🔒</div>
+              <div class="masked-text">该内容仅登录用户可见<br>登录后查看完整动态</div>
+              <button class="masked-btn" onclick="showLoginModal()">立即登录</button>
+            </div>
+          </div>
+
+          <!-- 另一个公开帖 -->
+          <div class="moment-card">
+            <div class="author-row">
+              <div class="avatar-placeholder" style="background: linear-gradient(135deg,#fde68a,#fbbf24);">☕</div>
+              <div class="author-info">
+                <div class="author-name">咖啡星人</div>
+                <div class="author-meta"><span>昨天</span></div>
+              </div>
+              <div class="badge-public">公开</div>
+            </div>
+            <div class="post-content">找一个愿意每天早上一起喝咖啡的人 ☕ 在吗？</div>
+            <div class="action-row">
+              <div class="action-btn" onclick="showLoginModal()">
+                <span class="icon">🤍</span><span>203</span>
+              </div>
+              <div class="action-btn" onclick="showLoginModal()">
+                <span class="icon">💬</span><span>44</span>
+              </div>
+              <div style="flex:1"></div>
+              <div class="action-btn">⋯</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 发布 FAB（游客也显示，点击引导登录）-->
+      <div class="publish-fab" onclick="showLoginModal()" title="登录后发布">✦</div>
+
+      <!-- 底部 Tab -->
+      <div class="tab-bar">
+        <div class="tab-item"><div class="tab-icon">🔍</div><div class="tab-text">发现</div></div>
+        <div class="tab-item"><div class="tab-icon">⚡</div><div class="tab-text">筛选</div></div>
+        <div class="tab-item active"><div class="tab-icon">✦</div><div class="tab-text">圈子</div></div>
+        <div class="tab-item"><div class="tab-icon">💬</div><div class="tab-text">消息</div></div>
+        <div class="tab-item"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+
+      <!-- 登录引导弹窗（默认隐藏） -->
+      <div class="modal-overlay" id="loginModal" style="display:none;">
+        <div class="modal-box">
+          <span class="modal-icon">💕</span>
+          <div class="modal-title">登录后解锁全部互动</div>
+          <div class="modal-desc">登录即可点赞、评论、发布动态<br>和心仪的 TA 产生连接</div>
+          <div class="modal-actions">
+            <button class="btn-primary" onclick="hideLoginModal()">立即登录</button>
+            <button class="btn-ghost" onclick="hideLoginModal()">稍后再说</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // ── 点赞切换 ──
+  function toggleLike(btn) {
+    const icon = btn.querySelector('.icon');
+    const count = btn.querySelector('.count');
+    const n = parseInt(count.textContent);
+    if (btn.classList.contains('liked')) {
+      btn.classList.remove('liked');
+      icon.textContent = '🤍';
+      count.textContent = n - 1;
+    } else {
+      btn.classList.add('liked');
+      icon.textContent = '❤️';
+      count.textContent = n + 1;
+      // 小震动效果
+      btn.style.transform = 'scale(1.3)';
+      setTimeout(() => { btn.style.transform = ''; }, 200);
+    }
+  }
+
+  // ── 评论（占位交互）──
+  function openComment() {
+    alert('评论功能：底部抽屉弹出（原型占位）');
+  }
+
+  // ── 添加图片（占位）──
+  function addImage() {
+    alert('调用 wx.chooseImage / uni.chooseImage（原型占位）');
+  }
+
+  // ── 发布（占位）──
+  function submitPost() {
+    const btn = document.querySelector('.publish-submit-btn');
+    btn.textContent = '发布中…';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '✓ 已发布';
+      btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+      setTimeout(() => {
+        btn.textContent = '发布';
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 1800);
+    }, 1000);
+  }
+
+  // ── 可见性单选 ──
+  function selectVisibility(el) {
+    document.querySelectorAll('.visibility-option').forEach(opt => {
+      opt.classList.remove('selected');
+      opt.querySelector('.visibility-radio').classList.remove('selected');
+    });
+    el.classList.add('selected');
+    el.querySelector('.visibility-radio').classList.add('selected');
+  }
+
+  // ── 登录弹窗 ──
+  function showLoginModal() {
+    document.getElementById('loginModal').style.display = 'flex';
+  }
+  function hideLoginModal() {
+    document.getElementById('loginModal').style.display = 'none';
+  }
+</script>
+</body>
+</html>

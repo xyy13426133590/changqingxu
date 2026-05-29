@@ -36,6 +36,20 @@
       }
     },
     {
+      "path": "pages/circle/index",
+      "style": {
+        "navigationBarTitleText": "圈子",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/circle/publish",
+      "style": {
+        "navigationBarTitleText": "发布动态",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/mine/index",
       "style": {
         "navigationBarTitleText": "我的",
@@ -115,11 +129,11 @@
   ],
   "subPackages": [],
   "tabBar": {
-    "custom": false,
-    "color": "#999999",
+    "custom": true,
+    "color": "#6b7280",
     "selectedColor": "#8B5CF6",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "white",
+    "backgroundColor": "#0f0f1a",
+    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/discover/index",
@@ -128,6 +142,10 @@
       {
         "pagePath": "pages/filter/index",
         "text": "筛选"
+      },
+      {
+        "pagePath": "pages/circle/index",
+        "text": "圈子"
       },
       {
         "pagePath": "pages/messages/index",
@@ -140,12 +158,12 @@
     ]
   },
   "globalStyle": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "white",
     "navigationBarTitleText": "长情许",
-    "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#F8F8F8",
+    "navigationBarBackgroundColor": "#1e1b4b",
+    "backgroundColor": "#0f0f1a",
     "app-plus": {
-      "background": "#efeff4"
+      "background": "#0f0f1a"
     }
   },
   "condition": {}

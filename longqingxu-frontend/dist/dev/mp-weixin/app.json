@@ -4,6 +4,8 @@
     "pages/filter/index",
     "pages/messages/index",
     "pages/messages/chat",
+    "pages/circle/index",
+    "pages/circle/publish",
     "pages/mine/index",
     "pages/mine/profile-edit",
     "pages/mine/my-card",
@@ -18,17 +20,17 @@
   ],
   "subPackages": [],
   "window": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "white",
     "navigationBarTitleText": "长情许",
-    "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#F8F8F8"
+    "navigationBarBackgroundColor": "#1e1b4b",
+    "backgroundColor": "#0f0f1a"
   },
   "tabBar": {
-    "custom": false,
-    "color": "#999999",
+    "custom": true,
+    "color": "#6b7280",
     "selectedColor": "#8B5CF6",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "white",
+    "backgroundColor": "#0f0f1a",
+    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/discover/index",
@@ -37,6 +39,10 @@
       {
         "pagePath": "pages/filter/index",
         "text": "筛选"
+      },
+      {
+        "pagePath": "pages/circle/index",
+        "text": "圈子"
       },
       {
         "pagePath": "pages/messages/index",

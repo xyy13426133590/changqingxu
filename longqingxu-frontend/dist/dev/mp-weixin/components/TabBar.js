@@ -14,6 +14,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const tabs = [
       { name: "discover", pagePath: "/pages/discover/index", text: "发现" },
       { name: "filter", pagePath: "/pages/filter/index", text: "筛选" },
+      { name: "circle", pagePath: "/pages/circle/index", text: "圈子" },
       { name: "messages", pagePath: "/pages/messages/index", text: "消息" },
       { name: "mine", pagePath: "/pages/mine/index", text: "我的" }
     ];

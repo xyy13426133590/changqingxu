@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import TabNavSvg from '@/components/TabNavSvg.vue'
 
-type TabName = 'discover' | 'filter' | 'messages' | 'mine'
+type TabName = 'discover' | 'filter' | 'circle' | 'messages' | 'mine'
 
 interface TabItem {
   name: TabName
@@ -33,6 +33,7 @@ const props = defineProps<{
 const tabs: TabItem[] = [
   { name: 'discover', pagePath: '/pages/discover/index', text: '发现' },
   { name: 'filter', pagePath: '/pages/filter/index', text: '筛选' },
+  { name: 'circle', pagePath: '/pages/circle/index', text: '圈子' },
   { name: 'messages', pagePath: '/pages/messages/index', text: '消息' },
   { name: 'mine', pagePath: '/pages/mine/index', text: '我的' },
 ]
@@ -49,19 +50,21 @@ function switchTab(item: TabItem) {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(15, 15, 26, 0.96);
   backdrop-filter: blur(20rpx);
-  border-top: 1rpx solid rgba(0, 0, 0, 0.05);
-  padding: 16rpx 48rpx calc(16rpx + env(safe-area-inset-bottom));
+  -webkit-backdrop-filter: blur(20rpx);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+  padding: 14rpx 0 calc(14rpx + env(safe-area-inset-bottom));
   display: flex;
   justify-content: space-around;
-  /* 高于 uni-h5 内置 tabbar，避免首帧叠层时压住自定义图标 */
   z-index: 10050;
 
   .tab-item {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 6rpx;
 
     .tab-icon-slot {
       width: 52rpx;
@@ -69,25 +72,28 @@ function switchTab(item: TabItem) {
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: filter 0.22s ease;
-      margin-bottom: 8rpx;
+      transition: filter 0.22s ease, transform 0.22s ease;
     }
 
     .tab-text {
-      font-size: 22rpx;
-      color: #A8B4C9;
+      font-size: 20rpx;
+      color: rgba(255, 255, 255, 0.35);
       letter-spacing: 0.5rpx;
+      transition: color 0.22s ease;
     }
 
     &.active {
       .tab-icon-slot {
-        /* 与未选中保持同尺寸，避免四个里有一个偏大 */
-        filter: drop-shadow(0 6rpx 14rpx rgba(139, 92, 246, 0.38));
+        filter: drop-shadow(0 4rpx 12rpx rgba(139, 92, 246, 0.5));
+        transform: scale(1.08);
       }
 
       .tab-text {
-        color: #8B5CF6;
-        font-weight: 600;
+        background: linear-gradient(135deg, #c4b5fd, #a5b4fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
       }
     }
   }

@@ -11,11 +11,11 @@ function getExt(filePath: string, fallback: string): string {
 }
 
 async function cloudUpload(
-  folder: 'avatars' | 'images' | 'voices',
+  folder: 'avatars' | 'images' | 'voices' | 'videos',
   filePath: string,
   fnName: string,
 ): Promise<{ url: string; fileName: string }> {
-  const ext = getExt(filePath, folder === 'voices' ? 'aac' : 'jpg')
+  const ext = getExt(filePath, folder === 'voices' ? 'aac' : folder === 'videos' ? 'mp4' : 'jpg')
   const cloudPath = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
   const uploadRes = await cloudUploadFile(cloudPath, filePath)
   return callCloud(fnName, { fileID: uploadRes.fileID, ext })

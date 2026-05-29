@@ -28,7 +28,7 @@ function getExt(filePath, fallback) {
 }
 function cloudUpload(folder, filePath, fnName) {
   return __async(this, null, function* () {
-    const ext = getExt(filePath, folder === "voices" ? "aac" : "jpg");
+    const ext = getExt(filePath, folder === "voices" ? "aac" : folder === "videos" ? "mp4" : "jpg");
     const cloudPath = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
     const uploadRes = yield services_cloud.cloudUploadFile(cloudPath, filePath);
     return services_cloud.callCloud(fnName, { fileID: uploadRes.fileID, ext });

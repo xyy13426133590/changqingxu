@@ -26,5 +26,21 @@
   "vip_orders": {
     ".read": false,
     ".write": false
+  },
+  "circles": {
+    ".read": true,
+    ".write": false
+  },
+  "moment_posts": {
+    ".read": false,
+    ".write": false
+  },
+  "moment_likes": {
+    ".read": false,
+    ".write": false
+  },
+  "moment_comments": {
+    ".read": false,
+    ".write": false
   }
 }

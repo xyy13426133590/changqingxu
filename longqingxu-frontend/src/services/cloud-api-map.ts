@@ -51,6 +51,18 @@ export const CLOUD_API_MAP = {
     avatar: 'upload-uploadAvatar',
     image: 'upload-uploadImage',
     voice: 'upload-uploadVoice',
+    video: 'upload-uploadVideo',
+  },
+  moments: {
+    listFeed: 'moment-listFeed',
+    createPost: 'moment-createPost',
+    deletePost: 'moment-deletePost',
+    toggleLike: 'moment-toggleLike',
+    listComments: 'moment-listComments',
+    createComment: 'moment-createComment',
+  },
+  circles: {
+    list: 'circle-list',
   },
 } as const
 
