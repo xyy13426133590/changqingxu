@@ -8,18 +8,48 @@ type ApiEnvelope<T> = {
 
 const ACCESS_TOKEN_KEY = 'accessToken'
 const REFRESH_TOKEN_KEY = 'refreshToken'
+const LEGACY_TOKEN_KEY = 'token'
+const PINIA_USER_STORE_KEY = 'user-store'
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 export const WS_BASE_URL = (import.meta.env.VITE_WS_BASE_URL || '').replace(/\/$/, '')
 
+function readPiniaPersistedToken(): string {
+  try {
+    const raw = uni.getStorageSync(PINIA_USER_STORE_KEY)
+    if (!raw) return ''
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+    const t = parsed?.token
+    return typeof t === 'string' ? t : ''
+  } catch {
+    return ''
+  }
+}
+
+/** 从 accessToken / token / Pinia 持久化中解析登录 token */
+export function resolveAccessToken(): string {
+  return (
+    (uni.getStorageSync(ACCESS_TOKEN_KEY) as string) ||
+    (uni.getStorageSync(LEGACY_TOKEN_KEY) as string) ||
+    readPiniaPersistedToken() ||
+    ''
+  )
+}
+
 export function setToken(accessToken: string, refreshToken?: string): void {
   uni.setStorageSync(ACCESS_TOKEN_KEY, accessToken)
+  uni.setStorageSync(LEGACY_TOKEN_KEY, accessToken)
   if (refreshToken) {
     uni.setStorageSync(REFRESH_TOKEN_KEY, refreshToken)
   }
 }
 
 export function getToken(): string {
-  return uni.getStorageSync(ACCESS_TOKEN_KEY) || ''
+  const token = resolveAccessToken()
+  // 从旧 key 或 Pinia 读到 token 时，同步到 accessToken，供后续请求使用
+  if (token && !(uni.getStorageSync(ACCESS_TOKEN_KEY) as string)) {
+    uni.setStorageSync(ACCESS_TOKEN_KEY, token)
+  }
+  return token
 }
 
 export function getRefreshToken(): string {
@@ -29,6 +59,7 @@ export function getRefreshToken(): string {
 export function clearToken(): void {
   uni.removeStorageSync(ACCESS_TOKEN_KEY)
   uni.removeStorageSync(REFRESH_TOKEN_KEY)
+  uni.removeStorageSync(LEGACY_TOKEN_KEY)
 }
 
 function buildUrl(path: string): string {

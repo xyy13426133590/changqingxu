@@ -18,7 +18,7 @@ exports.main = wrapHandler(async (event) => {
 
   const { token, ...filterUpdates } = event
   const filterSettings = { ...(user.filterSettings || {}), ...filterUpdates }
-  await db.collection('users').doc(userId).update({
+  await db.collection('dev_users').doc(userId).update({
     data: { filterSettings, updatedAt: new Date() },
   })
 

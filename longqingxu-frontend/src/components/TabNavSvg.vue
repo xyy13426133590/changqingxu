@@ -154,7 +154,7 @@ const props = defineProps<{
 }>()
 
 const TAB_ICON_ACTIVE = '#A78BFA'
-const TAB_ICON_INACTIVE = 'rgba(255,255,255,0.3)'
+const TAB_ICON_INACTIVE = '#c4b5fd'
 
 const iconPx = 26
 
@@ -207,8 +207,8 @@ function u(id: string) {
   }
 
   &.inactive {
-    opacity: 0.6;
-    filter: saturate(0.5) brightness(0.7);
+    opacity: 0.92;
+    filter: saturate(0.85) brightness(1);
   }
 }
 </style>

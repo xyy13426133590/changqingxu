@@ -107,7 +107,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }),
         e: ageMaxDisplay.value,
-        f: common_vendor.o(onAgeChange, "c2"),
+        f: common_vendor.o(onAgeChange, "4f"),
         g: common_vendor.t(ageMaxDisplay.value),
         h: common_vendor.f(distanceOptions, (opt, k0, i0) => {
           return {
@@ -133,7 +133,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => setIncome(opt), opt)
           };
         }),
-        k: common_vendor.o(applyFilters, "82"),
+        k: common_vendor.o(applyFilters, "83"),
         l: common_vendor.p({
           active: "filter"
         })

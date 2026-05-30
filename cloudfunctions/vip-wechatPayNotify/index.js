@@ -26,14 +26,14 @@ exports.main = async (event) => {
       return { code: 'FAIL', message: '无商户单号' }
     }
 
-    const res = await db.collection('vip_orders').where({ outTradeNo: outNo }).limit(1).get()
+    const res = await db.collection('dev_vip_orders').where({ outTradeNo: outNo }).limit(1).get()
     const order = res.data[0]
     if (!order) {
       console.warn(`通知订单未找到: ${outNo}`)
       return { code: 'SUCCESS', message: '成功' }
     }
 
-    const planRes = await db.collection('vip_plans').doc(order.planId).get()
+    const planRes = await db.collection('dev_vip_plans').doc(order.planId).get()
     await finalizeOrderPaid(order, planRes.data, txId || null)
     return { code: 'SUCCESS', message: '成功' }
   } catch (e) {

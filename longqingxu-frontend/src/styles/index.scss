@@ -42,19 +42,19 @@ cover-image {
   min-height: 100vh;
 }
 
-/* 玻璃拟态效果 - 深色背景版 */
+/* 模块卡片：实色表面 + 轻模糊（方案 B 层次台阶） */
 .glass {
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  background: $surface-card;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1rpx solid $border-color;
 }
 
 .glass-dark {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  border: 1rpx solid rgba(255, 200, 220, 0.08);
 }
 
 /* 文字工具类 */
@@ -96,7 +96,8 @@ cover-image {
 
 .btn-secondary {
   @extend .btn;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 200, 220, 0.12);
+  border: 1rpx solid rgba(255, 200, 220, 0.2);
   color: $text-primary;
 }
 
@@ -144,44 +145,44 @@ cover-image {
 
 .tag-yellow {
   @extend .tag;
-  background: rgba(251, 191, 36, 0.2);
-  color: #B45309;
+  background: rgba(251, 191, 36, 0.18);
+  color: #fcd34d;
 }
 
 .tag-blue {
   @extend .tag;
-  background: rgba(147, 197, 253, 0.3);
-  color: #1D4ED8;
+  background: rgba(147, 197, 253, 0.15);
+  color: #93c5fd;
 }
 
 .tag-purple {
   @extend .tag;
-  background: rgba(167, 139, 250, 0.2);
-  color: #6D28D9;
+  background: rgba(216, 180, 254, 0.15);
+  color: #d8b4fe;
 }
 
 .tag-green {
   @extend .tag;
-  background: rgba(110, 231, 183, 0.2);
-  color: #047857;
+  background: rgba(110, 231, 183, 0.15);
+  color: #6ee7b7;
 }
 
 .tag-orange {
   @extend .tag;
-  background: rgba(253, 186, 116, 0.3);
-  color: #C2410C;
+  background: rgba(253, 186, 116, 0.18);
+  color: #fdba74;
 }
 
 .tag-amber {
   @extend .tag;
-  background: rgba(252, 211, 77, 0.25);
-  color: #92400E;
+  background: rgba(252, 211, 77, 0.18);
+  color: #fde68a;
 }
 
 .tag-purple-light {
   @extend .tag;
-  background: rgba(233, 213, 255, 0.4);
-  color: #7C3AED;
+  background: rgba(249, 168, 212, 0.15);
+  color: #f9a8d4;
 }
 
 /* 标签行：占满宽度并允许子项在窄屏下换行 */
@@ -227,11 +228,11 @@ cover-image {
 @keyframes breathe-scale {
   0%, 100% { 
     transform: scale(1); 
-    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.25); 
+    box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.2); 
   }
   50% { 
     transform: scale(1.03); 
-    box-shadow: 0 0 20rpx 4rpx rgba(236, 72, 153, 0.15); 
+    box-shadow: 0 0 20rpx 4rpx rgba(244, 114, 182, 0.22); 
   }
 }
 
@@ -282,15 +283,15 @@ cover-image {
     margin-left: -72rpx;
     margin-top: -72rpx;
     border-radius: 50%;
-    border: 2rpx solid rgba(255, 255, 255, 0.55);
-    box-shadow: 0 0 0 1rpx rgba(167, 139, 250, 0.4), 0 0 18rpx rgba(236, 72, 153, 0.15);
+    border: 2rpx solid rgba(249, 168, 212, 0.5);
+    box-shadow: 0 0 0 1rpx rgba(244, 114, 182, 0.3), 0 0 18rpx rgba(244, 114, 182, 0.18);
     pointer-events: none;
     animation: ripple 2.8s ease-out infinite;
   }
   
   &::after {
     animation-delay: 1.4s;
-    border-color: rgba(196, 181, 253, 0.45);
+    border-color: rgba(216, 180, 254, 0.45);
   }
   
   .avatar-img {
@@ -300,7 +301,7 @@ cover-image {
     height: 144rpx;
     border-radius: 50%;
     border: 4rpx solid #fff;
-    box-shadow: 0 4rpx 20rpx rgba(139, 92, 246, 0.2);
+    box-shadow: 0 4rpx 20rpx rgba(244, 114, 182, 0.18);
     animation: avatar-breathe 3.2s ease-in-out infinite;
   }
   
@@ -341,7 +342,8 @@ cover-image {
 }
 
 .chat-bubble-other {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 200, 220, 0.1);
+  border: 1rpx solid rgba(255, 200, 220, 0.18);
   color: $text-primary;
   border-radius: 24rpx 24rpx 24rpx 8rpx;
   padding: 16rpx 24rpx;
@@ -378,10 +380,10 @@ cover-image {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(30, 27, 75, 0.97);
+  background: $surface-overlay;
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
-  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  border: 1rpx solid rgba(255, 200, 220, 0.12);
   border-radius: 32rpx 32rpx 0 0;
   padding: 32rpx;
   padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
@@ -392,7 +394,7 @@ cover-image {
     display: block;
     width: 72rpx;
     height: 6rpx;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(249, 168, 212, 0.3);
     border-radius: 3rpx;
     margin: 0 auto 32rpx;
   }
@@ -413,10 +415,11 @@ cover-image {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(15, 15, 26, 0.96);
+  background: $surface-tabbar;
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
-  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-top: 1rpx solid $border-color;
+  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.25);
   padding: 14rpx 0 calc(14rpx + env(safe-area-inset-bottom));
   display: flex;
   justify-content: space-around;
@@ -436,7 +439,7 @@ cover-image {
     
     .tab-text {
       font-size: 20rpx;
-      color: rgba(255, 255, 255, 0.35);
+      color: $text-tab-inactive;
     }
     
     &.active {
@@ -447,7 +450,7 @@ cover-image {
     }
     
     &:not(.active) {
-      color: $text-tertiary;
+      color: $text-tab-inactive;
     }
   }
 }
@@ -518,9 +521,9 @@ cover-image {
   .back-btn {
     width: 72rpx;
     height: 72rpx;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 200, 220, 0.1);
     backdrop-filter: blur(10rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    border: 1rpx solid rgba(255, 200, 220, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -528,7 +531,7 @@ cover-image {
 
     text {
       font-size: 40rpx;
-      color: #4B5563;
+      color: rgba(255, 220, 240, 0.7);
       font-weight: 300;
     }
   }
@@ -538,7 +541,7 @@ cover-image {
     text-align: center;
     font-size: 34rpx;
     font-weight: 600;
-    color: #1F2937;
+    color: #f0e8ff;
     margin-right: 72rpx;
   }
 }
@@ -562,7 +565,7 @@ cover-image {
 .filter-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #1F2937;
+  color: #f0e8ff;
   margin-bottom: 24rpx;
   display: flex;
   align-items: center;
@@ -592,7 +595,8 @@ cover-image {
 /* 选项按钮 */
 .filter-option {
   padding: 24rpx;
-  background: rgba(255, 255, 255, 0.5);
+  background: $surface-input;
+  border: 1rpx solid $border-subtle;
   border-radius: 20rpx;
   display: flex;
   flex-direction: column;
@@ -603,7 +607,7 @@ cover-image {
   .option-title {
     font-size: 28rpx;
     font-weight: 500;
-    color: #4B5563;
+    color: rgba(255, 220, 240, 0.85);
   }
 
   .option-title + .option-desc {
@@ -612,7 +616,7 @@ cover-image {
 
   .option-desc {
     font-size: 22rpx;
-    color: #9CA3AF;
+    color: $text-tertiary;
     text-align: center;
     line-height: 1.4;
   }
@@ -631,12 +635,12 @@ cover-image {
 .filter-hint {
   margin-top: 20rpx;
   padding: 16rpx 20rpx;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 200, 220, 0.06);
   border-radius: 12rpx;
 
   text {
     font-size: 22rpx;
-    color: #9CA3AF;
+    color: $text-tertiary;
     line-height: 1.5;
   }
 }
@@ -650,7 +654,7 @@ cover-image {
 
   text {
     font-size: 26rpx;
-    color: #6B7280;
+    color: $text-secondary;
 
     &.current {
       font-size: 30rpx;
@@ -672,11 +676,12 @@ cover-image {
 .filter-btn {
   flex: 1;
   padding: 20rpx 0;
-  background: rgba(255, 255, 255, 0.5);
+  background: $surface-input;
+  border: 1rpx solid $border-subtle;
   border-radius: 16rpx;
   text-align: center;
   font-size: 28rpx;
-  color: #4B5563;
+  color: rgba(255, 220, 240, 0.85);
   transition: all 0.2s ease;
 
   &.active {
@@ -698,10 +703,11 @@ cover-image {
 
 .filter-tag {
   padding: 16rpx 28rpx;
-  background: rgba(255, 255, 255, 0.5);
+  background: $surface-input;
+  border: 1rpx solid $border-subtle;
   border-radius: 9999rpx;
   font-size: 26rpx;
-  color: #4B5563;
+  color: rgba(255, 220, 240, 0.85);
   transition: all 0.2s ease;
 
   &.active {
@@ -723,7 +729,7 @@ cover-image {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 32rpx rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8rpx 32rpx rgba(244, 114, 182, 0.35);
 
   text {
     font-size: 32rpx;
@@ -746,9 +752,9 @@ cover-image {
   .back-btn {
     width: 72rpx;
     height: 72rpx;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 200, 220, 0.1);
     backdrop-filter: blur(10rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    border: 1rpx solid rgba(255, 200, 220, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -756,7 +762,7 @@ cover-image {
 
     text {
       font-size: 40rpx;
-      color: #4B5563;
+      color: rgba(255, 220, 240, 0.7);
       font-weight: 300;
     }
   }
@@ -766,7 +772,7 @@ cover-image {
     text-align: center;
     font-size: 34rpx;
     font-weight: 600;
-    color: #1F2937;
+    color: #f0e8ff;
     margin-right: 72rpx;
   }
 }
@@ -779,15 +785,15 @@ cover-image {
   padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
-.conversation-item {
+  .conversation-item {
   display: flex;
   align-items: center;
   padding: 24rpx 0;
-  border-bottom: 1rpx solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1rpx solid rgba(255, 200, 220, 0.1);
   position: relative;
 
   &.top {
-    background: rgba(139, 92, 246, 0.05);
+    background: rgba(244, 114, 182, 0.06);
   }
 
   .avatar-wrap {
@@ -833,24 +839,24 @@ cover-image {
       align-items: center;
 
       .nickname {
-        font-size: 30rpx;
-        font-weight: 600;
-        color: #1F2937;
-        max-width: 70%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+          font-size: 30rpx;
+          font-weight: 600;
+          color: #f0e8ff;
+          max-width: 70%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .time {
+          font-size: 24rpx;
+          color: $text-tertiary;
+        }
       }
 
-      .time {
-        font-size: 24rpx;
-        color: #9CA3AF;
-      }
-    }
-
-    .last-message {
-      font-size: 26rpx;
-      color: #6B7280;
+      .last-message {
+        font-size: 26rpx;
+        color: $text-secondary;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -882,9 +888,9 @@ cover-image {
   .back-btn {
     width: 72rpx;
     height: 72rpx;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 200, 220, 0.1);
     backdrop-filter: blur(10rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    border: 1rpx solid rgba(255, 200, 220, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -894,7 +900,7 @@ cover-image {
 
     text {
       font-size: 40rpx;
-      color: #4B5563;
+      color: rgba(255, 220, 240, 0.7);
       font-weight: 300;
       pointer-events: none;
     }
@@ -917,7 +923,7 @@ cover-image {
     .nickname {
       font-size: 32rpx;
       font-weight: 600;
-      color: #1F2937;
+      color: #f0e8ff;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -925,7 +931,7 @@ cover-image {
 
     .safety-tip {
       font-size: 22rpx;
-      color: #9CA3AF;
+      color: $text-tertiary;
     }
   }
 }
@@ -1001,9 +1007,10 @@ cover-image {
     }
 
     &.other {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 200, 220, 0.1);
+      border: 1rpx solid rgba(255, 200, 220, 0.18);
       border-radius: 24rpx 24rpx 24rpx 8rpx;
-      color: #1F2937;
+      color: #f0e8ff;
     }
 
     text {
@@ -1029,10 +1036,10 @@ cover-image {
   left: 0;
   right: 0;
   padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
-  background: rgba(20, 18, 50, 0.96);
+  background: $surface-overlay;
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
-  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-top: 1rpx solid rgba(255, 200, 220, 0.1);
   border-radius: 32rpx 32rpx 0 0;
   display: flex;
   align-items: flex-end;
@@ -1044,8 +1051,8 @@ cover-image {
     max-height: 160rpx;
     min-height: 80rpx;
     padding: 20rpx 28rpx;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1rpx solid rgba(139, 92, 246, 0.3);
+    background: rgba(255, 200, 220, 0.08);
+    border: 1rpx solid rgba(244, 114, 182, 0.28);
     border-radius: 24rpx;
     font-size: 28rpx;
     color: #e2e8f0;
@@ -1064,7 +1071,7 @@ cover-image {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4rpx 16rpx rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4rpx 16rpx rgba(244, 114, 182, 0.4);
 
     text {
       font-size: 32rpx;
@@ -1114,8 +1121,8 @@ cover-image {
         margin-left: -32rpx;
         margin-top: -32rpx;
         border-radius: 50%;
-        border: 2rpx solid rgba(255, 255, 255, 0.55);
-        box-shadow: 0 0 0 1rpx rgba(167, 139, 250, 0.4);
+        border: 2rpx solid rgba(249, 168, 212, 0.5);
+        box-shadow: 0 0 0 1rpx rgba(244, 114, 182, 0.3);
         pointer-events: none;
         animation: ripple 2.8s ease-out infinite;
       }
@@ -1133,7 +1140,7 @@ cover-image {
     .logo-text {
       font-size: 36rpx;
       font-weight: 700;
-      color: #1F2937;
+      color: #f0e8ff;
     }
   }
 
@@ -1153,7 +1160,7 @@ cover-image {
 
       text {
         font-size: 24rpx;
-        color: #4B5563;
+        color: rgba(255, 220, 240, 0.7);
       }
 
       .header-icon {
@@ -1209,18 +1216,18 @@ cover-image {
       .title-text {
         font-size: 28rpx;
         font-weight: 600;
-        color: #1F2937;
+        color: #f0e8ff;
       }
     }
 
     .daily-badge {
       padding: 8rpx 16rpx;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 200, 220, 0.12);
       border-radius: 20rpx;
 
       .badge-text {
         font-size: 22rpx;
-        color: #6B7280;
+        color: $text-secondary;
       }
     }
   }
@@ -1247,12 +1254,12 @@ cover-image {
         width: 96rpx;
         height: 96rpx;
         border-radius: 50%;
-        border: 4rpx solid rgba(139, 92, 246, 0.2);
+        border: 4rpx solid rgba(244, 114, 182, 0.25);
       }
 
       .daily-name {
         font-size: 22rpx;
-        color: #4B5563;
+        color: rgba(255, 220, 240, 0.72);
         max-width: 96rpx;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1466,7 +1473,7 @@ cover-image {
       .indicator {
         flex: 1;
         height: 4rpx;
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 200, 220, 0.35);
         border-radius: 2rpx;
 
         &.active {
@@ -1618,7 +1625,7 @@ cover-image {
         .nickname {
           font-size: 38rpx;
           font-weight: 700;
-          color: #1F2937;
+          color: #fff;
           line-height: 1.15;
           min-width: 0;
           white-space: normal;
@@ -1643,12 +1650,12 @@ cover-image {
       .match-badge-compact {
         flex-shrink: 0;
         align-self: center;
-        background: linear-gradient(135deg, #8B5CF6, #EC4899);
+        background: linear-gradient(135deg, #c084fc, #f472b6);
         padding: 10rpx 16rpx;
         border-radius: 20rpx;
         text-align: center;
         min-width: 156rpx;
-        box-shadow: 0 6rpx 20rpx rgba(139, 92, 246, 0.32);
+        box-shadow: 0 6rpx 20rpx rgba(244, 114, 182, 0.32);
 
         .match-line1 {
           display: block;
@@ -1678,7 +1685,7 @@ cover-image {
 
     .user-meta {
       font-size: 25rpx;
-      color: #6B7280;
+      color: $text-secondary;
       margin-bottom: 14rpx;
     }
 
@@ -1704,7 +1711,7 @@ cover-image {
 
     .bio-text {
       font-size: 25rpx;
-      color: #4B5563;
+      color: $text-secondary;
       line-height: 1.55;
       margin-bottom: 12rpx;
     }
@@ -1714,7 +1721,7 @@ cover-image {
       align-items: center;
       gap: 8rpx;
       font-size: 22rpx;
-      color: #9CA3AF;
+      color: $text-tertiary;
       margin-top: auto;
 
       .icon-hint {
@@ -1766,14 +1773,14 @@ cover-image {
     &.dislike {
       width: 112rpx;
       height: 112rpx;
-      background: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 200, 220, 0.12);
       backdrop-filter: blur(10rpx);
       border-radius: 50%;
-      box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
 
       .btn-icon {
         font-size: 48rpx;
-        color: #9CA3AF;
+        color: rgba(255, 200, 220, 0.6);
       }
     }
 
@@ -1781,9 +1788,9 @@ cover-image {
       flex: 1;
       max-width: 280rpx;
       height: 112rpx;
-      background: linear-gradient(135deg, #8B5CF6, #EC4899);
+      background: linear-gradient(135deg, #c084fc, #f472b6);
       border-radius: 56rpx;
-      box-shadow: 0 8rpx 32rpx rgba(139, 92, 246, 0.4);
+      box-shadow: 0 8rpx 32rpx rgba(244, 114, 182, 0.4);
 
       .btn-icon {
         font-size: 40rpx;
@@ -1801,10 +1808,10 @@ cover-image {
     &.like {
       width: 112rpx;
       height: 112rpx;
-      background: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 200, 220, 0.12);
       backdrop-filter: blur(10rpx);
       border-radius: 50%;
-      box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
 
       .btn-icon {
         font-size: 48rpx;
@@ -1853,7 +1860,7 @@ cover-image {
     width: 100%;
     font-size: 34rpx;
     font-weight: 700;
-    color: #1f2937;
+    color: #fff;
     line-height: 1.35;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1872,13 +1879,13 @@ cover-image {
   .mine-complete-label {
     font-size: 26rpx;
     font-weight: 500;
-    color: #6d28d9;
+    color: $secondary-light;
   }
 
   .mine-complete-num {
     font-size: 32rpx;
     font-weight: 700;
-    color: #7c3aed;
+    color: $primary-light;
     letter-spacing: 0.5rpx;
   }
 
@@ -1895,7 +1902,7 @@ cover-image {
   .mine-complete-fill {
     height: 100%;
     border-radius: 999rpx;
-    background: linear-gradient(90deg, #a78bfa, #7c3aed);
+    background: linear-gradient(90deg, $secondary-light, $primary);
     min-width: 0;
     transition: width 0.35s ease;
   }
@@ -1904,7 +1911,7 @@ cover-image {
     margin-top: 4rpx;
     font-size: 24rpx;
     font-weight: 500;
-    color: #57534e;
+    color: $text-secondary;
     line-height: 1.5;
     display: block;
   }
@@ -1924,10 +1931,8 @@ cover-image {
     padding: 32rpx;
     border-radius: 24rpx;
     margin-bottom: 24rpx;
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(20rpx);
-    -webkit-backdrop-filter: blur(20rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    background: $surface-card;
+    border: 1rpx solid $border-color;
     box-sizing: border-box;
 
     .menu-left {
@@ -1975,7 +1980,7 @@ cover-image {
         display: block;
         font-size: 30rpx;
         font-weight: 500;
-        color: #1F2937;
+        color: #f0e8ff;
         line-height: 1.3;
       }
     }
@@ -2001,30 +2006,30 @@ cover-image {
 
       /* 未完成：三字「未认证」 */
       &.pending {
-        background: rgba(249, 115, 22, 0.18);
-        color: #c2410c;
-        border: 1rpx solid rgba(249, 115, 22, 0.35);
+        background: $badge-pending-bg;
+        color: $badge-pending-text;
+        border: 1rpx solid $badge-pending-border;
       }
 
       /* 已完成：三字「已认证」 */
       &.done {
-        background: rgba(34, 197, 94, 0.15);
-        color: #15803d;
-        border: 1rpx solid rgba(34, 197, 94, 0.28);
+        background: $badge-done-bg;
+        color: $badge-done-text;
+        border: 1rpx solid $badge-done-border;
       }
 
       /* 兼容旧 class */
       &.on {
-        background: rgba(34, 197, 94, 0.15);
-        color: #15803d;
-        border: 1rpx solid rgba(34, 197, 94, 0.28);
+        background: $badge-done-bg;
+        color: $badge-done-text;
+        border: 1rpx solid $badge-done-border;
       }
     }
 
     .menu-arrow {
       display: block;
       font-size: 28rpx;
-      color: #9CA3AF;
+      color: $text-tertiary;
       line-height: 1;
       flex-shrink: 0;
       pointer-events: none;
@@ -2104,13 +2109,13 @@ cover-image {
 .user-detail-name {
   font-size: 38rpx;
   font-weight: 700;
-  color: #1f2937;
+  color: #fff;
   line-height: 1.2;
 }
 
 .user-detail-gender {
   font-size: 30rpx;
-  color: #6b7280;
+  color: $text-secondary;
 }
 
 .user-detail-badges {
@@ -2129,21 +2134,21 @@ cover-image {
   line-height: 1.3;
 
   &.real {
-    background: rgba(59, 130, 246, 0.18);
-    color: #1d4ed8;
-    border: 1rpx solid rgba(59, 130, 246, 0.3);
+    background: rgba(59, 130, 246, 0.28);
+    color: #93c5fd;
+    border: 1rpx solid rgba(59, 130, 246, 0.45);
   }
 
   &.face {
-    background: rgba(16, 185, 129, 0.18);
-    color: #047857;
-    border: 1rpx solid rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.28);
+    color: #6ee7b7;
+    border: 1rpx solid rgba(16, 185, 129, 0.45);
   }
 
   &.vip {
-    background: linear-gradient(135deg, rgba(252, 211, 77, 0.35), rgba(249, 115, 22, 0.28));
-    color: #9a3412;
-    border: 1rpx solid rgba(249, 115, 22, 0.4);
+    background: linear-gradient(135deg, rgba(252, 211, 77, 0.35), rgba(249, 115, 22, 0.32));
+    color: #fde68a;
+    border: 1rpx solid rgba(249, 115, 22, 0.45);
   }
 }
 
@@ -2151,7 +2156,7 @@ cover-image {
   display: block;
   margin-top: 16rpx;
   font-size: 26rpx;
-  color: #6b7280;
+  color: $text-secondary;
   line-height: 1.45;
 }
 
@@ -2159,14 +2164,14 @@ cover-image {
   display: block;
   font-size: 28rpx;
   font-weight: 700;
-  color: #1f2937;
+  color: #f0e8ff;
   margin-bottom: 14rpx;
 }
 
 .user-detail-meta-line {
   display: block;
   font-size: 26rpx;
-  color: #374151;
+  color: rgba(255, 220, 240, 0.8);
   line-height: 1.5;
 }
 
@@ -2174,7 +2179,7 @@ cover-image {
   display: block;
   margin-top: 12rpx;
   font-size: 22rpx;
-  color: #9ca3af;
+  color: $text-tertiary;
   line-height: 1.45;
 }
 
@@ -2198,7 +2203,7 @@ cover-image {
     width: 112rpx;
     flex-shrink: 0;
     font-size: 24rpx;
-    color: #9ca3af;
+    color: $text-tertiary;
     line-height: 1.4;
   }
 
@@ -2206,7 +2211,7 @@ cover-image {
     flex: 1;
     min-width: 0;
     font-size: 26rpx;
-    color: #1f2937;
+    color: #f0e8ff;
     font-weight: 500;
     line-height: 1.4;
   }
@@ -2234,7 +2239,7 @@ cover-image {
 .user-detail-match-line {
   display: block;
   font-size: 26rpx;
-  color: #4b5563;
+  color: rgba(255, 220, 240, 0.7);
   margin-bottom: 16rpx;
 }
 
@@ -2262,20 +2267,20 @@ cover-image {
 .user-detail-score-num {
   font-size: 24rpx;
   font-weight: 700;
-  color: #7c3aed;
+  color: #f9a8d4;
   flex-shrink: 0;
 }
 
 .user-detail-bio {
   display: block;
   font-size: 28rpx;
-  color: #374151;
+  color: rgba(255, 220, 240, 0.8);
   line-height: 1.55;
 }
 
 .user-detail-muted-text {
   font-size: 26rpx;
-  color: #9ca3af;
+  color: $text-secondary;
 }
 
 .user-detail-hobby-tags {
@@ -2289,9 +2294,9 @@ cover-image {
   font-size: 24rpx;
   padding: 10rpx 22rpx;
   border-radius: 999rpx;
-  background: rgba(139, 92, 246, 0.12);
-  color: #6d28d9;
-  border: 1rpx solid rgba(139, 92, 246, 0.25);
+  background: rgba(255, 200, 220, 0.1);
+  color: $secondary-light;
+  border: 1rpx solid rgba(244, 114, 182, 0.25);
 }
 
 /* 编辑资料页 */
@@ -2304,9 +2309,9 @@ cover-image {
   .back-btn {
     width: 72rpx;
     height: 72rpx;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 200, 220, 0.1);
     backdrop-filter: blur(10rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    border: 1rpx solid rgba(255, 200, 220, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2314,7 +2319,7 @@ cover-image {
 
     text {
       font-size: 40rpx;
-      color: #4B5563;
+      color: rgba(255, 220, 240, 0.7);
       font-weight: 300;
     }
   }
@@ -2324,7 +2329,7 @@ cover-image {
     text-align: center;
     font-size: 34rpx;
     font-weight: 600;
-    color: #1F2937;
+    color: #f0e8ff;
     margin-right: 72rpx;
   }
 }
@@ -2366,7 +2371,7 @@ cover-image {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4rpx 16rpx rgba(139, 92, 246, 0.4);
+      box-shadow: 0 4rpx 16rpx rgba(244, 114, 182, 0.35);
 
       text {
         font-size: 28rpx;
@@ -2386,27 +2391,17 @@ cover-image {
   margin-bottom: 24rpx;
 
   &.profile-form-card {
-    /* 与 gradient-bg 同系色相，低不透明度 + 模糊，视觉上与外层几乎一体 */
-    background: linear-gradient(
-      158deg,
-      rgba(255, 255, 255, 0.22) 0%,
-      rgba(196, 181, 253, 0.36) 38%,
-      rgba(165, 180, 252, 0.32) 68%,
-      rgba(147, 197, 253, 0.3) 100%
-    );
-    border: 1rpx solid rgba(255, 255, 255, 0.55);
-    box-shadow:
-      0 8rpx 36rpx rgba(99, 102, 241, 0.07),
-      inset 0 1rpx 0 rgba(255, 255, 255, 0.42);
-    backdrop-filter: saturate(1.25) blur(22px);
-    -webkit-backdrop-filter: saturate(1.25) blur(22px);
+    background: $surface-card;
+    border: 1rpx solid $glass-border;
+    box-shadow: $shadow-sm;
     overflow: hidden;
 
     .form-input,
     .form-select,
     .form-textarea {
-      background: rgba(255, 255, 255, 0.52);
-      border: 1rpx solid rgba(255, 255, 255, 0.62);
+      background: $surface-input;
+      border: 1rpx solid $border-color;
+      color: $text-primary;
     }
 
     .hint-box {
@@ -2415,24 +2410,24 @@ cover-image {
     }
 
     .hobby-tags .hobby-tag {
-      background: rgba(255, 255, 255, 0.4);
-      border-color: rgba(255, 255, 255, 0.55);
-      color: #4b5563;
+      background: rgba(255, 200, 220, 0.1);
+      border-color: rgba(255, 200, 220, 0.2);
+      color: rgba(255, 220, 240, 0.8);
 
       &.active {
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.92), rgba(236, 72, 153, 0.88));
-        border-color: rgba(255, 255, 255, 0.35);
+        background: linear-gradient(135deg, rgba(192, 132, 252, 0.92), rgba(244, 114, 182, 0.88));
+        border-color: rgba(255, 200, 220, 0.35);
         color: #fff;
       }
     }
 
     .auto-info-grid .auto-info-item {
-      background: rgba(255, 255, 255, 0.34);
-      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 200, 220, 0.08);
+      border-color: rgba(255, 200, 220, 0.18);
 
       .auto-info-icon-slot {
-        background: rgba(255, 255, 255, 0.38);
-        border-color: rgba(139, 92, 246, 0.3);
+        background: rgba(255, 200, 220, 0.1);
+        border-color: rgba(244, 114, 182, 0.28);
       }
     }
   }
@@ -2440,7 +2435,7 @@ cover-image {
   .section-title {
     font-size: 30rpx;
     font-weight: 600;
-    color: #1f2937;
+    color: #f0e8ff;
     margin-bottom: 0;
     display: flex;
     align-items: center;
@@ -2464,15 +2459,15 @@ cover-image {
     width: 100%;
     height: 88rpx;
     padding: 0 28rpx;
-    background: #f3f4f6;
+    background: $surface-input;
     border-radius: 16rpx;
     font-size: 28rpx;
-    color: #1f2937;
-    border: 1rpx solid #e5e7eb;
+    color: $text-primary;
+    border: 1rpx solid $border-color;
     box-sizing: border-box;
 
     &::placeholder {
-      color: #9ca3af;
+      color: $text-disabled;
     }
   }
 
@@ -2481,11 +2476,11 @@ cover-image {
     min-height: 88rpx;
     height: auto;
     padding: 0 28rpx;
-    background: #f3f4f6;
+    background: $surface-input;
     border-radius: 16rpx;
     font-size: 28rpx;
-    color: #1f2937;
-    border: 1rpx solid #e5e7eb;
+    color: $text-primary;
+    border: 1rpx solid $border-color;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -2507,23 +2502,23 @@ cover-image {
     width: 100%;
     min-height: 160rpx;
     padding: 24rpx 28rpx;
-    background: #f3f4f6;
+    background: $surface-input;
     border-radius: 16rpx;
     font-size: 28rpx;
-    color: #1f2937;
-    border: 1rpx solid #e5e7eb;
+    color: $text-primary;
+    border: 1rpx solid $border-color;
     box-sizing: border-box;
     resize: none;
 
     &::placeholder {
-      color: #9ca3af;
+      color: $text-disabled;
     }
   }
 
   .char-count {
     text-align: right;
     font-size: 24rpx;
-    color: #9ca3af;
+    color: $text-tertiary;
     margin-top: 0;
   }
 }
@@ -2543,8 +2538,8 @@ cover-image {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #f9fafb;
-    border: 1rpx solid #e5e7eb;
+    background: $surface-input;
+    border: 1rpx solid $border-color;
     border-radius: 16rpx;
     padding: 20rpx 8rpx 24rpx;
     text-align: center;
@@ -2557,8 +2552,8 @@ cover-image {
       height: 80rpx;
       margin-bottom: 12rpx;
       border-radius: 18rpx;
-      background: rgba(139, 92, 246, 0.1);
-      border: 1rpx solid rgba(139, 92, 246, 0.22);
+      background: rgba(244, 114, 182, 0.1);
+      border: 1rpx solid rgba(244, 114, 182, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2575,13 +2570,13 @@ cover-image {
     /* 星座符号略调字号，与 emoji 视觉重量接近 */
     .auto-info-icon-symbol {
       font-size: 44rpx;
-      color: #8b5cf6;
+      color: #c084fc;
     }
 
     .info-value {
       font-size: 26rpx;
       font-weight: 700;
-      color: #8b5cf6;
+      color: #d8b4fe;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2599,7 +2594,7 @@ cover-image {
 
     .info-label {
       font-size: 22rpx;
-      color: #6b7280;
+      color: $text-tertiary;
       line-height: 1.3;
     }
   }
@@ -2628,13 +2623,13 @@ cover-image {
     padding: 16rpx 28rpx;
     border-radius: 9999rpx;
     font-size: 26rpx;
-    background: #f3f4f6;
-    border: 1rpx solid #e5e7eb;
-    color: #4b5563;
+    background: rgba(255, 200, 220, 0.08);
+    border: 1rpx solid rgba(255, 200, 220, 0.15);
+    color: rgba(255, 220, 240, 0.8);
 
     &.active {
-      background: #8b5cf6;
-      border-color: #7c3aed;
+      background: #c084fc;
+      border-color: #a855f7;
       color: #fff;
     }
   }
@@ -2683,7 +2678,7 @@ cover-image {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 32rpx rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8rpx 32rpx rgba(244, 114, 182, 0.35);
   margin-top: 48rpx;
 
   text {
@@ -2703,9 +2698,9 @@ cover-image {
   .back-btn {
     width: 72rpx;
     height: 72rpx;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 200, 220, 0.1);
     backdrop-filter: blur(10rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    border: 1rpx solid rgba(255, 200, 220, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2713,7 +2708,7 @@ cover-image {
 
     text {
       font-size: 40rpx;
-      color: #4B5563;
+      color: rgba(255, 220, 240, 0.7);
       font-weight: 300;
     }
   }
@@ -2723,7 +2718,7 @@ cover-image {
     text-align: center;
     font-size: 34rpx;
     font-weight: 600;
-    color: #1F2937;
+    color: #f0e8ff;
     margin-right: 72rpx;
   }
 }
@@ -2750,7 +2745,7 @@ cover-image {
       right: 0;
       bottom: 0;
       left: 0;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+      background: linear-gradient(135deg, rgba(192, 132, 252, 0.1), rgba(244, 114, 182, 0.1));
       pointer-events: none;
     }
 
@@ -2773,7 +2768,7 @@ cover-image {
 
         .brand-slogan {
           font-size: 24rpx;
-          color: #6B7280;
+          color: $text-secondary;
         }
       }
 
@@ -2811,7 +2806,7 @@ cover-image {
             .name {
               font-size: 32rpx;
               font-weight: 700;
-              color: #1F2937;
+              color: #f0e8ff;
             }
 
             .age {
@@ -2832,21 +2827,21 @@ cover-image {
 
           .info-detail {
             font-size: 26rpx;
-            color: #6B7280;
+            color: $text-secondary;
             line-height: 1.6;
           }
         }
       }
 
       .card-bio {
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 200, 220, 0.08);
         border-radius: 20rpx;
         padding: 24rpx;
         margin-bottom: 24rpx;
 
         text {
           font-size: 28rpx;
-          color: #4B5563;
+          color: rgba(255, 220, 240, 0.7);
           line-height: 1.6;
         }
       }
@@ -2867,7 +2862,7 @@ cover-image {
 
           .hobby-item {
             padding: 8rpx 20rpx;
-            background: rgba(139, 92, 246, 0.15);
+            background: rgba(244, 114, 182, 0.12);
             border-radius: 9999rpx;
             font-size: 24rpx;
             color: #7C3AED;
@@ -2915,9 +2910,9 @@ cover-image {
   left: 0;
   right: 0;
   padding: 24rpx 40rpx calc(24rpx + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.9);
+  background: $surface-overlay;
   backdrop-filter: blur(20rpx);
-  border-top: 1rpx solid rgba(0, 0, 0, 0.05);
+  border-top: 1rpx solid rgba(255, 200, 220, 0.1);
   display: flex;
   align-items: center;
   gap: 24rpx;
@@ -2926,8 +2921,8 @@ cover-image {
     width: 96rpx;
     height: 96rpx;
     border-radius: 50%;
-    border: 4rpx solid #D1D5DB;
-    background: rgba(255, 255, 255, 0.6);
+    border: 1rpx solid rgba(255, 200, 220, 0.2);
+    background: rgba(255, 200, 220, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2935,20 +2930,20 @@ cover-image {
 
     text {
       font-size: 40rpx;
-      color: #9CA3AF;
+      color: $text-secondary;
     }
   }
 
   .chat-btn {
     flex: 1;
     height: 96rpx;
-    background: linear-gradient(135deg, #8B5CF6, #EC4899);
+    background: linear-gradient(135deg, #c084fc, #f472b6);
     border-radius: 24rpx;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 16rpx;
-    box-shadow: 0 8rpx 32rpx rgba(139, 92, 246, 0.4);
+    box-shadow: 0 8rpx 32rpx rgba(244, 114, 182, 0.4);
 
     text {
       font-size: 32rpx;
@@ -2968,9 +2963,9 @@ cover-image {
   .back-btn {
     width: 72rpx;
     height: 72rpx;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 200, 220, 0.1);
     backdrop-filter: blur(10rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    border: 1rpx solid rgba(255, 200, 220, 0.2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2978,7 +2973,7 @@ cover-image {
 
     text {
       font-size: 40rpx;
-      color: #4B5563;
+      color: rgba(255, 220, 240, 0.7);
       font-weight: 300;
     }
   }
@@ -2988,7 +2983,7 @@ cover-image {
     text-align: center;
     font-size: 34rpx;
     font-weight: 700;
-    color: #1F2937;
+    color: #f0e8ff;
     margin-right: 72rpx;
   }
 }
@@ -3076,21 +3071,20 @@ cover-image {
     display: block;
     font-size: 30rpx;
     font-weight: 700;
-    color: #1F2937;
+    color: #f0e8ff;
     margin-bottom: 24rpx;
   }
 
   .plan-item {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(20rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    background: $surface-card;
+    border: 1rpx solid $border-color;
     border-radius: 24rpx;
     padding: 32rpx;
     margin-bottom: 24rpx;
     position: relative;
 
     &.active {
-      border: 4rpx solid #F97316;
+      border: 4rpx solid #f472b6;
     }
 
     .plan-tag {
@@ -3098,7 +3092,7 @@ cover-image {
       top: -16rpx;
       left: 32rpx;
       padding: 4rpx 20rpx;
-      background: linear-gradient(135deg, #F97316, #EC4899);
+      background: linear-gradient(135deg, #c084fc, #f472b6);
       border-radius: 20rpx;
       font-size: 22rpx;
       color: #fff;
@@ -3126,12 +3120,12 @@ cover-image {
       .plan-name {
         font-size: 32rpx;
         font-weight: 700;
-        color: #1F2937;
+        color: #f0e8ff;
       }
 
       .plan-desc {
         font-size: 26rpx;
-        color: #6B7280;
+        color: $text-secondary;
         margin-top: 8rpx;
       }
     }
@@ -3156,18 +3150,18 @@ cover-image {
       .plan-price {
         font-size: 40rpx;
         font-weight: 700;
-        color: #F97316;
+        color: #f9a8d4;
       }
 
       .plan-original {
         font-size: 24rpx;
-        color: #9CA3AF;
+        color: $text-tertiary;
         text-decoration: line-through;
       }
 
       .plan-save {
         font-size: 24rpx;
-        color: #10B981;
+        color: #6ee7b7;
       }
     }
 
@@ -3180,10 +3174,10 @@ cover-image {
       .feature-tag {
         display: block;
         padding: 8rpx 16rpx;
-        background: rgba(249, 115, 22, 0.15);
+        background: rgba(244, 114, 182, 0.12);
         border-radius: 8rpx;
         font-size: 22rpx;
-        color: #C2410C;
+        color: #f9a8d4;
         line-height: 1.3;
       }
     }
@@ -3197,14 +3191,13 @@ cover-image {
     display: block;
     font-size: 30rpx;
     font-weight: 700;
-    color: #1F2937;
+    color: #f0e8ff;
     margin-bottom: 24rpx;
   }
 
   .benefits-list {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(20rpx);
-    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    background: $surface-card;
+    border: 1rpx solid $border-color;
     border-radius: 24rpx;
     padding: 32rpx;
 
@@ -3254,12 +3247,12 @@ cover-image {
         .benefit-title {
           font-size: 28rpx;
           font-weight: 600;
-          color: #1F2937;
+          color: #f0e8ff;
         }
 
         .benefit-desc {
           font-size: 24rpx;
-          color: #6B7280;
+          color: $text-secondary;
         }
       }
     }
@@ -3272,9 +3265,9 @@ cover-image {
   left: 0;
   right: 0;
   padding: 24rpx 40rpx calc(24rpx + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.9);
+  background: $surface-overlay;
   backdrop-filter: blur(20rpx);
-  border-top: 1rpx solid rgba(0, 0, 0, 0.05);
+  border-top: 1rpx solid rgba(255, 200, 220, 0.1);
 
   .vip-buy-btn {
     width: 100%;
@@ -3297,7 +3290,7 @@ cover-image {
   .vip-agreement {
     text-align: center;
     font-size: 22rpx;
-    color: rgba(255, 255, 255, 0.4);
+    color: $text-tertiary;
   }
 }
 
@@ -3334,7 +3327,7 @@ cover-image {
 
     text {
       font-size: 32rpx;
-      color: rgba(255, 255, 255, 0.6);
+      color: $text-secondary;
     }
   }
 }
@@ -3353,26 +3346,24 @@ cover-image {
     transition: all 0.2s ease;
 
     &.active {
-      background: linear-gradient(135deg, $primary, #6366f1);
+      background: linear-gradient(135deg, $primary, $secondary);
       color: #fff;
       font-weight: 600;
-      box-shadow: 0 6rpx 20rpx rgba(139, 92, 246, 0.4);
+      box-shadow: 0 6rpx 20rpx rgba(244, 114, 182, 0.4);
     }
 
     &.inactive {
-      background: rgba(255, 255, 255, 0.06);
-      color: rgba(255, 255, 255, 0.45);
-      border: 1rpx solid rgba(255, 255, 255, 0.1);
+      background: $surface-input;
+      color: $text-tertiary;
+      border: 1rpx solid $border-subtle;
     }
   }
 }
 
 /* 动态卡片 */
 .moment-card {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  background: $surface-card;
+  border: 1rpx solid $border-color;
   border-radius: 40rpx;
   padding: 32rpx;
   margin-bottom: 24rpx;
@@ -3413,7 +3404,7 @@ cover-image {
       align-items: center;
       gap: 16rpx;
       font-size: 22rpx;
-      color: rgba(255, 255, 255, 0.4);
+      color: $text-tertiary;
 
       .moment-location {
         display: flex;
@@ -3430,8 +3421,8 @@ cover-image {
     flex-shrink: 0;
 
     &.public {
-      background: rgba(139, 92, 246, 0.18);
-      border: 1rpx solid rgba(139, 92, 246, 0.3);
+      background: rgba(244, 114, 182, 0.15);
+      border: 1rpx solid rgba(244, 114, 182, 0.28);
       color: #c4b5fd;
     }
 
@@ -3447,7 +3438,7 @@ cover-image {
 .moment-content {
   font-size: 28rpx;
   line-height: 1.65;
-  color: rgba(255, 255, 255, 0.85);
+  color: $text-primary;
   margin-bottom: 20rpx;
 }
 
@@ -3517,11 +3508,11 @@ cover-image {
 }
 
 /* 视频封面区 */
-.moment-video-cell {
+  .moment-video-cell {
   position: relative;
   border-radius: 20rpx;
   overflow: hidden;
-  background: linear-gradient(135deg, #1e1b4b, #2d1b69);
+  background: linear-gradient(135deg, #2a1545, #3d1060);
   aspect-ratio: 16 / 10;
   margin-bottom: 20rpx;
   display: flex;
@@ -3569,7 +3560,7 @@ cover-image {
     display: flex;
     align-items: center;
     gap: 8rpx;
-    color: rgba(255, 255, 255, 0.45);
+    color: $text-tertiary;
     font-size: 26rpx;
     transition: color 0.2s;
 
@@ -3609,7 +3600,7 @@ cover-image {
 
     .masked-text {
       font-size: 26rpx;
-      color: rgba(255, 255, 255, 0.4);
+      color: $text-secondary;
       text-align: center;
       line-height: 1.6;
     }
@@ -3622,7 +3613,7 @@ cover-image {
       border-radius: 9999rpx;
       font-size: 26rpx;
       font-weight: 600;
-      box-shadow: 0 6rpx 20rpx rgba(139, 92, 246, 0.4);
+      box-shadow: 0 6rpx 20rpx rgba(244, 114, 182, 0.35);
     }
   }
 }
@@ -3635,11 +3626,11 @@ cover-image {
   width: 104rpx;
   height: 104rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, $primary, #6366f1);
+  background: linear-gradient(135deg, $primary, $secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 12rpx 32rpx rgba(139, 92, 246, 0.5);
+  box-shadow: 0 12rpx 32rpx rgba(244, 114, 182, 0.5);
   z-index: 50;
 
   text {
@@ -3659,16 +3650,16 @@ cover-image {
 }
 
 /* 评论底部抽屉 */
-.moment-comment-sheet {
+  .moment-comment-sheet {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   max-height: 75vh;
-  background: rgba(20, 18, 58, 0.98);
+  background: $surface-overlay;
   backdrop-filter: blur(24rpx);
   -webkit-backdrop-filter: blur(24rpx);
-  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  border: 1rpx solid rgba(255, 200, 220, 0.12);
   border-radius: 40rpx 40rpx 0 0;
   z-index: 200;
   display: flex;
@@ -3679,7 +3670,7 @@ cover-image {
     display: block;
     width: 72rpx;
     height: 8rpx;
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(249, 168, 212, 0.28);
     border-radius: 4rpx;
     margin: 24rpx auto 16rpx;
     flex-shrink: 0;
@@ -3754,8 +3745,8 @@ cover-image {
       flex: 1;
       min-height: 72rpx;
       padding: 16rpx 24rpx;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1rpx solid rgba(139, 92, 246, 0.3);
+      background: rgba(255, 200, 220, 0.08);
+      border: 1rpx solid rgba(244, 114, 182, 0.28);
       border-radius: 36rpx;
       font-size: 26rpx;
       color: #e2e8f0;
@@ -3768,12 +3759,12 @@ cover-image {
     .comment-send-btn {
       width: 80rpx;
       height: 80rpx;
-      background: linear-gradient(135deg, $primary, #6366f1);
+      background: linear-gradient(135deg, $primary, $secondary);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4rpx 16rpx rgba(139, 92, 246, 0.4);
+      box-shadow: 0 4rpx 16rpx rgba(244, 114, 182, 0.4);
       flex-shrink: 0;
 
       text {
@@ -3792,7 +3783,7 @@ cover-image {
 /* 发布页样式 */
 .circle-publish-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #1e1b4b 0%, #0f0f1a 100%);
+  background: linear-gradient(180deg, $gradient-start 0%, $gradient-end 100%);
   display: flex;
   flex-direction: column;
 }
@@ -3817,7 +3808,7 @@ cover-image {
 
     text {
       font-size: 40rpx;
-      color: rgba(255, 255, 255, 0.6);
+      color: $text-secondary;
       font-weight: 300;
     }
   }
@@ -3830,12 +3821,12 @@ cover-image {
 
   .publish-submit-btn {
     padding: 14rpx 36rpx;
-    background: linear-gradient(135deg, $primary, #6366f1);
+    background: linear-gradient(135deg, $primary, $secondary);
     color: #fff;
     border-radius: 9999rpx;
     font-size: 28rpx;
     font-weight: 600;
-    box-shadow: 0 6rpx 20rpx rgba(139, 92, 246, 0.4);
+    box-shadow: 0 6rpx 20rpx rgba(244, 114, 182, 0.4);
 
     &.disabled {
       background: rgba(255, 255, 255, 0.1);
@@ -3877,7 +3868,7 @@ cover-image {
   }
 
   &:focus {
-    border-color: rgba(139, 92, 246, 0.5);
+    border-color: rgba(244, 114, 182, 0.45);
   }
 }
 
@@ -3886,7 +3877,7 @@ cover-image {
 
   .section-label {
     font-size: 24rpx;
-    color: rgba(255, 255, 255, 0.45);
+    color: $text-tertiary;
     margin-bottom: 16rpx;
   }
 
@@ -3993,7 +3984,7 @@ cover-image {
 
   .picker-label {
     font-size: 24rpx;
-    color: rgba(255, 255, 255, 0.45);
+    color: $text-tertiary;
     margin-bottom: 16rpx;
   }
 
@@ -4014,8 +4005,8 @@ cover-image {
     transition: all 0.2s;
 
     &.selected {
-      border-color: rgba(139, 92, 246, 0.5);
-      background: rgba(139, 92, 246, 0.1);
+      border-color: rgba(244, 114, 182, 0.45);
+      background: rgba(244, 114, 182, 0.1);
     }
 
     .option-icon {
@@ -4069,7 +4060,7 @@ cover-image {
 .circle-login-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8rpx);
   -webkit-backdrop-filter: blur(8rpx);
   display: flex;
@@ -4077,59 +4068,86 @@ cover-image {
   justify-content: center;
   z-index: 300;
   padding: 48rpx;
+  box-sizing: border-box;
 
   .login-modal-box {
     width: 100%;
-    background: linear-gradient(160deg, #1e1b4b, #2d1b69);
-    border: 1rpx solid rgba(196, 181, 253, 0.2);
+    max-width: 620rpx;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(160deg, $surface-elevated 0%, $surface-card 100%);
+    border: 1rpx solid $glass-border;
     border-radius: 48rpx;
-    padding: 64rpx 48rpx 48rpx;
+    padding: 56rpx 40rpx 40rpx;
     text-align: center;
 
     .modal-icon {
-      font-size: 100rpx;
+      font-size: 88rpx;
       display: block;
-      margin-bottom: 28rpx;
+      line-height: 1.2;
+      margin-bottom: 24rpx;
+    }
+
+    .modal-copy {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 40rpx;
     }
 
     .modal-title {
+      display: block;
+      width: 100%;
       font-size: 36rpx;
       font-weight: 700;
-      color: #e2e8f0;
-      margin-bottom: 16rpx;
+      color: $text-primary;
+      line-height: 1.4;
+      margin-bottom: 20rpx;
     }
 
     .modal-desc {
-      font-size: 26rpx;
-      color: rgba(255, 255, 255, 0.5);
-      line-height: 1.65;
-      margin-bottom: 48rpx;
+      display: block;
+      width: 100%;
+      font-size: 28rpx;
+      color: $text-secondary;
+      line-height: 1.55;
+
+      & + .modal-desc {
+        margin-top: 8rpx;
+      }
     }
 
     .modal-btn-group {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 20rpx;
+      align-items: stretch;
 
       .modal-btn-primary {
         padding: 28rpx 0;
-        background: linear-gradient(135deg, $primary, #6366f1);
+        background: linear-gradient(135deg, $primary, $secondary);
         color: #fff;
         border-radius: 32rpx;
         font-size: 30rpx;
         font-weight: 700;
-        box-shadow: 0 8rpx 24rpx rgba(139, 92, 246, 0.4);
+        box-shadow: 0 8rpx 24rpx rgba(244, 114, 182, 0.4);
         text-align: center;
+        line-height: 1.3;
       }
 
       .modal-btn-ghost {
+        margin-top: 20rpx;
         padding: 28rpx 0;
-        background: rgba(255, 255, 255, 0.05);
-        color: rgba(255, 255, 255, 0.45);
+        background: $surface-input;
+        color: $text-secondary;
         border-radius: 32rpx;
         font-size: 28rpx;
-        border: 1rpx solid rgba(255, 255, 255, 0.1);
+        border: 1rpx solid $border-color;
         text-align: center;
+        line-height: 1.3;
       }
     }
   }

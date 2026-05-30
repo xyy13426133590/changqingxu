@@ -13,7 +13,7 @@ exports.main = wrapHandler(async (event) => {
   const orderId = event.orderId || event.id
   assertRequired({ orderId }, ['orderId'])
 
-  const orderRes = await db.collection('vip_orders').doc(orderId).get()
+  const orderRes = await db.collection('dev_vip_orders').doc(orderId).get()
   const order = orderRes.data
   if (!order) {
     const err = new Error('订单不存在')
@@ -28,7 +28,7 @@ exports.main = wrapHandler(async (event) => {
 
   let plan
   try {
-    const planRes = await db.collection('vip_plans').doc(order.planId).get()
+    const planRes = await db.collection('dev_vip_plans').doc(order.planId).get()
     plan = planRes.data
   } catch {
     plan = null

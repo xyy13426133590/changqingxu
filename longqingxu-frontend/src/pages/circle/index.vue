@@ -186,8 +186,11 @@
     <view v-if="showLogin" class="circle-login-modal">
       <view class="login-modal-box">
         <text class="modal-icon">💕</text>
-        <text class="modal-title">登录后解锁全部互动</text>
-        <text class="modal-desc">登录即可点赞、评论、发布动态{{ '\n' }}和心仪的 TA 产生连接</text>
+        <view class="modal-copy">
+          <text class="modal-title">登录后解锁全部互动</text>
+          <text class="modal-desc">登录即可点赞、评论、发布动态</text>
+          <text class="modal-desc">和心仪的 TA 产生连接</text>
+        </view>
         <view class="modal-btn-group">
           <view class="modal-btn-primary" @click="goLogin">立即登录</view>
           <view class="modal-btn-ghost" @click="showLogin = false">稍后再说</view>
@@ -357,6 +360,8 @@ function formatDuration(sec: number): string {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
+
 .feed-scroll {
   flex: 1;
 }
@@ -379,7 +384,7 @@ function formatDuration(sec: number): string {
   text-align: center;
   padding: 32rpx 0;
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.3);
+  color: $text-tertiary;
 }
 
 .sheet-overlay {

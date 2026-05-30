@@ -299,6 +299,7 @@ function formatDuration(duration?: number): string {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
 .page-container {
   min-height: 100vh;
   display: flex;
@@ -337,7 +338,7 @@ function formatDuration(duration?: number): string {
 
     .voice-duration {
       font-size: 26rpx;
-      color: #6b7280;
+      color: $text-secondary;
     }
   }
 
@@ -348,7 +349,7 @@ function formatDuration(duration?: number): string {
 
     .voice-bar {
       width: 6rpx;
-      background: #8b5cf6;
+      background: #c084fc;
       border-radius: 3rpx;
     }
   }
@@ -374,7 +375,7 @@ function formatDuration(duration?: number): string {
 
   text {
     font-size: 18rpx;
-    color: #9ca3af;
+    color: $text-tertiary;
   }
 }
 </style>

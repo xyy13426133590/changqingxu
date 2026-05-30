@@ -7,8 +7,10 @@ import {
   apiWechatLogin,
 } from '@/services/api-auth'
 import { apiGetMe, type UserProfile as ApiUserProfile } from '@/services/api-user'
-import { clearToken, getToken } from '@/services/api'
+import { clearToken, getToken, resolveAccessToken, setToken } from '@/services/api'
+import { CloudUnauthorizedError } from '@/services/cloud'
 import { resolveAvatar } from '@/utils/avatar'
+import { useDiscoverStore } from '@/stores/discover'
 
 export interface UserProfile {
   id: string
@@ -117,11 +119,15 @@ export const useUserStore = defineStore('user', () => {
   })
 
   function init() {
-    const savedToken = uni.getStorageSync('token') as string
+    const savedToken = token.value || resolveAccessToken()
     if (savedToken) {
       token.value = savedToken
       isLogin.value = true
+      setToken(savedToken)
       void hydrateProfile()
+    } else if (isLogin.value || profile.value?.id) {
+      // Pinia 恢复了登录态但没有 token，视为失效
+      logout()
     } else {
       token.value = ''
       isLogin.value = false
@@ -131,18 +137,23 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function hydrateProfile(): Promise<boolean> {
-    const t = getToken() || token.value || (uni.getStorageSync('token') as string)
-    if (!t) return false
+    const t = resolveAccessToken() || token.value
+    if (!t) {
+      logout()
+      return false
+    }
+    setToken(t)
+    token.value = t
     try {
       const me = await apiGetMe()
       profile.value = { ...profile.value, ...mapApiUserToProfile(me) }
       isLogin.value = true
-      token.value = t
       return true
     } catch (e) {
-      // 仅鉴权失效时清登录态；网络抖动、云函数未部署等不应把刚登录用户踢下线
       const msg = e instanceof Error ? e.message : ''
       if (
+        e instanceof CloudUnauthorizedError ||
+        msg.includes('请先登录') ||
         msg.includes('401') ||
         msg.includes('未授权') ||
         msg.includes('Unauthorized') ||
@@ -268,7 +279,7 @@ export const useUserStore = defineStore('user', () => {
     token.value = userToken
     profile.value = { ...userProfile }
     isLogin.value = true
-    uni.setStorageSync('token', userToken)
+    setToken(userToken)
   }
 
   function logout() {
@@ -318,5 +329,19 @@ export const useUserStore = defineStore('user', () => {
   persist: {
     key: 'user-store',
     paths: ['token', 'profile', 'dailyGreetings'],
+    afterRestore: (ctx) => {
+      const store = ctx.store as {
+        token?: string
+        isLogin: boolean
+        profile?: { id?: string }
+      }
+      if (store.token) {
+        setToken(store.token)
+        store.isLogin = true
+      } else if (store.isLogin || store.profile?.id) {
+        store.isLogin = false
+        store.profile = {}
+      }
+    },
   },
 })

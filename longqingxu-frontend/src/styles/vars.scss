@@ -1,18 +1,18 @@
-// 长情许 - 深色紫罗兰主题变量
+// 长情许 - 暖紫霞光主题变量（方案 B：表面层级 + 可读对比）
 
-// 主色调 - 紫色渐变
-$primary: #8B5CF6;
-$primary-light: #A78BFA;
-$primary-dark: #7C3AED;
+// 主色调 - 薰衣草玫瑰渐变
+$primary: #c084fc;
+$primary-light: #e879f9;
+$primary-dark: #a855f7;
 
 // 辅助色
-$secondary: #EC4899;
-$secondary-light: #F472B6;
+$secondary: #f472b6;
+$secondary-light: #f9a8d4;
 
-// 深色背景渐变色
-$gradient-start: #1e1b4b;
-$gradient-mid: #1a1233;
-$gradient-end: #0f0f1a;
+// 背景渐变（略提亮，保留深夜浪漫紫）
+$gradient-start: #322055;
+$gradient-mid: #261845;
+$gradient-end: #1c1038;
 
 // 功能色
 $success: #10B981;
@@ -20,19 +20,40 @@ $warning: #F59E0B;
 $danger: #EF4444;
 $info: #3B82F6;
 
-// 深色模式文字色
-$text-primary: #e2e8f0;
-$text-secondary: rgba(255, 255, 255, 0.65);
-$text-tertiary: rgba(255, 255, 255, 0.35);
-$text-white: #FFFFFF;
+// 文字层级
+$text-primary: #f8f4ff;
+$text-secondary: rgba(248, 242, 255, 0.92);
+$text-tertiary: rgba(235, 225, 250, 0.75);
+$text-disabled: rgba(210, 195, 230, 0.58);
+$text-tab-inactive: rgba(235, 228, 255, 0.78);
+$text-white: #ffffff;
 
-// 深色背景色
-$bg-primary: #0f0f1a;
-$bg-secondary: rgba(255, 255, 255, 0.06);
-$bg-tertiary: rgba(255, 255, 255, 0.04);
+// 表面层级（实色台阶，避免「紫叠紫」糊成一团）
+$surface-page: #1c1038;
+$surface-card: #2a1a4a;
+$surface-input: #3d2d62;
+$surface-elevated: #4a356e;
+$surface-tabbar: #352560;
+$surface-overlay: #2a1a4a;
 
-// 边框色
-$border-color: rgba(255, 255, 255, 0.1);
+// 兼容旧名
+$bg-primary: $surface-page;
+$bg-secondary: rgba(255, 200, 220, 0.1);
+$bg-tertiary: rgba(255, 200, 220, 0.06);
+
+// 玻璃 / 描边
+$glass-bg: rgba(255, 200, 220, 0.12);
+$glass-border: rgba(255, 200, 220, 0.22);
+$border-color: rgba(255, 200, 220, 0.2);
+$border-subtle: rgba(255, 200, 220, 0.14);
+
+// 状态标签（浅字 + 半透明底，避免深字叠深底）
+$badge-pending-bg: rgba(251, 146, 60, 0.28);
+$badge-pending-text: #fdba74;
+$badge-pending-border: rgba(251, 146, 60, 0.45);
+$badge-done-bg: rgba(34, 197, 94, 0.22);
+$badge-done-text: #86efac;
+$badge-done-border: rgba(34, 197, 94, 0.38);
 
 // 圆角
 $radius-sm: 8rpx;
@@ -41,11 +62,11 @@ $radius-lg: 24rpx;
 $radius-xl: 32rpx;
 $radius-full: 9999rpx;
 
-// 阴影
-$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
-$shadow-md: 0 4rpx 20rpx rgba(139, 92, 246, 0.25);
-$shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.5);
-$shadow-glow: 0 0 20rpx rgba(139, 92, 246, 0.4);
+// 阴影（玫瑰粉 glow）
+$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.35);
+$shadow-md: 0 4rpx 20rpx rgba(244, 114, 182, 0.22);
+$shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.55);
+$shadow-glow: 0 0 20rpx rgba(244, 114, 182, 0.35);
 
 // 间距
 $spacing-xs: 8rpx;

@@ -16,7 +16,7 @@ exports.main = wrapHandler(async (event) => {
   const { planId, payMethod = 'wechat' } = event
   assertRequired({ planId }, ['planId'])
 
-  const planRes = await db.collection('vip_plans').doc(planId).get()
+  const planRes = await db.collection('dev_vip_plans').doc(planId).get()
   const plan = planRes.data
   if (!plan || !plan.isActive) {
     const err = new Error('套餐不存在或已下架')
@@ -50,7 +50,7 @@ exports.main = wrapHandler(async (event) => {
     createdAt: now,
     updatedAt: now,
   }
-  await db.collection('vip_orders').doc(orderId).set({ data: order })
+  await db.collection('dev_vip_orders').doc(orderId).set({ data: order })
 
   const mode = (process.env.WECHAT_PAY_MODE || 'mock').toLowerCase()
   if (mode === 'mock' || !isWechatPayLiveReady()) {
@@ -67,7 +67,7 @@ exports.main = wrapHandler(async (event) => {
       amountYuan: Number(plan.price),
       openid: user.wechatOpenid.trim(),
     })
-    await db.collection('vip_orders').doc(orderId).update({
+    await db.collection('dev_vip_orders').doc(orderId).update({
       data: { wechatPrepayId: prepayId, updatedAt: new Date() },
     })
     order.wechatPrepayId = prepayId

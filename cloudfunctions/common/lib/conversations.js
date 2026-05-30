@@ -1,14 +1,18 @@
 const { db, _ } = require('/opt/db')
+const { CONVERSATION_COLLECTION, MESSAGE_COLLECTION } = require('/opt/constants')
 const { generateUUID } = require('/opt/utils/crypto')
 const { getUserById } = require('./users')
 
+const CONV_COL = CONVERSATION_COLLECTION
+const MSG_COL = MESSAGE_COLLECTION
+
 async function getConversationById(id) {
-  const res = await db.collection('conversations').doc(id).get()
+  const res = await db.collection(CONV_COL).doc(id).get()
   return res.data || null
 }
 
 async function findConversation(userId1, userId2) {
-  const res = await db.collection('conversations').where(
+  const res = await db.collection(CONV_COL).where(
     _.or([
       { userId1, userId2 },
       { userId1: userId2, userId2: userId1 },
@@ -20,7 +24,7 @@ async function findConversation(userId1, userId2) {
 async function getLastMessage(messageId) {
   if (!messageId) return null
   try {
-    const res = await db.collection('messages').doc(messageId).get()
+    const res = await db.collection(MSG_COL).doc(messageId).get()
     return res.data || null
   } catch {
     return null
@@ -81,7 +85,7 @@ async function createConversationDoc(userId, targetUserId) {
     createdAt: now,
     updatedAt: now,
   }
-  await db.collection('conversations').doc(id).set({ data })
+  await db.collection(CONV_COL).doc(id).set({ data })
   return data
 }
 

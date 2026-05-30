@@ -37,7 +37,9 @@ const { getUserById } = require('/opt/lib/users')
 
 `common/` 内部模块仍用相对路径；打包进 Layer 后互相引用不变。
 
-## 云函数列表（37）
+## 云函数列表
+
+完整功能说明见 **[FUNCTIONS.md](FUNCTIONS.md)**（46 个业务函数 + 功能描述）。
 
 | 模块 | 云函数名 |
 |------|----------|
@@ -46,7 +48,9 @@ const { getUserById } = require('/opt/lib/users')
 | Matches | match-likeUser, match-passUser, match-superLikeUser, match-getMutualMatches, match-resetSwipeHistory |
 | Chat | chat-getConversations, chat-createConversation, chat-deleteConversation, chat-togglePinConversation, chat-getMessages, chat-sendMessage, chat-markMessagesRead |
 | VIP | vip-getVipPlans, vip-createVipOrder, vip-getVipOrder, vip-mockPayOrder, vip-wechatPayNotify |
-| Upload | upload-uploadAvatar, upload-uploadImage, upload-uploadVoice |
+| Upload | upload-uploadAvatar, upload-uploadImage, upload-uploadVoice, upload-uploadVideo |
+| Moment | moment-listFeed, moment-createPost, moment-deletePost, moment-toggleLike, moment-listComments, moment-createComment |
+| Dev | dev-seedUsers, dev-diagnoseDiscover |
 
 ## 注意事项
 

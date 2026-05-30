@@ -1,18 +1,28 @@
 const { db } = require('/opt/db')
+const { USER_COLLECTION, MATCH_COLLECTION } = require('/opt/constants')
 const { calculateAge, calculateZodiacInfo } = require('/opt/utils/date')
 
+const USER_COL = USER_COLLECTION
+
+function isActiveUser(user) {
+  if (!user) return false
+  const status = user.status
+  return !status || status === 'active'
+}
+
 async function getUserById(userId) {
-  const res = await db.collection('users').doc(userId).get()
+  const res = await db.collection(USER_COL).doc(userId).get()
   return res.data || null
 }
 
 async function getUserByPhone(phone) {
-  const res = await db.collection('users').where({ phone, status: 'active' }).limit(1).get()
-  return res.data[0] || null
+  const res = await db.collection(USER_COL).where({ phone }).limit(20).get()
+  const user = (res.data || []).find(isActiveUser)
+  return user || null
 }
 
 async function getUserByOpenid(openid) {
-  const res = await db.collection('users').where({ wechatOpenid: openid }).limit(1).get()
+  const res = await db.collection(USER_COL).where({ wechatOpenid: openid }).limit(1).get()
   return res.data[0] || null
 }
 
@@ -89,41 +99,46 @@ function applyProfileUpdates(user, updates) {
 }
 
 async function getMatchedUserIds(userId) {
-  const res = await db.collection('matches').where({ userId }).field({ targetUserId: true }).get()
+  const res = await db.collection(MATCH_COLLECTION).where({ userId }).field({ targetUserId: true }).get()
   return res.data.map((m) => m.targetUserId)
 }
 
-async function queryRecommendationUsers(userId, matchedUserIds, applyFilters, take, randomOrder = false) {
-  let query = db.collection('users').where({
-    status: 'active',
-    _id: db.command.neq(userId),
+function applyUserFilters(users, filterSettings) {
+  const fs = filterSettings || {}
+  const { ageRange, education, incomeRange } = fs
+  return users.filter((u) => {
+    if (ageRange?.min != null && ageRange?.max != null && u.age != null) {
+      if (u.age < ageRange.min || u.age > ageRange.max) return false
+    }
+    if (Array.isArray(education) && education.length > 0) {
+      if (!education.includes(u.education)) return false
+    }
+    if (incomeRange?.min) {
+      const target = incomeRange.max || incomeRange.min
+      if (u.income !== target && u.income !== incomeRange.min) return false
+    }
+    return true
   })
-  if (matchedUserIds.length > 0) {
-    query = query.where({ _id: db.command.nin(matchedUserIds) })
-  }
-  const res = await query.get()
-  let users = res.data
+}
+
+async function listActiveUsers(limit = 100) {
+  const res = await db.collection(USER_COL).limit(limit).get()
+  return (res.data || []).filter(isActiveUser)
+}
+
+async function queryRecommendationUsers(userId, matchedUserIds, applyFilters, take, randomOrder = false) {
+  const exclude = new Set([userId, ...(matchedUserIds || [])].filter(Boolean))
+  let users = (await listActiveUsers(100)).filter((u) => !exclude.has(u._id))
 
   if (applyFilters) {
     const current = await getUserById(userId)
-    const fs = current?.filterSettings || {}
-    const { ageRange, education, incomeRange } = fs
-    users = users.filter((u) => {
-      if (ageRange?.min != null && ageRange?.max != null && u.age != null) {
-        if (u.age < ageRange.min || u.age > ageRange.max) return false
-      }
-      if (Array.isArray(education) && education.length > 0) {
-        if (!education.includes(u.education)) return false
-      }
-      if (incomeRange?.min && u.income !== incomeRange.min) return false
-      return true
-    })
+    users = applyUserFilters(users, current?.filterSettings)
   }
 
   if (randomOrder) {
     users = users.sort(() => Math.random() - 0.5)
   } else {
-    users = users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    users = users.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
   }
 
   if (take != null && take > 0) {
@@ -133,6 +148,8 @@ async function queryRecommendationUsers(userId, matchedUserIds, applyFilters, ta
 }
 
 module.exports = {
+  USER_COL,
+  isActiveUser,
   getUserById,
   getUserByPhone,
   getUserByOpenid,
@@ -140,5 +157,7 @@ module.exports = {
   formatUserCard,
   applyProfileUpdates,
   getMatchedUserIds,
+  listActiveUsers,
+  applyUserFilters,
   queryRecommendationUsers,
 }

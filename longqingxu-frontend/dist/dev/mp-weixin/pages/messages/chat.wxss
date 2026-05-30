@@ -30,7 +30,7 @@
 }
 .voice-bubble .voice-content .voice-duration.data-v-4859ecaa {
   font-size: 26rpx;
-  color: #6b7280;
+  color: rgba(248, 242, 255, 0.92);
 }
 .voice-bubble .voice-wave-preview.data-v-4859ecaa {
   display: flex;
@@ -39,7 +39,7 @@
 }
 .voice-bubble .voice-wave-preview .voice-bar.data-v-4859ecaa {
   width: 6rpx;
-  background: #8b5cf6;
+  background: #c084fc;
   border-radius: 3rpx;
 }
 .emoji-bubble.data-v-4859ecaa {
@@ -58,5 +58,5 @@
 }
 .msg-status text.data-v-4859ecaa {
   font-size: 18rpx;
-  color: #9ca3af;
+  color: rgba(235, 225, 250, 0.75);
 }

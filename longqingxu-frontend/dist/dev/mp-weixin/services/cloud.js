@@ -68,9 +68,11 @@ function callCloud(_0) {
     initCloud();
     const payload = __spreadValues({}, data);
     if (!options.skipAuth) {
-      const accessToken = services_api.getToken();
-      if (accessToken)
-        payload.token = accessToken;
+      const accessToken = services_api.resolveAccessToken();
+      if (!accessToken) {
+        throw new CloudUnauthorizedError("请先登录");
+      }
+      payload.token = accessToken;
     }
     const wxCloud = (_a = globalThis == null ? void 0 : globalThis.wx) == null ? void 0 : _a.cloud;
     if (!wxCloud)
@@ -103,6 +105,7 @@ function cloudUploadFile(cloudPath, filePath) {
   });
 }
 exports.CLOUD_ENV = CLOUD_ENV;
+exports.CloudUnauthorizedError = CloudUnauthorizedError;
 exports.callCloud = callCloud;
 exports.cloudUploadFile = cloudUploadFile;
 exports.initCloud = initCloud;

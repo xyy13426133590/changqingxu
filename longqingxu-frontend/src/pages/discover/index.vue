@@ -74,6 +74,14 @@
           </view>
           <view v-if="!userStore.isLogin" class="empty-btn" @click="goLogin">去登录</view>
           <view v-else class="empty-btn" @click="navigateToFilter">调整筛选</view>
+          <view
+            v-if="userStore.isLogin"
+            class="empty-btn seed-btn"
+            :class="{ loading: seeding }"
+            @click="seedDemoUsers"
+          >
+            {{ seeding ? '写入中…' : '初始化演示数据' }}
+          </view>
         </view>
       </view>
       <view
@@ -219,7 +227,8 @@ import { useDiscoverStore } from '@/stores/discover'
 import { useUserStore } from '@/stores/user'
 import { useMessagesStore } from '@/stores/messages'
 import TabBar from '@/components/TabBar.vue'
-import { getToken } from '@/services/api'
+import { getToken, resolveAccessToken } from '@/services/api'
+import { callCloud, USE_CLOUD, CloudUnauthorizedError } from '@/services/cloud'
 import { isMpWeixinLocalhostApi, mpWeixinApiHint } from '@/utils/dev-api'
 import { resolveAvatar, DEMO_AVATARS } from '@/utils/avatar'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
@@ -262,6 +271,7 @@ function onDailyAvatarError(userId: string) {
 }
 const dailyUsers = computed(() => discoverStore.dailyRecommendations)
 const pageLoading = ref(false)
+const seeding = ref(false)
 
 const dailyEmptyHint = computed(() => {
   if (!getToken()) return '登录后查看每日推荐'
@@ -284,7 +294,7 @@ const emptyHint = computed(() => {
     return '本地演示账号较少，你已滑完一轮；系统已重新展示推荐。继续滑卡会再次看完，可点「重新浏览」清空记录。'
   }
   if (userStore.isLogin) {
-    return '已看完当前推荐，或筛选过严。可点「重新浏览」清空滑卡记录，或放宽筛选条件。'
+    return '库里暂无可推荐用户。可点「初始化演示数据」写入演示账号，或放宽筛选条件。'
   }
   return '库里暂无其他用户。请先登录，或运行 pnpm run seed:dev 写入演示数据。'
 })
@@ -299,8 +309,97 @@ async function reloadDiscover() {
     return
   }
   await loadDiscoverIfAuthed()
+  if (discoverStore.loadError?.includes('请先登录')) {
+    uni.showModal({
+      title: '登录已失效',
+      content: '登录凭证未同步或已过期，请重新登录后再查看推荐。',
+      confirmText: '去登录',
+      success: (res) => {
+        if (res.confirm) goLogin()
+      },
+    })
+    return
+  }
   if (hasAuthSession() && !discoverStore.currentUser) {
+    if (USE_CLOUD) {
+      try {
+        const diag = await callCloud<{
+          totalActiveUsers: number
+          recommendableForYou: number
+          yourUserFound: boolean
+          userId: string | null
+          collection: string
+          sampleNicknames: string[]
+        }>('dev-diagnoseDiscover')
+        let content = ''
+        if (!resolveAccessToken()) {
+          content = '未检测到登录凭证，请重新登录。'
+        } else if (!diag.userId) {
+          content = '登录凭证无效，云函数无法识别当前用户，请退出后重新登录。'
+        } else if (!diag.yourUserFound) {
+          content = '当前登录账号不在 dev_users 中，请重新注册/登录一次。'
+        } else if (diag.recommendableForYou > 0) {
+          content = `${diag.collection} 中有 ${diag.recommendableForYou} 人可推荐（如：${diag.sampleNicknames.join('、')}），请点「重新加载」或重新部署 user-getRecommendations。`
+        } else if (diag.totalActiveUsers <= 1) {
+          content = `${diag.collection} 里只有你自己，请先点「初始化演示数据」。`
+        } else {
+          content = `共 ${diag.totalActiveUsers} 人，但可推荐为 0。请点「重新浏览」或放宽筛选。`
+        }
+        uni.showModal({ title: '仍无推荐', content, showCancel: false })
+        return
+      } catch (e) {
+        if (e instanceof CloudUnauthorizedError) {
+          uni.showModal({
+            title: '请先登录',
+            content: '当前未携带有效登录凭证，请重新登录。',
+            confirmText: '去登录',
+            success: (res) => {
+              if (res.confirm) goLogin()
+            },
+          })
+          return
+        }
+      }
+    }
     uni.showToast({ title: '仍无推荐，请检查后端与数据库', icon: 'none' })
+  }
+}
+
+async function seedDemoUsers() {
+  if (!USE_CLOUD) {
+    uni.showToast({ title: '仅支持云函数模式', icon: 'none' })
+    return
+  }
+  seeding.value = true
+  try {
+    const res = await callCloud<{
+      added: string[]
+      skipped: string[]
+      failed: Array<{ nickname: string; error: string }>
+      totalInCollection: number
+    }>('dev-seedUsers', {}, { skipAuth: true })
+    const added = res.added?.length ?? 0
+    const skipped = res.skipped?.length ?? 0
+    const total = res.totalInCollection ?? 0
+    uni.showToast({
+      title: `新增 ${added}，跳过 ${skipped}，库中共 ${total} 人`,
+      icon: 'none',
+      duration: 3500,
+    })
+    await discoverStore.loadDiscoverPage()
+    if (!discoverStore.currentUser) {
+      uni.showToast({ title: '数据已写入，请点「重新加载」', icon: 'none' })
+    }
+  } catch (e: any) {
+    uni.showToast({
+      title: e?.message?.includes('not exist') || e?.message?.includes('找不到')
+        ? '请先在开发者工具部署 dev-seedUsers 云函数'
+        : (e?.message || '写入失败，请先部署云函数'),
+      icon: 'none',
+      duration: 3500,
+    })
+  } finally {
+    seeding.value = false
   }
 }
 
@@ -535,7 +634,7 @@ function hideNativeTabBar() {
 }
 
 function hasAuthSession(): boolean {
-  return !!(getToken() || userStore.token || userStore.isLogin)
+  return !!resolveAccessToken()
 }
 
 async function loadDiscoverIfAuthed() {
@@ -581,6 +680,7 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
 .page-container {
   min-height: 100vh;
   display: flex;
@@ -598,14 +698,14 @@ onMounted(() => {
   display: block;
   font-size: 32rpx;
   font-weight: 600;
-  color: #1f2937;
+  color: #f0e8ff;
   margin-bottom: 16rpx;
 }
 
 .empty-desc {
   display: block;
   font-size: 26rpx;
-  color: #6b7280;
+  color: $text-secondary;
   line-height: 1.5;
   margin-bottom: 32rpx;
 }
@@ -621,13 +721,27 @@ onMounted(() => {
   padding: 20rpx 48rpx;
   border-radius: 999rpx;
   font-size: 28rpx;
-  color: #4b5563;
-  background: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 220, 240, 0.8);
+  background: rgba(255, 200, 220, 0.1);
+  border: 1rpx solid rgba(255, 200, 220, 0.18);
 }
 
 .empty-btn.primary {
   color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  background: linear-gradient(135deg, #c084fc, #f472b6);
+  border: none;
+}
+
+.empty-btn.seed-btn {
+  font-size: 24rpx;
+  color: $text-secondary;
+  background: rgba(255, 200, 220, 0.06);
+  border: 1rpx dashed rgba(255, 200, 220, 0.2);
+  padding: 14rpx 32rpx;
+}
+
+.empty-btn.seed-btn.loading {
+  opacity: 0.5;
 }
 
 .daily-empty {
@@ -639,7 +753,7 @@ onMounted(() => {
 
 .daily-empty-text {
   font-size: 24rpx;
-  color: #6b7280;
+  color: $text-secondary;
 }
 
 /* 小程序：保证卡片内容区有高度，避免只显示空玻璃框 */

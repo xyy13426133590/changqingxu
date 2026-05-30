@@ -282,6 +282,7 @@ function onLogout() {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
 .page-container {
   min-height: 100vh;
   display: flex;
@@ -311,7 +312,7 @@ function onLogout() {
   margin: 0 auto 28rpx;
   border-radius: 50%;
   padding: 6rpx;
-  background: linear-gradient(135deg, #c4b5fd, #93c5fd);
+  background: linear-gradient(135deg, #f9a8d4, #c084fc);
   box-sizing: border-box;
 }
 
@@ -325,14 +326,14 @@ function onLogout() {
 .guest-title {
   font-size: 36rpx;
   font-weight: 700;
-  color: #1f2937;
+  color: #f0e8ff;
   display: block;
   margin-bottom: 12rpx;
 }
 
 .guest-desc {
   font-size: 26rpx;
-  color: #6b7280;
+  color: $text-secondary;
   line-height: 1.5;
   display: block;
   margin-bottom: 40rpx;
@@ -359,8 +360,8 @@ function onLogout() {
   }
 
   &.primary {
-    background: linear-gradient(135deg, #8b5cf6, #ec4899);
-    box-shadow: 0 8rpx 28rpx rgba(139, 92, 246, 0.32);
+    background: linear-gradient(135deg, #c084fc, #f472b6);
+    box-shadow: 0 8rpx 28rpx rgba(244, 114, 182, 0.35);
 
     text {
       color: #fff;
@@ -368,11 +369,11 @@ function onLogout() {
   }
 
   &.outline {
-    background: rgba(255, 255, 255, 0.35);
-    border: 1rpx solid rgba(255, 255, 255, 0.55);
+    background: rgba(255, 200, 220, 0.1);
+    border: 1rpx solid rgba(255, 200, 220, 0.25);
 
     text {
-      color: #5b21b6;
+      color: #f9a8d4;
     }
   }
 }
@@ -382,6 +383,6 @@ function onLogout() {
 }
 
 .logout-text {
-  color: #6b7280 !important;
+  color: $text-secondary !important;
 }
 </style>

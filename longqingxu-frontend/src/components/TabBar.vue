@@ -45,15 +45,18 @@ function switchTab(item: TabItem) {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
+
 .custom-tabbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(15, 15, 26, 0.96);
+  background: $surface-tabbar;
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
-  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-top: 1rpx solid $border-color;
+  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.25);
   padding: 14rpx 0 calc(14rpx + env(safe-area-inset-bottom));
   display: flex;
   justify-content: space-around;
@@ -77,7 +80,7 @@ function switchTab(item: TabItem) {
 
     .tab-text {
       font-size: 20rpx;
-      color: rgba(255, 255, 255, 0.35);
+      color: $text-tab-inactive;
       letter-spacing: 0.5rpx;
       transition: color 0.22s ease;
     }
@@ -89,10 +92,7 @@ function switchTab(item: TabItem) {
       }
 
       .tab-text {
-        background: linear-gradient(135deg, #c4b5fd, #a5b4fc);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: $primary-light;
         font-weight: 700;
       }
     }

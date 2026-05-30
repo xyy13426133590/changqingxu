@@ -279,6 +279,7 @@ async function submitSms() {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
 .auth-page {
   min-height: 100vh;
   height: 100%;
@@ -294,8 +295,8 @@ async function submitSms() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1rpx solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 200, 220, 0.08);
+  border: 1rpx solid rgba(255, 200, 220, 0.18);
   backdrop-filter: blur(16px);
 }
 
@@ -309,14 +310,14 @@ async function submitSms() {
 
 .auth-nav-back {
   font-size: 44rpx;
-  color: #4b5563;
+  color: $text-secondary;
   font-weight: 300;
 }
 
 .auth-nav-title {
   font-size: 34rpx;
   font-weight: 600;
-  color: #1f2937;
+  color: #f0e8ff;
 }
 
 .auth-nav-placeholder {
@@ -340,7 +341,7 @@ async function submitSms() {
 .phone-flow-lead {
   display: block;
   font-size: 24rpx;
-  color: #6b7280;
+  color: $text-secondary;
   text-align: center;
   line-height: 1.5;
   margin-bottom: 28rpx;
@@ -354,14 +355,14 @@ async function submitSms() {
 
 .auth-logo {
   font-size: 64rpx;
-  color: #5b21b6;
+  color: #e879f9;
   display: block;
   line-height: 1.2;
 }
 
 .auth-sub {
   font-size: 26rpx;
-  color: #6b7280;
+  color: $text-secondary;
   margin-top: 12rpx;
   display: block;
 }
@@ -407,7 +408,7 @@ async function submitSms() {
 .wx-hint {
   display: block;
   font-size: 22rpx;
-  color: #6b7280;
+  color: $text-secondary;
   text-align: center;
   line-height: 1.45;
   margin-bottom: 20rpx;
@@ -418,14 +419,14 @@ async function submitSms() {
   margin: 0 0 24rpx;
   padding: 28rpx 0;
   line-height: normal;
-  border: 1rpx solid rgba(255, 255, 255, 0.65);
+  border: 1rpx solid rgba(255, 200, 220, 0.3);
   border-radius: 32rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16rpx;
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4rpx 24rpx rgba(91, 33, 182, 0.08);
+  background: rgba(255, 200, 220, 0.1);
+  box-shadow: 0 4rpx 24rpx rgba(244, 114, 182, 0.1);
 
   &::after {
     border: none;
@@ -447,7 +448,7 @@ async function submitSms() {
 .phone-entry-label {
   font-size: 32rpx;
   font-weight: 600;
-  color: #4c1d95;
+  color: #f9a8d4;
 }
 
 .auth-card {
@@ -460,14 +461,14 @@ async function submitSms() {
   gap: 16rpx;
   margin-bottom: 20rpx;
   padding: 0 24rpx;
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 200, 220, 0.08);
   border-radius: 20rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.5);
+  border: 1rpx solid rgba(255, 200, 220, 0.2);
 }
 
 .prefix {
   font-size: 28rpx;
-  color: #6b7280;
+  color: $text-secondary;
   flex-shrink: 0;
 }
 
@@ -493,9 +494,9 @@ async function submitSms() {
   margin: 0;
   padding: 20rpx 24rpx;
   line-height: normal;
-  border: 1rpx solid rgba(124, 58, 237, 0.35);
+  border: 1rpx solid rgba(244, 114, 182, 0.35);
   border-radius: 20rpx;
-  background: rgba(124, 58, 237, 0.15);
+  background: rgba(244, 114, 182, 0.12);
 
   &::after {
     border: none;
@@ -503,7 +504,7 @@ async function submitSms() {
 
   text {
     font-size: 26rpx;
-    color: #6d28d9;
+    color: #f9a8d4;
     font-weight: 500;
   }
 
@@ -519,7 +520,7 @@ async function submitSms() {
 .sms-tip {
   display: block;
   font-size: 22rpx;
-  color: #7c3aed;
+  color: #f9a8d4;
   margin-bottom: 24rpx;
   line-height: 1.4;
 }
@@ -532,11 +533,11 @@ async function submitSms() {
 
 .auth-link {
   font-size: 26rpx;
-  color: #7c3aed;
+  color: #f9a8d4;
   padding: 12rpx 0;
 
   &.muted {
-    color: #9ca3af;
+    color: $text-tertiary;
   }
 }
 
@@ -548,8 +549,8 @@ async function submitSms() {
   border: none;
   border-radius: 32rpx;
   text-align: center;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  box-shadow: 0 8rpx 28rpx rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, #c084fc, #f472b6);
+  box-shadow: 0 8rpx 28rpx rgba(244, 114, 182, 0.38);
 
   &::after {
     border: none;
@@ -576,7 +577,7 @@ async function submitSms() {
 
   text {
     font-size: 22rpx;
-    color: #6b7280;
+    color: $text-tertiary;
     line-height: 1.5;
   }
 }

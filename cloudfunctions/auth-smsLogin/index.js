@@ -14,7 +14,7 @@ exports.main = wrapHandler(async (event) => {
   assertRequired({ phone, code }, ['phone', 'code'])
   assertPhone(phone)
 
-  await verifySmsCode(db.collection('sms_codes'), phone, code, 'login')
+  await verifySmsCode(db.collection('dev_sms_codes'), phone, code, 'login')
 
   let user = await getUserByPhone(phone)
   if (!user) {
@@ -24,7 +24,7 @@ exports.main = wrapHandler(async (event) => {
     })
   }
 
-  const tokens = await generateTokens(user)
+  const tokens = generateTokens(user)
   await updateLastLogin(user._id)
 
   return {

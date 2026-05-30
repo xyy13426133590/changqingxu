@@ -55,6 +55,7 @@ function goRegister() {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
 .welcome-page {
   min-height: 100vh;
   display: flex;
@@ -75,14 +76,14 @@ function goRegister() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.25);
-  border: 1rpx solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 200, 220, 0.1);
+  border: 1rpx solid rgba(255, 200, 220, 0.2);
   backdrop-filter: blur(12px);
 }
 
 .back-ico {
   font-size: 40rpx;
-  color: #4b5563;
+  color: $text-secondary;
   font-weight: 300;
 }
 
@@ -99,7 +100,7 @@ function goRegister() {
 
 .brand-logo {
   font-size: 68rpx;
-  color: #5b21b6;
+  color: #e879f9;
   display: block;
   line-height: 1.15;
 }
@@ -108,14 +109,14 @@ function goRegister() {
   display: block;
   margin-top: 12rpx;
   font-size: 26rpx;
-  color: #6b7280;
+  color: $text-secondary;
 }
 
 .brand-en {
   display: block;
   margin-top: 8rpx;
   font-size: 22rpx;
-  color: #9ca3af;
+  color: $text-tertiary;
   letter-spacing: 0.12em;
 }
 
@@ -124,8 +125,8 @@ function goRegister() {
   padding: 28rpx 0;
   border-radius: 32rpx;
   text-align: center;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  box-shadow: 0 8rpx 28rpx rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, #c084fc, #f472b6);
+  box-shadow: 0 8rpx 28rpx rgba(244, 114, 182, 0.38);
 
   text {
     font-size: 32rpx;
@@ -141,7 +142,7 @@ function goRegister() {
 
   text {
     font-size: 28rpx;
-    color: #7c3aed;
+    color: #f9a8d4;
     font-weight: 500;
   }
 }
@@ -153,7 +154,7 @@ function goRegister() {
 
   text {
     font-size: 22rpx;
-    color: #6b7280;
+    color: $text-tertiary;
     line-height: 1.5;
   }
 }

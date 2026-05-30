@@ -19,7 +19,7 @@ exports.main = wrapHandler(async (event) => {
     throw err
   }
 
-  const orderRes = await db.collection('vip_orders').doc(orderId).get()
+  const orderRes = await db.collection('dev_vip_orders').doc(orderId).get()
   const order = orderRes.data
   if (!order || order.userId !== userId) {
     const err = new Error('订单不存在')
@@ -27,10 +27,10 @@ exports.main = wrapHandler(async (event) => {
     throw err
   }
 
-  const planRes = await db.collection('vip_plans').doc(order.planId).get()
+  const planRes = await db.collection('dev_vip_plans').doc(order.planId).get()
   const plan = planRes.data
   await finalizeOrderPaid(order, plan, 'mock_tx_' + order._id)
 
-  const refreshed = await db.collection('vip_orders').doc(orderId).get()
+  const refreshed = await db.collection('dev_vip_orders').doc(orderId).get()
   return formatOrderResponse(refreshed.data, plan)
 })

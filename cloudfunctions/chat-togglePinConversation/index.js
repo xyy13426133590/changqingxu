@@ -32,7 +32,7 @@ exports.main = wrapHandler(async (event) => {
   } else {
     update.isPinned2 = !conversation.isPinned2
   }
-  await db.collection('conversations').doc(conversationId).update({ data: update })
+  await db.collection('dev_conversations').doc(conversationId).update({ data: update })
 
   return { isPinned: isUser1 ? update.isPinned1 : update.isPinned2 }
 })

@@ -40,7 +40,7 @@ exports.main = wrapHandler(async (event) => {
     isRead: false,
     createdAt: now,
   }
-  await db.collection('messages').doc(id).set({ data: message })
+  await db.collection('dev_messages').doc(id).set({ data: message })
 
   const isUser1 = conversation.userId1 === senderId
   const convUpdate = {
@@ -53,7 +53,7 @@ exports.main = wrapHandler(async (event) => {
   } else {
     convUpdate.unreadCount1 = (conversation.unreadCount1 || 0) + 1
   }
-  await db.collection('conversations').doc(conversationId).update({ data: convUpdate })
+  await db.collection('dev_conversations').doc(conversationId).update({ data: convUpdate })
 
   return formatMessageResponse(message)
 })

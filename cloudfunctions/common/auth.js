@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken')
 
+/** 优先云控制台 JWT_SECRET；未配置时仅用于本地/演示，生产务必在控制台配置 */
 function getJwtSecret() {
-  return process.env.JWT_SECRET || 'changqingxu-dev-secret-change-me'
+  const fromEnv = (process.env.JWT_SECRET || '').trim()
+  return fromEnv || 'changqingxu-dev-secret-change-me'
 }
 
 function getJwtExpiresIn() {
@@ -24,10 +26,11 @@ function verifyToken(token) {
 }
 
 function extractToken(event) {
-  if (event?.token) return event.token
-  const auth = event?.headers?.authorization || event?.headers?.Authorization
-  if (auth && auth.startsWith('Bearer ')) return auth.slice(7)
-  return null
+  const raw = event?.token ?? event?.data?.token
+  if (!raw || typeof raw !== 'string') return null
+  let t = raw.trim()
+  if (t.startsWith('Bearer ')) t = t.slice(7).trim()
+  return t || null
 }
 
 async function requireAuth(event) {

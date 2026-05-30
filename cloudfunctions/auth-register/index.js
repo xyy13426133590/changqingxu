@@ -24,7 +24,7 @@ exports.main = wrapHandler(async (event) => {
   }
 
   if (code && code !== DEMO_SMS_CODE) {
-    await verifySmsCode(db.collection('sms_codes'), phone, code, 'register')
+    await verifySmsCode(db.collection('dev_sms_codes'), phone, code, 'register')
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)

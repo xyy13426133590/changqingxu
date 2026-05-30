@@ -130,9 +130,9 @@
   "subPackages": [],
   "tabBar": {
     "custom": true,
-    "color": "#6b7280",
+    "color": "#9ca3af",
     "selectedColor": "#8B5CF6",
-    "backgroundColor": "#0f0f1a",
+    "backgroundColor": "#352560",
     "borderStyle": "black",
     "list": [
       {
@@ -160,10 +160,10 @@
   "globalStyle": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "长情许",
-    "navigationBarBackgroundColor": "#1e1b4b",
-    "backgroundColor": "#0f0f1a",
+    "navigationBarBackgroundColor": "#261845",
+    "backgroundColor": "#1c1038",
     "app-plus": {
-      "background": "#0f0f1a"
+      "background": "#1c1038"
     }
   },
   "condition": {}

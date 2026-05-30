@@ -27,7 +27,7 @@ exports.main = wrapHandler(async (event) => {
     await sendTencentSms(phone, code)
   }
 
-  await db.collection('sms_codes').doc(id).set({
+  await db.collection('dev_sms_codes').doc(id).set({
     data: {
       _id: id,
       phone,

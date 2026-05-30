@@ -30,16 +30,16 @@ exports.main = wrapHandler(async (event) => {
   const convUpdate = { updatedAt: new Date() }
   if (isUser1) convUpdate.unreadCount1 = 0
   else convUpdate.unreadCount2 = 0
-  await db.collection('conversations').doc(conversationId).update({ data: convUpdate })
+  await db.collection('dev_conversations').doc(conversationId).update({ data: convUpdate })
 
-  const unread = await db.collection('messages').where({
+  const unread = await db.collection('dev_messages').where({
     conversationId,
     receiverId: userId,
     isRead: false,
   }).get()
 
   for (const msg of unread.data) {
-    await db.collection('messages').doc(msg._id).update({ data: { isRead: true } })
+    await db.collection('dev_messages').doc(msg._id).update({ data: { isRead: true } })
   }
 
   return { message: '标记成功', clearedCount }

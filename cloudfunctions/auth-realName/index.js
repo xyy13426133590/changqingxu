@@ -22,7 +22,7 @@ exports.main = wrapHandler(async (event) => {
   }
 
   const maskedIdCard = normalizedIdCard.replace(/(\d{4})\d{10}(\d{4})/, '$1**********$2')
-  await db.collection('users').doc(userId).update({
+  await db.collection('dev_users').doc(userId).update({
     data: {
       legalName: legalName.trim(),
       idCardMasked: maskedIdCard,

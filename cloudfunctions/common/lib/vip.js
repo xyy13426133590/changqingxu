@@ -1,5 +1,8 @@
 const { db } = require('/opt/db')
+const { USER_COLLECTION, VIP_ORDER_COLLECTION } = require('/opt/constants')
 const { getUserById } = require('./users')
+
+const VIP_ORDER_COL = VIP_ORDER_COLLECTION
 
 function formatPlan(plan) {
   return {
@@ -37,7 +40,7 @@ async function finalizeOrderPaid(order, plan, wechatTransactionId) {
     throw err
   }
   if (wechatTransactionId) {
-    const dup = await db.collection('vip_orders')
+    const dup = await db.collection(VIP_ORDER_COL)
       .where({ wechatTransactionId })
       .limit(1)
       .get()
@@ -60,7 +63,7 @@ async function finalizeOrderPaid(order, plan, wechatTransactionId) {
   }
   const expiresAt = new Date(base)
   expiresAt.setMonth(expiresAt.getMonth() + plan.durationMonths)
-  await db.collection('vip_orders').doc(order._id).update({
+  await db.collection(VIP_ORDER_COL).doc(order._id).update({
     data: {
       status: 'paid',
       payTime: now,
@@ -69,10 +72,10 @@ async function finalizeOrderPaid(order, plan, wechatTransactionId) {
       updatedAt: now,
     },
   })
-  await db.collection('users').doc(order.userId).update({
+  await db.collection(USER_COLLECTION).doc(order.userId).update({
     data: { isVip: true, vipExpiry: expiresAt, updatedAt: now },
   })
-  const refreshed = await db.collection('vip_orders').doc(order._id).get()
+  const refreshed = await db.collection(VIP_ORDER_COL).doc(order._id).get()
   return refreshed.data
 }
 

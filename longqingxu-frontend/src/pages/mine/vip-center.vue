@@ -267,7 +267,7 @@ function goBack() {
 .load-error {
   display: block;
   font-size: 26rpx;
-  color: #b91c1c;
+  color: #fca5a5;
   margin-bottom: 16rpx;
 }
 </style>

@@ -46,7 +46,7 @@ exports.main = wrapHandler(async (event) => {
   // 批量获取作者信息
   const authorIds = [...new Set(posts.map((p) => p.authorId))]
   const usersRes = await db
-    .collection('users')
+    .collection('dev_users')
     .where({ _id: _.in(authorIds) })
     .field({ _id: true, nickname: true, avatar: true })
     .get()

@@ -133,6 +133,7 @@ function onStart() {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
 .face-page {
   min-height: 100vh;
   display: flex;
@@ -151,23 +152,23 @@ function onStart() {
   width: 100%;
   padding: 20rpx 24rpx;
   border-radius: 20rpx;
-  background: rgba(224, 231, 255, 0.85);
-  border: 1rpx solid rgba(165, 180, 252, 0.6);
+  background: rgba(192, 132, 252, 0.12);
+  border: 1rpx solid rgba(216, 180, 254, 0.3);
   margin-bottom: 28rpx;
 
   text {
     font-size: 24rpx;
-    color: #4338ca;
+    color: #e9d5ff;
     line-height: 1.45;
   }
 
   &.warn {
-    background: rgba(254, 243, 199, 0.9);
-    border-color: rgba(252, 211, 77, 0.6);
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.3);
   }
 
   &.warn text {
-    color: #92400e;
+    color: #fde68a;
   }
 }
 
@@ -176,7 +177,7 @@ function onStart() {
 
   text {
     font-size: 26rpx;
-    color: #7c3aed;
+    color: #f9a8d4;
     font-weight: 600;
   }
 }
@@ -192,18 +193,18 @@ function onStart() {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 6rpx solid rgba(167, 139, 250, 0.45);
+  border: 6rpx solid rgba(249, 168, 212, 0.45);
 }
 
 .ring-inner {
   position: absolute;
   inset: 36rpx;
   border-radius: 50%;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.75), rgba(224, 231, 255, 0.9));
+  background: linear-gradient(160deg, rgba(255, 200, 220, 0.12), rgba(192, 132, 252, 0.15));
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx dashed rgba(139, 92, 246, 0.35);
+  border: 2rpx dashed rgba(244, 114, 182, 0.35);
 }
 
 .face-emoji {
@@ -214,7 +215,7 @@ function onStart() {
   position: absolute;
   width: 40rpx;
   height: 40rpx;
-  border-color: #8b5cf6;
+  border-color: #c084fc;
   border-style: solid;
 
   &.tl {
@@ -246,13 +247,13 @@ function onStart() {
 .face-title {
   font-size: 36rpx;
   font-weight: 600;
-  color: #1f2937;
+  color: #f0e8ff;
   margin-bottom: 12rpx;
 }
 
 .face-desc {
   font-size: 26rpx;
-  color: #6b7280;
+  color: $text-secondary;
   text-align: center;
   line-height: 1.5;
   margin-bottom: 32rpx;
@@ -268,8 +269,8 @@ function onStart() {
   width: 140rpx;
   padding: 20rpx 0;
   border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.35);
-  border: 1rpx solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 200, 220, 0.1);
+  border: 1rpx solid rgba(255, 200, 220, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -282,7 +283,7 @@ function onStart() {
 
 .chip-t {
   font-size: 22rpx;
-  color: #4b5563;
+  color: rgba(255, 220, 240, 0.72);
 }
 
 .primary-btn {
@@ -291,8 +292,8 @@ function onStart() {
   padding: 28rpx 0;
   border-radius: 32rpx;
   text-align: center;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  box-shadow: 0 8rpx 28rpx rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, #c084fc, #f472b6);
+  box-shadow: 0 8rpx 28rpx rgba(244, 114, 182, 0.38);
   margin-bottom: 28rpx;
 
   text {
@@ -309,7 +310,7 @@ function onStart() {
 
 .fine-print {
   font-size: 22rpx;
-  color: #9ca3af;
+  color: $text-tertiary;
   text-align: center;
   line-height: 1.5;
   padding: 0 16rpx;

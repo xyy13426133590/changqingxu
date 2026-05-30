@@ -12,6 +12,6 @@
   display: block;
 }
 .tab-nav-svg.inactive.data-v-04c9902c {
-  opacity: 0.6;
-  filter: saturate(0.5) brightness(0.7);
+  opacity: 0.92;
+  filter: saturate(0.85) brightness(1);
 }

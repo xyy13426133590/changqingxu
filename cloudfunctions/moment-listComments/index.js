@@ -35,7 +35,7 @@ exports.main = wrapHandler(async (event) => {
   // 批量获取评论者信息
   const userIds = [...new Set(comments.map((c) => c.userId))]
   const usersRes = await db
-    .collection('users')
+    .collection('dev_users')
     .where({ _id: _.in(userIds) })
     .field({ _id: true, nickname: true, avatar: true })
     .get()

@@ -10,7 +10,7 @@ const { getUserById } = require('/opt/lib/users')
 
 exports.main = wrapHandler(async (event) => {
   const userId = await requireAuth(event)
-  const res = await db.collection('matches')
+  const res = await db.collection('dev_matches')
     .where({ userId, isMutual: true })
     .orderBy('createdAt', 'desc')
     .get()

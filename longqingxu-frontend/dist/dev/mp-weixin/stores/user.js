@@ -3,7 +3,9 @@ const common_vendor = require("../common/vendor.js");
 const services_apiAuth = require("../services/api-auth.js");
 const services_apiUser = require("../services/api-user.js");
 const services_api = require("../services/api.js");
+const services_cloud = require("../services/cloud.js");
 const utils_avatar = require("../utils/avatar.js");
+const stores_discover = require("./discover.js");
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
@@ -100,11 +102,15 @@ const useUserStore = common_vendor.defineStore("user", () => {
     return profile.value.vipExpiry && new Date(profile.value.vipExpiry) > /* @__PURE__ */ new Date() ? "active" : "expired";
   });
   function init() {
-    const savedToken = common_vendor.index.getStorageSync("token");
+    var _a;
+    const savedToken = token.value || services_api.resolveAccessToken();
     if (savedToken) {
       token.value = savedToken;
       isLogin.value = true;
+      services_api.setToken(savedToken);
       void hydrateProfile();
+    } else if (isLogin.value || ((_a = profile.value) == null ? void 0 : _a.id)) {
+      logout();
     } else {
       token.value = "";
       isLogin.value = false;
@@ -114,18 +120,21 @@ const useUserStore = common_vendor.defineStore("user", () => {
   }
   function hydrateProfile() {
     return __async(this, null, function* () {
-      const t = services_api.getToken() || token.value || common_vendor.index.getStorageSync("token");
-      if (!t)
+      const t = services_api.resolveAccessToken() || token.value;
+      if (!t) {
+        logout();
         return false;
+      }
+      services_api.setToken(t);
+      token.value = t;
       try {
         const me = yield services_apiUser.apiGetMe();
         profile.value = __spreadValues(__spreadValues({}, profile.value), mapApiUserToProfile(me));
         isLogin.value = true;
-        token.value = t;
         return true;
       } catch (e) {
         const msg = e instanceof Error ? e.message : "";
-        if (msg.includes("401") || msg.includes("未授权") || msg.includes("Unauthorized") || msg.includes("登录已过期")) {
+        if (e instanceof services_cloud.CloudUnauthorizedError || msg.includes("请先登录") || msg.includes("401") || msg.includes("未授权") || msg.includes("Unauthorized") || msg.includes("登录已过期")) {
           logout();
         }
         return false;
@@ -246,7 +255,7 @@ const useUserStore = common_vendor.defineStore("user", () => {
     token.value = userToken;
     profile.value = __spreadValues({}, userProfile);
     isLogin.value = true;
-    common_vendor.index.setStorageSync("token", userToken);
+    services_api.setToken(userToken);
   }
   function logout() {
     services_api.clearToken();
@@ -254,7 +263,7 @@ const useUserStore = common_vendor.defineStore("user", () => {
     isLogin.value = false;
     profile.value = {};
     realNameDraft.value = null;
-    useDiscoverStore().clearDiscoverData();
+    stores_discover.useDiscoverStore().clearDiscoverData();
   }
   function updateProfile(data) {
     profile.value = __spreadValues(__spreadValues({}, profile.value), data);
@@ -291,7 +300,18 @@ const useUserStore = common_vendor.defineStore("user", () => {
 }, {
   persist: {
     key: "user-store",
-    paths: ["token", "profile", "dailyGreetings"]
+    paths: ["token", "profile", "dailyGreetings"],
+    afterRestore: (ctx) => {
+      var _a;
+      const store = ctx.store;
+      if (store.token) {
+        services_api.setToken(store.token);
+        store.isLogin = true;
+      } else if (store.isLogin || ((_a = store.profile) == null ? void 0 : _a.id)) {
+        store.isLogin = false;
+        store.profile = {};
+      }
+    }
   }
 });
 exports.useUserStore = useUserStore;

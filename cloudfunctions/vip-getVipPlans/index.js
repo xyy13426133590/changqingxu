@@ -9,7 +9,7 @@ const { formatPlan } = require('/opt/lib/vip')
 
 exports.main = wrapHandler(async (event) => {
   await requireAuth(event)
-  const res = await db.collection('vip_plans')
+  const res = await db.collection('dev_vip_plans')
     .where({ isActive: true })
     .orderBy('sortOrder', 'asc')
     .get()

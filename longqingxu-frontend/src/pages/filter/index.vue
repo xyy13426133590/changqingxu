@@ -42,8 +42,8 @@
           :value="ageMaxDisplay"
           min="18"
           max="60"
-          active-color="#8B5CF6"
-          background-color="#E5E7EB"
+          active-color="#c084fc"
+          background-color="rgba(255,200,220,0.15)"
           block-size="24"
           @change="onAgeChange"
         />

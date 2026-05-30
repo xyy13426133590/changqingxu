@@ -9,7 +9,7 @@ if (!Math) {
   _easycom_uni_icons();
 }
 const TAB_ICON_ACTIVE = "#A78BFA";
-const TAB_ICON_INACTIVE = "rgba(255,255,255,0.3)";
+const TAB_ICON_INACTIVE = "#c4b5fd";
 const iconPx = 26;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "TabNavSvg",

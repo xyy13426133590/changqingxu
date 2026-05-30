@@ -1,4 +1,4 @@
-import { getToken } from './api'
+import { resolveAccessToken } from './api'
 
 type ApiResponse<T> = {
   code: string
@@ -53,8 +53,11 @@ export async function callCloud<T>(
 
   const payload: Record<string, unknown> = { ...data }
   if (!options.skipAuth) {
-    const accessToken = getToken()
-    if (accessToken) payload.token = accessToken
+    const accessToken = resolveAccessToken()
+    if (!accessToken) {
+      throw new CloudUnauthorizedError('请先登录')
+    }
+    payload.token = accessToken
   }
 
   // #ifdef MP-WEIXIN

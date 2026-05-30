@@ -27,14 +27,14 @@ exports.main = wrapHandler(async (event) => {
     throw err
   }
 
-  const res = await db.collection('messages')
+  const res = await db.collection('dev_messages')
     .where({ conversationId })
     .orderBy('createdAt', 'desc')
     .skip((page - 1) * limit)
     .limit(limit)
     .get()
 
-  const countRes = await db.collection('messages').where({ conversationId }).count()
+  const countRes = await db.collection('dev_messages').where({ conversationId }).count()
   const messages = res.data.reverse().map(formatMessageResponse)
 
   return { messages, total: countRes.total }

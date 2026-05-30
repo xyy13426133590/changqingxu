@@ -52,7 +52,7 @@ exports.main = wrapHandler(async (event) => {
 
   // 获取评论者信息
   const userRes = await db
-    .collection('users')
+    .collection('dev_users')
     .doc(userId)
     .field({ _id: true, nickname: true, avatar: true })
     .get()

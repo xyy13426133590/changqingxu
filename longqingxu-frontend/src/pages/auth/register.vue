@@ -142,6 +142,7 @@ async function submit() {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -155,8 +156,8 @@ async function submit() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1rpx solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 200, 220, 0.08);
+  border: 1rpx solid rgba(255, 200, 220, 0.18);
   backdrop-filter: blur(16px);
 }
 
@@ -170,14 +171,14 @@ async function submit() {
 
 .auth-nav-back {
   font-size: 44rpx;
-  color: #4b5563;
+  color: $text-secondary;
   font-weight: 300;
 }
 
 .auth-nav-title {
   font-size: 34rpx;
   font-weight: 600;
-  color: #1f2937;
+  color: #f0e8ff;
 }
 
 .auth-nav-placeholder {
@@ -198,13 +199,13 @@ async function submit() {
 .auth-hero-title {
   font-size: 40rpx;
   font-weight: 700;
-  color: #1f2937;
+  color: #f0e8ff;
   display: block;
 }
 
 .auth-sub {
   font-size: 26rpx;
-  color: #6b7280;
+  color: $text-secondary;
   margin-top: 12rpx;
   display: block;
 }
@@ -224,7 +225,7 @@ async function submit() {
   width: 36rpx;
   height: 36rpx;
   border-radius: 8rpx;
-  border: 2rpx solid #c4b5fd;
+  border: 2rpx solid rgba(244, 114, 182, 0.4);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -233,20 +234,20 @@ async function submit() {
 
   text {
     font-size: 22rpx;
-    color: #7c3aed;
+    color: #f9a8d4;
     font-weight: 700;
   }
 
   &.on {
-    background: rgba(139, 92, 246, 0.15);
-    border-color: #8b5cf6;
+    background: rgba(244, 114, 182, 0.15);
+    border-color: #f472b6;
   }
 }
 
 .auth-agree-text {
   flex: 1;
   font-size: 22rpx;
-  color: #6b7280;
+  color: $text-secondary;
   line-height: 1.45;
 }
 
@@ -255,8 +256,8 @@ async function submit() {
   padding: 28rpx 0;
   border-radius: 32rpx;
   text-align: center;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  box-shadow: 0 8rpx 28rpx rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, #c084fc, #f472b6);
+  box-shadow: 0 8rpx 28rpx rgba(244, 114, 182, 0.38);
 
   text {
     font-size: 32rpx;
@@ -273,10 +274,10 @@ async function submit() {
 .auth-bottom-link {
   text-align: center;
   font-size: 26rpx;
-  color: #6b7280;
+  color: $text-secondary;
 
   .auth-link {
-    color: #7c3aed;
+    color: #f9a8d4;
     margin-left: 8rpx;
     font-weight: 600;
   }

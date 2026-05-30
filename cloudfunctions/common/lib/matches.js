@@ -1,14 +1,17 @@
 const { db, _ } = require('/opt/db')
+const { MATCH_COLLECTION } = require('/opt/constants')
 const { generateUUID } = require('/opt/utils/crypto')
 const { getUserById } = require('./users')
 
+const MATCH_COL = MATCH_COLLECTION
+
 async function getMatch(userId, targetUserId) {
-  const res = await db.collection('matches').where({ userId, targetUserId }).limit(1).get()
+  const res = await db.collection(MATCH_COL).where({ userId, targetUserId }).limit(1).get()
   return res.data[0] || null
 }
 
 async function getReverseLike(userId, targetUserId) {
-  const res = await db.collection('matches')
+  const res = await db.collection(MATCH_COL)
     .where({
       userId: targetUserId,
       targetUserId: userId,
@@ -22,14 +25,14 @@ async function getReverseLike(userId, targetUserId) {
 async function saveMatch(doc) {
   const now = new Date()
   if (doc._id) {
-    await db.collection('matches').doc(doc._id).update({
+    await db.collection(MATCH_COL).doc(doc._id).update({
       data: { ...doc, updatedAt: now },
     })
     return { ...doc, updatedAt: now }
   }
   const id = generateUUID()
   const data = { ...doc, _id: id, createdAt: now }
-  await db.collection('matches').doc(id).set({ data })
+  await db.collection(MATCH_COL).doc(id).set({ data })
   return data
 }
 

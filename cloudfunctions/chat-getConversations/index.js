@@ -9,7 +9,7 @@ const { enrichConversation } = require('/opt/lib/conversations')
 
 exports.main = wrapHandler(async (event) => {
   const userId = await requireAuth(event)
-  const res = await db.collection('conversations').where(
+  const res = await db.collection('dev_conversations').where(
     _.or([{ userId1: userId }, { userId2: userId }]),
   ).orderBy('lastMessageAt', 'desc').get()
 

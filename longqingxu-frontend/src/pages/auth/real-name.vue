@@ -112,6 +112,7 @@ function onNext() {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/vars.scss';
 .auth-flow {
   min-height: 100vh;
   display: flex;
@@ -140,7 +141,7 @@ function onNext() {
 .hero-title {
   font-size: 34rpx;
   font-weight: 600;
-  color: #1f2937;
+  color: #f0e8ff;
   display: block;
 }
 
@@ -148,7 +149,7 @@ function onNext() {
   display: block;
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: #6b7280;
+  color: $text-secondary;
   line-height: 1.5;
   padding: 0 16rpx;
 }
@@ -159,8 +160,8 @@ function onNext() {
   border-radius: 24rpx;
   padding: 28rpx 24rpx;
   margin-bottom: 20rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.45);
-  background: rgba(255, 255, 255, 0.22);
+  border: 1rpx solid rgba(255, 200, 220, 0.18);
+  background: rgba(255, 200, 220, 0.08);
 }
 
 .field {
@@ -173,7 +174,7 @@ function onNext() {
 
 .label {
   font-size: 26rpx;
-  color: #4b5563;
+  color: rgba(255, 220, 240, 0.72);
   display: block;
   margin-bottom: 12rpx;
 }
@@ -184,10 +185,10 @@ function onNext() {
   line-height: 1.45;
   padding: 22rpx 24rpx;
   border-radius: 16rpx;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1rpx solid rgba(167, 139, 250, 0.35);
+  background: rgba(255, 200, 220, 0.08);
+  border: 1rpx solid rgba(244, 114, 182, 0.28);
   font-size: 28rpx;
-  color: #1f2937;
+  color: #f0e8ff;
   box-sizing: border-box;
   position: relative;
   z-index: 2;
@@ -200,7 +201,7 @@ function onNext() {
 
   text {
     font-size: 22rpx;
-    color: #6b7280;
+    color: $text-tertiary;
     line-height: 1.5;
   }
 }
@@ -209,8 +210,8 @@ function onNext() {
   padding: 28rpx 0;
   border-radius: 32rpx;
   text-align: center;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  box-shadow: 0 8rpx 28rpx rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, #c084fc, #f472b6);
+  box-shadow: 0 8rpx 28rpx rgba(244, 114, 182, 0.38);
 
   text {
     font-size: 32rpx;

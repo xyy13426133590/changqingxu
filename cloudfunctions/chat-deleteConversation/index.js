@@ -25,8 +25,8 @@ exports.main = wrapHandler(async (event) => {
     throw err
   }
 
-  await db.collection('conversations').doc(conversationId).remove()
-  await db.collection('messages').where({ conversationId }).remove()
+  await db.collection('dev_conversations').doc(conversationId).remove()
+  await db.collection('dev_messages').where({ conversationId }).remove()
 
   return { message: '会话已删除' }
 })

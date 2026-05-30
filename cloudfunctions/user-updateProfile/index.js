@@ -18,7 +18,7 @@ exports.main = wrapHandler(async (event) => {
 
   const { token, ...updates } = event
   const profileUpdates = applyProfileUpdates(user, updates)
-  await db.collection('users').doc(userId).update({
+  await db.collection('dev_users').doc(userId).update({
     data: { ...profileUpdates, updatedAt: new Date() },
   })
 

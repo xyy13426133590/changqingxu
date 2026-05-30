@@ -1,4 +1,5 @@
 const { db } = require('/opt/db')
+const { USER_COLLECTION } = require('/opt/constants')
 const { generateUUID } = require('/opt/utils/crypto')
 const { getUserById } = require('./users')
 
@@ -45,12 +46,12 @@ async function createUser(data) {
     createdAt: now,
     updatedAt: now,
   }
-  await db.collection('users').doc(id).set({ data: user })
+  await db.collection(USER_COLLECTION).doc(id).set({ data: user })
   return user
 }
 
 async function updateLastLogin(userId) {
-  await db.collection('users').doc(userId).update({
+  await db.collection(USER_COLLECTION).doc(userId).update({
     data: { lastLoginAt: new Date(), updatedAt: new Date() },
   })
 }

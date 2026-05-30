@@ -41,7 +41,7 @@ exports.main = wrapHandler(async (event) => {
     throw err
   }
 
-  await db.collection('users').doc(userId).update({
+  await db.collection('dev_users').doc(userId).update({
     data: { isFaceVerified: true, updatedAt: new Date() },
   })
 
