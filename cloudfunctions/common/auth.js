@@ -50,6 +50,18 @@ async function requireAuth(event) {
   }
 }
 
+/** 有 token 则解析 userId，无 token 或无效则返回 null（游客） */
+async function optionalAuth(event) {
+  const token = extractToken(event)
+  if (!token) return null
+  try {
+    const payload = verifyToken(token)
+    return payload.sub || null
+  } catch {
+    return null
+  }
+}
+
 function formatAuthUser(user) {
   return {
     id: user._id,
@@ -67,5 +79,6 @@ module.exports = {
   verifyToken,
   extractToken,
   requireAuth,
+  optionalAuth,
   formatAuthUser,
 }

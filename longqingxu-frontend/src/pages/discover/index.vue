@@ -579,7 +579,10 @@ function commitPass() {
   discoverStore.dislikeUser(currentUser.value.id)
 }
 
+const greetingInFlight = ref(false)
+
 async function handleGreeting() {
+  if (greetingInFlight.value) return
   const peer = currentUser.value
   if (!peer?.id) {
     uni.showToast({ title: '用户信息异常，请刷新推荐', icon: 'none' })
@@ -589,6 +592,7 @@ async function handleGreeting() {
     uni.navigateTo({ url: '/pages/auth/welcome' })
     return
   }
+  greetingInFlight.value = true
   uni.showLoading({ mask: true, title: '准备聊天…' })
   try {
     const convId = await messagesStore.createConversation(
@@ -605,8 +609,9 @@ async function handleGreeting() {
     uni.navigateTo({ url: `/pages/messages/chat?conversationId=${convId}` })
   } catch (e) {
     const msg = e instanceof Error ? e.message : '创建会话失败'
-    uni.showToast({ title: msg, icon: 'none' })
+    uni.showModal({ title: '打招呼失败', content: msg, showCancel: false })
   } finally {
+    greetingInFlight.value = false
     uni.hideLoading()
   }
 }

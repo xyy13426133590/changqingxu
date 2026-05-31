@@ -4,8 +4,7 @@
  */
 import { USE_CLOUD, callCloud, cloudUploadFile } from './cloud'
 import { CLOUD_API_MAP } from './cloud-api-map'
-import { get, post } from './api'
-import { useUserStore } from '@/stores/user'
+import { get, post, getToken } from './api'
 
 export interface MomentAuthor {
   id: string
@@ -61,10 +60,6 @@ export interface CommentsResult {
   total: number
   hasMore: boolean
   page: number
-}
-
-function getToken(): string | undefined {
-  return useUserStore().accessToken || undefined
 }
 
 export async function apiListFeed(params: {
@@ -130,6 +125,31 @@ export async function apiCreateComment(params: {
     return callCloud(CLOUD_API_MAP.moments.createComment, { ...params, token })
   }
   return post(`/moments/${params.postId}/comments`, params)
+}
+
+export interface MyStats {
+  postCount: number
+  totalLikes: number
+  totalComments: number
+}
+
+export async function apiListMyPosts(params: {
+  page?: number
+  limit?: number
+}): Promise<FeedResult> {
+  const token = getToken()
+  if (USE_CLOUD) {
+    return callCloud(CLOUD_API_MAP.moments.listMyPosts, { ...params, token })
+  }
+  return get('/moments/me', params)
+}
+
+export async function apiGetMyStats(): Promise<MyStats> {
+  const token = getToken()
+  if (USE_CLOUD) {
+    return callCloud(CLOUD_API_MAP.moments.getMyStats, { token })
+  }
+  return get('/moments/me/stats', {})
 }
 
 /**

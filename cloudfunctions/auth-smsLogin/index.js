@@ -24,7 +24,7 @@ exports.main = wrapHandler(async (event) => {
     })
   }
 
-  const tokens = generateTokens(user)
+  const tokens = await generateTokens(user)
   await updateLastLogin(user._id)
 
   return {

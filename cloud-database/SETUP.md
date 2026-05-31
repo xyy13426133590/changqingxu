@@ -2,9 +2,11 @@
 
 云环境 ID：`cloud1-d6g7211of923bfddc`
 
-## 1. 创建集合（7 个）
+## 1. 创建集合
 
 在云开发控制台 → 数据库，依次创建：
+
+### 基础（7 个）
 
 | 集合名 | 说明 |
 |--------|------|
@@ -15,6 +17,17 @@
 | `messages` | 消息 |
 | `vip_plans` | VIP 套餐 |
 | `vip_orders` | VIP 订单 |
+
+### 圈子 / 动态（4 个，发布动态前必建）
+
+| 集合名 | 说明 |
+|--------|------|
+| `moment_posts` | 动态帖子（`moment-createPost` 写入） |
+| `moment_likes` | 点赞记录 |
+| `moment_comments` | 评论 |
+| `circles` | 圈子（MVP 可空集合，Feed 默认 `default_public`） |
+
+> 若发布失败，请检查云函数是否已部署到当前环境，以及 `moment_posts` 集合 schema 是否与示例文档字段一致。
 
 字段定义见 [collections-schema.md](collections-schema.md)。
 
@@ -42,8 +55,16 @@
 
 ### conversations
 
-- `userId1` + `userId2`（复合唯一）
-- `lastMessageAt`
+| 索引字段 | 是否唯一 | 说明 |
+|----------|----------|------|
+| `userId1` + `userId2` | **是（复合唯一）** | 同一对用户只能有一条会话；**不同**用户可与同一 `userId2` 各建一条 |
+| `lastMessageAt` | 否 | 会话列表排序 |
+
+**常见误配（会导致打招呼 E11000）：**
+
+- ❌ 不要给 `userId2` 单独建**唯一**索引（否则全库只能有一条 `userId2 = user-demo-002` 的会话）
+- ❌ 不要给 `userId1` 单独建**唯一**索引
+- ✅ 只保留 `userId1 + userId2` 这一条复合唯一索引
 
 ### messages
 
@@ -60,6 +81,25 @@
 - `outTradeNo`（唯一）
 - `wechatTransactionId`（唯一）
 - `status`
+
+### moment_posts（圈子动态）
+
+| 索引字段 | 是否唯一 | 说明 |
+|----------|----------|------|
+| `createdAt` 降序 | 否 | Feed 按时间排序 |
+| `circleId` + `createdAt` 降序 | 否 | 圈子内时间线 |
+| `authorId` + `createdAt` 降序 | 否 | 我的动态列表 |
+| `status` + `visibility` | **否（切勿唯一）** | 仅用于组合查询加速 |
+
+> **重要：** `status` + `visibility` 必须是**普通复合索引**。若勾选「唯一」，全站只能有一条 `active` + `public` 的动态，发布会报 `E11000 duplicate key`（与集合是否创建无关）。
+
+### moment_likes
+
+- `postId` + `userId`（复合**唯一**，防重复点赞）
+
+### moment_comments
+
+- `postId` + `createdAt`（复合，非唯一）
 
 ## 3. 导入种子数据
 
@@ -79,7 +119,8 @@
 
 ## 验收
 
-- [ ] 7 个集合均已创建
+- [ ] 基础 7 个集合均已创建
+- [ ] 圈子相关 4 个集合（`moment_posts` 等）已创建
 - [ ] 索引与 schema 文档一致
 - [ ] `vip_plans` 有 3 条种子数据
 - [ ] 安全规则已生效，客户端无法直接写 `users`

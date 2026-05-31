@@ -94,7 +94,7 @@
         "desc": "用于在聊天中录制并发送语音消息"
       }
     },
-    "requiredPrivateInfos": ["getLocation"],
+    "requiredPrivateInfos": ["getLocation", "chooseLocation"],
     "optimization": {
       "subPackages": true
     },

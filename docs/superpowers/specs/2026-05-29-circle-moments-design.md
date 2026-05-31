@@ -1,8 +1,9 @@
 # 长情许 · 圈子动态功能设计文档
 
-**版本：** 1.0  
-**日期：** 2026-05-29  
-**项目：** longqingxu-frontend（uni-app 微信小程序 + 微信云开发）
+**版本：** 1.1  
+**日期：** 2026-05-29（v1.1 增补：我的动态 / 作品库，2026-05-31）  
+**项目：** longqingxu-frontend（uni-app 微信小程序 + 微信云开发）  
+**原型：** [`docs/prototypes/2026-05-29-circle-feed-prototype.html`](../../prototypes/2026-05-29-circle-feed-prototype.html)（①–③ 圈子基础流；④–⑥ 我的动态与入口）
 
 ---
 
@@ -31,6 +32,8 @@
 | 点赞 | 登录用户点赞/取消点赞；乐观更新 |
 | 评论 | 登录用户发表一级评论；评论列表展开（底部抽屉） |
 | 游客引导 | 点赞/评论/发布时弹出「请登录」提示 |
+| **我的动态（作品库）** | 登录用户在「我的」查看自己发布的全部历史；管理（删除）；快捷再发布 |
+| **圈子顶栏头像入口** | 登录态点击头像进入「我的动态」（辅入口，与抖音「我→作品」主入口互补） |
 
 ### 二期（不在本文档范围）
 
@@ -39,6 +42,9 @@
 - 动态搜索与话题标签
 - 举报/审核后台
 - @提醒通知
+- 他人主页动态列表（`moment-listUserPosts`）
+- 作品网格视图、编辑动态、草稿箱、置顶动态（可绑 VIP）
+- 「喜欢」Tab（我赞过的帖）
 
 ---
 
@@ -162,8 +168,8 @@ WHERE status = 'active'
 
 - `{ createdAt: -1 }` — Feed 主排序
 - `{ circleId: 1, createdAt: -1 }` — 圈子内时间线
-- `{ authorId: 1, createdAt: -1 }` — 个人主页动态（二期）
-- `{ status: 1, visibility: 1 }` — 过滤组合
+- `{ authorId: 1, createdAt: -1 }` — **我的动态**列表（`moment-listMyPosts`，P1 必建）
+- `{ status: 1, visibility: 1 }` — 过滤组合（**普通索引，禁止设为唯一**，否则只能有一条公开动态）
 
 ### 3.3 集合 `moment_likes`
 
@@ -372,7 +378,58 @@ WHERE status = 'active'
 
 **实现：** 软删除，将 `status` 改为 `"deleted"`
 
-### 4.7 `upload-uploadVideo` — 视频上传
+### 4.7 `moment-listMyPosts` — 我的动态列表（v1.1 新增）
+
+**鉴权：** JWT 必填
+
+**说明：** 与 `moment-listFeed` 分离。广场 Feed 按可见性过滤全站内容；本接口**仅查当前用户作为作者**的帖子，用于「作品库」，不混入他人动态。
+
+**请求：**
+
+```json
+{
+  "token": "...",
+  "page": 1,
+  "limit": 10
+}
+```
+
+**服务端查询：**
+
+```
+WHERE authorId = viewerId
+  AND status = 'active'
+ORDER BY createdAt DESC
+```
+
+**响应 data：** 结构与 `moment-listFeed` 的 `posts[]` 单条一致（可不含 `masked`；`isLiked` 对本人帖可为 true/false）。
+
+```json
+{
+  "posts": [ /* 同 listFeed 单条 */ ],
+  "total": 3,
+  "hasMore": false,
+  "page": 1
+}
+```
+
+### 4.8 `moment-getMyStats` — 我的动态汇总（v1.1 新增，可选与 list 合并）
+
+**鉴权：** JWT 必填
+
+**响应 data：**
+
+```json
+{
+  "postCount": 3,
+  "totalLikes": 128,
+  "totalComments": 17
+}
+```
+
+实现：对 `moment_posts` 按 `authorId` count；`totalLikes` / `totalComments` 可对作者活跃帖冗余字段求和（MVP）或聚合查询。
+
+### 4.9 `upload-uploadVideo` — 视频上传
 
 **鉴权：** JWT 必填
 
@@ -399,15 +456,68 @@ WHERE status = 'active'
 - `TabBar.vue` — `tabs` 数组插入 `{ name: 'circle', pagePath: '/pages/circle/index', text: '圈子' }`；`TabName` 类型增加 `'circle'`
 - `TabNavSvg.vue` — 增加 `circle` 分支，图标为同心圆光圈（与紫色渐变一致）
 
-### 5.2 页面清单
+### 5.2 信息架构：我的动态入口（v1.1）
+
+对标抖音「我 → 作品」，长情许采用 **主入口在「我的」、辅入口在圈子顶栏**：
+
+| 优先级 | 入口 | 行为 |
+|--------|------|------|
+| **主** | 我的 Tab → 菜单「我的动态」 | `navigateTo` → `pages/mine/my-moments` |
+| **辅** | 圈子顶栏左侧头像（登录态） | 同上 |
+| **辅** | 发布成功 | 主按钮回广场；次按钮「查看我的动态」 |
+| 弱 | 广场 Feed 自己的卡 | 仅显示删除（已有）；**不能**作为唯一管理入口 |
+
+**不在圈子 Pill 增加「我的」Tab**：全站/关注/同城为内容发现维度，与「作品库」语义冲突。
+
+### 5.3 页面清单
 
 | 页面 | 路径 | Tab | 说明 |
 |------|------|-----|------|
-| 圈子首页 | `pages/circle/index` | 是 | Feed 列表 + 顶栏 + 右下角发布 FAB |
-| 发布页 | `pages/circle/publish` | 否 | `navigateTo`；选图/视频、文案、位置、可见性 |
-| 动态详情 | `pages/circle/detail` | 否 | `navigateTo`；完整评论列表（MVP 可用底部抽屉代替） |
+| 圈子首页 | `pages/circle/index` | 是 | Feed + 顶栏（左头像/右通知）+ 发布 FAB |
+| 发布页 | `pages/circle/publish` | 否 | 选图/视频、文案、位置、可见性；成功后可跳我的动态 |
+| **我的动态** | `pages/mine/my-moments` | 否 | 本人历史列表 + 统计 + 底栏「发布动态」 |
+| 动态详情 | `pages/circle/detail` | 否 | 完整评论列表（MVP 可用底部抽屉代替） |
 
-### 5.3 组件清单
+### 5.4 `pages/mine/my-moments` 交互说明
+
+**顶区：**
+
+- 导航：‹ 返回、标题「我的动态」
+- 身份条：头像 + 昵称（点击可进 `profile-edit`）
+- 统计：`{postCount} 条动态 · {totalLikes} 获赞 · {totalComments} 评论`（数据来自 `moment-getMyStats`）
+
+**内容区（MVP）：**
+
+- 子 Tab 仅实现「作品」；「喜欢」置灰并标注「即将上线」
+- 列表形态：**时间线卡片**（复用 `moment-card` 样式，**隐藏作者行**，保留可见性角标、媒体、点赞/评论数）
+- 卡片操作：`⋯` → 删除（`moment-deletePost`）；编辑放二期
+- 下拉刷新 + 上拉分页（`moment-listMyPosts`）
+
+**底栏：**
+
+- 固定按钮「＋ 发布动态」→ `pages/circle/publish`
+
+**空状态：**
+
+- 文案：「还没有发布动态」/「分享生活，更容易被看见」
+- 按钮：「去发布」
+
+### 5.5 我的 Tab 菜单变更
+
+在 `pages/mine/index` 的 `menuItems` 中，于「我的资料卡」与「会员中心」之间插入：
+
+| key | label | 副文案 |
+|-----|-------|--------|
+| `my-moments` | 我的动态 | 右侧显示 `{postCount} 条`（0 条时不显示或显示「去发布」） |
+
+### 5.6 圈子顶栏变更
+
+| 状态 | 左侧 | 中间 | 右侧 |
+|------|------|------|------|
+| 登录 | 用户头像（可点） | ✦ 圈子 | 🔔 通知（占位） |
+| 游客 | 👤（点登录） | ✦ 圈子 | 🔔 |
+
+### 5.7 组件清单
 
 | 组件 | 路径 | 说明 |
 |------|------|------|
@@ -416,9 +526,9 @@ WHERE status = 'active'
 | `MomentCommentSheet` | `components/MomentCommentSheet.vue` | 底部弹层评论列表 + 输入框 |
 | `VisibilityPicker` | `components/VisibilityPicker.vue` | 发布时选择可见性的单选组件 |
 
-### 5.4 服务层
+### 5.9 服务层
 
-新建 `src/services/api-moment.ts`：
+新建 `src/services/api-moment.ts`（v1.1 增补 `apiListMyPosts` / `apiGetMyStats`）：
 
 ```typescript
 // 遵循现有双模式结构
@@ -427,6 +537,10 @@ export function apiListFeed(params: ListFeedParams): Promise<FeedResult> {
   return get('/moments/feed', params)
 }
 // ... toggleLike / createPost / listComments / createComment / deletePost
+export function apiListMyPosts(params: { page?: number; limit?: number }): Promise<FeedResult> {
+  if (USE_CLOUD) return callCloud(CLOUD_API_MAP.moments.listMyPosts, params)
+  return get('/moments/me', params)
+}
 ```
 
 `cloud-api-map.ts` 新增：
@@ -434,6 +548,8 @@ export function apiListFeed(params: ListFeedParams): Promise<FeedResult> {
 ```typescript
 moments: {
   listFeed: 'moment-listFeed',
+  listMyPosts: 'moment-listMyPosts',   // v1.1
+  getMyStats: 'moment-getMyStats',     // v1.1 可选
   getPost: 'moment-getPost',
   createPost: 'moment-createPost',
   deletePost: 'moment-deletePost',
@@ -446,13 +562,12 @@ circles: {
 },
 ```
 
-Pinia Store：`src/stores/circle.ts`
+Pinia Store：
 
-- 管理 Feed 分页（`posts`、`page`、`hasMore`、`loading`）
-- 点赞乐观更新（先改 `isLiked`/`likeCount`，失败后回滚）
-- 评论局部加载（按 `postId` 存储）
+- `src/stores/circle.ts` — Feed 分页、点赞乐观更新、评论抽屉
+- `src/stores/my-moments.ts`（v1.1 建议新建）— 我的动态列表分页、`stats`、与发布页返回刷新联动
 
-### 5.5 全局样式新增
+### 5.8 全局样式新增
 
 在 `index.scss` 末尾追加圈子模块区块：
 
@@ -465,6 +580,9 @@ Pinia Store：`src/stores/circle.ts`
 .moment-actions { /* 点赞/评论行 */ }
 .circle-publish-fab { /* 右下角发布按钮 */ }
 .moment-comment-sheet { /* 评论底部抽屉 */ }
+.my-moments-header { /* 统计区 */ }
+.my-moments-empty { /* 空状态 */ }
+.my-moments-publish-bar { /* 底栏发布 */ }
 ```
 
 ---
@@ -504,7 +622,15 @@ Pinia Store：`src/stores/circle.ts`
 - 内容审核后台
 - 话题标签 / 搜索
 - 发布成功后 @好友通知
-- 个人主页展示自己的动态
+
+### v1.1 待实现（本文档已定义，代码未做）
+
+- [ ] `moment-listMyPosts` / `moment-getMyStats` 云函数
+- [ ] `pages/mine/my-moments` 页面 + `pages.json` 路由
+- [ ] 我的 Tab 菜单项「我的动态」
+- [ ] 圈子顶栏头像 → 我的动态
+- [ ] 发布成功次要跳转「查看我的动态」
+- [ ] 原型屏 ④⑤⑥（见 HTML 原型）
 
 ---
 
@@ -544,14 +670,23 @@ Pinia Store：`src/stores/circle.ts`
 - [ ] 作者删除自己的帖：软删除（status=deleted），Feed 不再出现
 - [ ] 非作者删除他人帖：403 错误
 
+### 我的动态（v1.1）
+
+- [ ] `moment-listMyPosts` 仅返回当前用户 `authorId` 的 active 帖
+- [ ] 我的动态页不展示他人帖子
+- [ ] 删除后列表移除且广场 Feed 不再出现
+- [ ] 空状态展示且可跳转发布页
+- [ ] 发布成功后从「查看我的动态」进入列表且含新帖
+
 ---
 
 ## 附：实现阶段划分
 
 | 阶段 | 内容 | 依赖 |
 |------|------|------|
-| P0 | 本文档 + HTML 原型 | — |
-| P1 | 云库集合 + 安全规则 + 云函数 | P0 审批 |
+| P0 | 本文档 + HTML 原型（含 ④ 我的动态） | — |
+| P1 | 云库集合 + 安全规则 + 云函数（含 listMyPosts） | P0 审批 |
 | P2 | 圈子 Tab + Feed 页面 + api-moment + 全局样式 | P1 |
 | P3 | 发布页 + 上传 + 视频播放 | P2 |
 | P4 | 点赞 + 评论 + 游客引导 | P3 |
+| **P5** | **我的动态页 + 我的菜单 + 圈子头像入口 + getMyStats** | P4 |

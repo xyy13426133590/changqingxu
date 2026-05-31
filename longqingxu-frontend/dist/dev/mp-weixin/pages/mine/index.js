@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
+const stores_myMoments = require("../../stores/my-moments.js");
 const utils_avatar = require("../../utils/avatar.js");
 const utils_tabbar = require("../../utils/tabbar.js");
 const utils_safeArea = require("../../utils/safe-area.js");
@@ -33,6 +34,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const defaultAvatar = utils_avatar.DEMO_AVATARS[0];
     const guestAvatarSrc = utils_avatar.DEMO_AVATARS[1];
     const userStore = stores_user.useUserStore();
+    const myMomentsStore = stores_myMoments.useMyMomentsStore();
     function strFilled(v) {
       return typeof v === "string" && v.trim().length > 0;
     }
@@ -71,10 +73,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onShow(() => {
       utils_tabbar.safeHideNativeTabBar();
       void userStore.hydrateProfile();
+      if (userStore.isLogin) {
+        void myMomentsStore.loadStats();
+      }
     });
     function authMenuTag(done) {
       return done ? { tag: AUTH_TAG_DONE, tagTone: "done" } : { tag: AUTH_TAG_PENDING, tagTone: "pending" };
     }
+    const myMomentsTag = common_vendor.computed(() => {
+      if (!myMomentsStore.statsLoaded)
+        return void 0;
+      const count = myMomentsStore.stats.postCount;
+      return count > 0 ? `${count} 条` : "去发布";
+    });
     const menuItems = common_vendor.computed(() => [
       {
         key: "profile-edit",
@@ -88,6 +99,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         icon: "🪪",
         iconClass: "orange"
       },
+      __spreadValues({
+        key: "my-moments",
+        label: "我的动态",
+        icon: "✦",
+        iconClass: "purple"
+      }, myMomentsTag.value ? { tag: myMomentsTag.value, tagTone: void 0 } : {}),
       {
         key: "vip-center",
         label: "会员中心",
@@ -127,6 +144,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           break;
         case "my-card":
           navigateTo("my-card");
+          break;
+        case "my-moments":
+          common_vendor.index.navigateTo({ url: "/pages/mine/my-moments" });
           break;
         case "vip-center":
           navigateTo("vip-center");

@@ -1,6 +1,7 @@
 const { db, _ } = require('/opt/db')
 const { CONVERSATION_COLLECTION, MESSAGE_COLLECTION } = require('/opt/constants')
 const { generateUUID } = require('/opt/utils/crypto')
+const { prepareSetPayload } = require('/opt/utils/db-write')
 const { getUserById } = require('./users')
 
 const CONV_COL = CONVERSATION_COLLECTION
@@ -71,22 +72,23 @@ async function enrichConversation(conversation, currentUserId) {
 async function createConversationDoc(userId, targetUserId) {
   const now = new Date()
   const id = generateUUID()
-  const data = {
-    _id: id,
-    userId1: userId,
-    userId2: targetUserId,
-    lastMessageId: null,
-    lastMessageAt: null,
-    unreadCount1: 0,
-    unreadCount2: 0,
-    isPinned1: false,
-    isPinned2: false,
-    isBlocked: false,
-    createdAt: now,
-    updatedAt: now,
-  }
+  const { data, record } = prepareSetPayload(
+    {
+      userId1: userId,
+      userId2: targetUserId,
+      lastMessageId: null,
+      lastMessageAt: null,
+      unreadCount1: 0,
+      unreadCount2: 0,
+      isPinned1: false,
+      isPinned2: false,
+      isBlocked: false,
+    },
+    id,
+    now,
+  )
   await db.collection(CONV_COL).doc(id).set({ data })
-  return data
+  return record
 }
 
 function formatMessageResponse(message) {

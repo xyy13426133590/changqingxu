@@ -1,6 +1,7 @@
 const { db, _ } = require('/opt/db')
 const { MATCH_COLLECTION } = require('/opt/constants')
 const { generateUUID } = require('/opt/utils/crypto')
+const { prepareSetPayload, prepareUpdatePayload } = require('/opt/utils/db-write')
 const { getUserById } = require('./users')
 
 const MATCH_COL = MATCH_COLLECTION
@@ -25,15 +26,14 @@ async function getReverseLike(userId, targetUserId) {
 async function saveMatch(doc) {
   const now = new Date()
   if (doc._id) {
-    await db.collection(MATCH_COL).doc(doc._id).update({
-      data: { ...doc, updatedAt: now },
-    })
-    return { ...doc, updatedAt: now }
+    const { data, createdAt } = prepareUpdatePayload(doc, now)
+    await db.collection(MATCH_COL).doc(doc._id).update({ data })
+    return { _id: doc._id, createdAt: createdAt ?? doc.createdAt, ...data }
   }
   const id = generateUUID()
-  const data = { ...doc, _id: id, createdAt: now }
+  const { data, record } = prepareSetPayload(doc, id, now)
   await db.collection(MATCH_COL).doc(id).set({ data })
-  return data
+  return record
 }
 
 function formatMatchResponse(match, targetUser) {

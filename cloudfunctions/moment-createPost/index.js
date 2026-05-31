@@ -1,34 +1,91 @@
 const cloud = require('wx-server-sdk')
-cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
+const { CLOUD_ENV, MOMENT_POST_COLLECTION, USER_COLLECTION } = require('/opt/constants')
+
+// 固定与小程序 .env 中 VITE_CLOUD_ENV 一致，避免 DYNAMIC_CURRENT_ENV 指错环境
+cloud.init({ env: CLOUD_ENV })
 
 const { wrapHandler } = require('/opt/response')
 const { requireAuth } = require('/opt/auth')
-const { assertRequired } = require('/opt/validate')
 
-const db = cloud.database()
+const db = cloud.database({ env: CLOUD_ENV })
+const API_VERSION = 'moment-createPost/add-v4'
+
+function normalizeMedia(media) {
+  return (media || []).map((m) => {
+    const item = { type: m.type, fileID: String(m.fileID) }
+    if (m.type === 'video' && m.duration != null) {
+      item.duration = Number(m.duration)
+    }
+    if (m.width != null) item.width = Number(m.width)
+    if (m.height != null) item.height = Number(m.height)
+    return item
+  })
+}
+
+function buildPostData(userId, event) {
+  const { circleId = 'default_public', visibility = 'public', content, media = [], location } = event
+  const trimmedContent = typeof content === 'string' ? content.trim() : ''
+  const normalizedMedia = normalizeMedia(media)
+
+  const postData = {
+    authorId: userId,
+    circleId: circleId || 'default_public',
+    visibility,
+    media: normalizedMedia,
+    likeCount: 0,
+    commentCount: 0,
+    status: 'active',
+    createdAt: db.serverDate(),
+    updatedAt: db.serverDate(),
+  }
+
+  if (trimmedContent) {
+    postData.content = trimmedContent
+  }
+
+  if (location && typeof location === 'object' && location.name) {
+    const loc = { name: String(location.name) }
+    if (location.latitude != null && !Number.isNaN(Number(location.latitude))) {
+      loc.latitude = Number(location.latitude)
+    }
+    if (location.longitude != null && !Number.isNaN(Number(location.longitude))) {
+      loc.longitude = Number(location.longitude)
+    }
+    postData.location = loc
+  }
+
+  return { postData, trimmedContent, normalizedMedia }
+}
+
+function formatDbError(e, method) {
+  const parts = [
+    `[${API_VERSION}]`,
+    method,
+    e && (e.errCode != null ? `code=${e.errCode}` : ''),
+    e && (e.errMsg || e.message || String(e)),
+  ].filter(Boolean)
+  return parts.join(' ')
+}
 
 exports.main = wrapHandler(async (event) => {
   const userId = await requireAuth(event)
-  const { circleId = 'default_public', visibility = 'public', content, media = [], location } = event
+  const { postData, trimmedContent, normalizedMedia } = buildPostData(userId, event)
 
-  // 校验：内容和媒体至少有一个
-  if ((!content || !content.trim()) && (!media || media.length === 0)) {
+  if (!trimmedContent && normalizedMedia.length === 0) {
     const err = new Error('请添加内容或图片')
     err.statusCode = 400
     throw err
   }
 
-  // 内容长度
-  if (content && content.length > 500) {
+  if (trimmedContent.length > 500) {
     const err = new Error('文案最多500字')
     err.statusCode = 400
     throw err
   }
 
-  // 媒体校验
-  if (media && media.length > 0) {
-    const images = media.filter((m) => m.type === 'image')
-    const videos = media.filter((m) => m.type === 'video')
+  if (normalizedMedia.length > 0) {
+    const images = normalizedMedia.filter((m) => m.type === 'image')
+    const videos = normalizedMedia.filter((m) => m.type === 'video')
     if (images.length > 9) {
       const err = new Error('图片最多9张')
       err.statusCode = 400
@@ -51,9 +108,9 @@ exports.main = wrapHandler(async (event) => {
         throw err
       }
     }
-    for (const m of media) {
+    for (const m of normalizedMedia) {
       if (!m.fileID || !m.fileID.startsWith('cloud://')) {
-        const err = new Error('媒体文件 fileID 格式错误')
+        const err = new Error('图片未上传完成，请删除后重新添加')
         err.statusCode = 400
         throw err
       }
@@ -61,50 +118,79 @@ exports.main = wrapHandler(async (event) => {
   }
 
   const validVisibility = ['public', 'login_only', 'circle_members']
-  if (!validVisibility.includes(visibility)) {
+  if (!validVisibility.includes(postData.visibility)) {
     const err = new Error('可见性参数错误')
     err.statusCode = 400
     throw err
   }
 
-  const now = new Date().toISOString()
-  const postData = {
-    authorId: userId,
-    circleId: circleId || 'default_public',
-    visibility,
-    content: content ? content.trim() : '',
-    media: media || [],
-    location: location || null,
-    likeCount: 0,
-    commentCount: 0,
-    status: 'active',
-    auditStatus: 'passed',
-    createdAt: now,
-    updatedAt: now,
+  // 预检：确认当前环境能访问 moment_posts（排除环境/集合名错误）
+  try {
+    await db.collection(MOMENT_POST_COLLECTION).count()
+  } catch (preErr) {
+    console.error('[moment-createPost] preflight count fail:', preErr)
+    const err = new Error(
+      formatDbError(preErr, 'count') +
+        `。请确认云函数与小程序均使用环境 ${CLOUD_ENV}，且集合 ${MOMENT_POST_COLLECTION} 已创建`,
+    )
+    err.statusCode = 500
+    throw err
   }
 
-  const addRes = await db.collection('moment_posts').add({ data: postData })
+  let addRes
+  const method = 'collection.add'
+  try {
+    addRes = await db.collection(MOMENT_POST_COLLECTION).add({ data: postData })
+  } catch (e1) {
+    console.error('[moment-createPost] add fail (full):', e1)
+    // 若控制台开启了严格 schema，auditStatus 等扩展字段可能导致失败，再试精简字段
+    const minimal = {
+      authorId: postData.authorId,
+      circleId: postData.circleId,
+      visibility: postData.visibility,
+      media: postData.media,
+      likeCount: 0,
+      commentCount: 0,
+      status: 'active',
+      createdAt: db.serverDate(),
+      updatedAt: db.serverDate(),
+    }
+    if (postData.content) minimal.content = postData.content
+    if (postData.location) minimal.location = postData.location
 
-  // 获取作者信息
+    try {
+      addRes = await db.collection(MOMENT_POST_COLLECTION).add({ data: minimal })
+    } catch (e2) {
+      console.error('[moment-createPost] add fail (minimal):', e2)
+      const err = new Error(
+        `${formatDbError(e1, method)} | 重试: ${formatDbError(e2, method)}`,
+      )
+      err.statusCode = 500
+      throw err
+    }
+  }
+
   const userRes = await db
-    .collection('dev_users')
+    .collection(USER_COLLECTION)
     .doc(userId)
     .field({ _id: true, nickname: true, avatar: true })
     .get()
 
   const author = userRes.data || { _id: userId, nickname: '用户', avatar: '' }
+  const createdAt = new Date().toISOString()
 
   return {
     id: addRes._id,
-    author: { id: author._id, nickname: author.nickname, avatar: author.avatar || '' },
-    content: postData.content,
+    author: { id: author._id, nickname: author.nickname || '', avatar: author.avatar || '' },
+    content: postData.content || '',
     media: postData.media,
-    location: postData.location,
+    location: postData.location || null,
     likeCount: 0,
     commentCount: 0,
     isLiked: false,
-    visibility,
-    createdAt: now,
+    visibility: postData.visibility,
+    createdAt,
     masked: false,
+    _apiVersion: API_VERSION,
   }
 })

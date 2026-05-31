@@ -61,7 +61,7 @@ exports.main = wrapHandler(async (event) => {
 
   return {
     id: addRes._id,
-    author: { id: author._id, nickname: author.nickname, avatar: author.avatar || '' },
+    author: { id: author._id, nickname: author.nickname || '', avatar: author.avatar || '' },
     content: commentData.content,
     createdAt: now,
   }

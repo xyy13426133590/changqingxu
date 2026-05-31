@@ -78,6 +78,13 @@
       }
     },
     {
+      "path": "pages/mine/my-moments",
+      "style": {
+        "navigationBarTitleText": "我的动态",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/legal/member-agreement",
       "style": {
         "navigationBarTitleText": "会员服务协议",

@@ -6,6 +6,7 @@ const { wrapHandler } = require('/opt/response')
 const { assertPhone } = require('/opt/validate')
 const { db } = require('/opt/db')
 const { generateUUID } = require('/opt/utils/crypto')
+const { prepareSetPayload } = require('/opt/utils/db-write')
 const { DEMO_SMS_CODE } = require('/opt/constants')
 const { isSmsDemoMode, isSmsConfigured, sendTencentSms } = require('/opt/utils/tencent-sms')
 
@@ -27,17 +28,13 @@ exports.main = wrapHandler(async (event) => {
     await sendTencentSms(phone, code)
   }
 
-  await db.collection('dev_sms_codes').doc(id).set({
-    data: {
-      _id: id,
-      phone,
-      code,
-      type,
-      expiresAt,
-      isUsed: false,
-      createdAt: new Date(),
-    },
-  })
+  const now = new Date()
+  const { data } = prepareSetPayload(
+    { phone, code, type, expiresAt, isUsed: false },
+    id,
+    now,
+  )
+  await db.collection('dev_sms_codes').doc(id).set({ data })
 
   const result = { message: '验证码发送成功' }
   if (demoMode) {

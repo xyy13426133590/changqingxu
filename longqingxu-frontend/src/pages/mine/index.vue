@@ -81,6 +81,7 @@
 import { computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore, type UserProfile } from '@/stores/user'
+import { useMyMomentsStore } from '@/stores/my-moments'
 import TabBar from '@/components/TabBar.vue'
 import { DEMO_AVATARS } from '@/utils/avatar'
 import { safeHideNativeTabBar } from '@/utils/tabbar'
@@ -92,6 +93,7 @@ const defaultAvatar = DEMO_AVATARS[0]
 const guestAvatarSrc = DEMO_AVATARS[1]
 
 const userStore = useUserStore()
+const myMomentsStore = useMyMomentsStore()
 
 function strFilled(v: string | undefined | null): boolean {
   return typeof v === 'string' && v.trim().length > 0
@@ -135,6 +137,9 @@ const profileCompletenessPercent = computed(() =>
 onShow(() => {
   safeHideNativeTabBar()
   void userStore.hydrateProfile()
+  if (userStore.isLogin) {
+    void myMomentsStore.loadStats()
+  }
 })
 
 /** 认证角标：统一三字——未完成「未认证」、已完成「已认证」 */
@@ -157,6 +162,12 @@ function authMenuTag(done: boolean): Pick<MenuItem, 'tag' | 'tagTone'> {
     : { tag: AUTH_TAG_PENDING, tagTone: 'pending' }
 }
 
+const myMomentsTag = computed(() => {
+  if (!myMomentsStore.statsLoaded) return undefined
+  const count = myMomentsStore.stats.postCount
+  return count > 0 ? `${count} 条` : '去发布'
+})
+
 const menuItems = computed<MenuItem[]>(() => [
   {
     key: 'profile-edit',
@@ -169,6 +180,13 @@ const menuItems = computed<MenuItem[]>(() => [
     label: '我的资料卡',
     icon: '🪪',
     iconClass: 'orange',
+  },
+  {
+    key: 'my-moments',
+    label: '我的动态',
+    icon: '✦',
+    iconClass: 'purple',
+    ...(myMomentsTag.value ? { tag: myMomentsTag.value, tagTone: undefined } : {}),
   },
   {
     key: 'vip-center',
@@ -212,6 +230,9 @@ function onMenuTap(key: string) {
       break
     case 'my-card':
       navigateTo('my-card')
+      break
+    case 'my-moments':
+      uni.navigateTo({ url: '/pages/mine/my-moments' })
       break
     case 'vip-center':
       navigateTo('vip-center')

@@ -10,6 +10,7 @@
     "pages/mine/profile-edit",
     "pages/mine/my-card",
     "pages/mine/vip-center",
+    "pages/mine/my-moments",
     "pages/legal/member-agreement",
     "pages/user/detail",
     "pages/auth/welcome",
@@ -63,7 +64,8 @@
     }
   },
   "requiredPrivateInfos": [
-    "getLocation"
+    "getLocation",
+    "chooseLocation"
   ],
   "lazyCodeLoading": "requiredComponents",
   "usingComponents": {}

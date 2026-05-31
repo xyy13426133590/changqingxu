@@ -5,6 +5,18 @@
 
     <!-- 顶栏 -->
     <view class="circle-header">
+      <!-- 左侧：头像（登录态跳我的动态；游客跳登录） -->
+      <view class="circle-header-avatar" @click="onHeaderAvatar">
+        <image
+          v-if="userStore.isLogin"
+          class="header-avatar-img"
+          :src="resolveAvatar(userStore.profile?.avatar)"
+          mode="aspectFill"
+        />
+        <view v-else class="header-avatar-guest">
+          <text>👤</text>
+        </view>
+      </view>
       <text class="circle-title">✦ 圈子</text>
       <view class="circle-notify-btn">
         <text>🔔</text>
@@ -250,7 +262,7 @@ async function onLoadMore() {
 }
 
 function goPublish() {
-  if (!userStore.isLoggedIn) {
+  if (!userStore.isLogin) {
     showLoginModal()
     return
   }
@@ -259,6 +271,14 @@ function goPublish() {
 
 function showLoginModal() {
   showLogin.value = true
+}
+
+function onHeaderAvatar() {
+  if (userStore.isLogin) {
+    uni.navigateTo({ url: '/pages/mine/my-moments' })
+  } else {
+    showLoginModal()
+  }
 }
 
 function goLogin() {
@@ -271,7 +291,7 @@ function onCardClick(_post: MomentPost) {
 }
 
 function onLike(post: MomentPost) {
-  if (!userStore.isLoggedIn) {
+  if (!userStore.isLogin) {
     showLoginModal()
     return
   }
@@ -279,7 +299,7 @@ function onLike(post: MomentPost) {
 }
 
 function onComment(post: MomentPost) {
-  if (!userStore.isLoggedIn) {
+  if (!userStore.isLogin) {
     showLoginModal()
     return
   }
@@ -306,7 +326,7 @@ async function onDelete(post: MomentPost) {
 }
 
 function isMyPost(post: MomentPost) {
-  return userStore.user?.id && post.author.id === userStore.user.id
+  return userStore.profile?.id && post.author.id === userStore.profile.id
 }
 
 // 媒体工具
@@ -392,5 +412,38 @@ function formatDuration(sec: number): string {
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 199;
+}
+
+/* 顶栏左侧头像 */
+.circle-header-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-avatar-img {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(192, 132, 252, 0.5);
+}
+
+.header-avatar-guest {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text {
+    font-size: 32rpx;
+    line-height: 1;
+  }
 }
 </style>

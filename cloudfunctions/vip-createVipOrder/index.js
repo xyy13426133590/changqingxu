@@ -7,6 +7,7 @@ const { requireAuth } = require('/opt/auth')
 const { assertRequired } = require('/opt/validate')
 const { db } = require('/opt/db')
 const { generateUUID } = require('/opt/utils/crypto')
+const { prepareSetPayload } = require('/opt/utils/db-write')
 const { randomOutTradeNo, isWechatPayLiveReady, createJsapiTransaction, buildMiniProgramPayment } = require('/opt/utils/wechat-pay')
 const { getUserById } = require('/opt/lib/users')
 const { formatOrderResponse } = require('/opt/lib/vip')
@@ -39,18 +40,19 @@ exports.main = wrapHandler(async (event) => {
   const outTradeNo = randomOutTradeNo()
   const now = new Date()
   const orderId = generateUUID()
-  const order = {
-    _id: orderId,
-    userId,
-    planId,
-    amount: plan.price,
-    status: 'pending',
-    payMethod,
-    outTradeNo,
-    createdAt: now,
-    updatedAt: now,
-  }
-  await db.collection('dev_vip_orders').doc(orderId).set({ data: order })
+  const { data: orderData, record: order } = prepareSetPayload(
+    {
+      userId,
+      planId,
+      amount: plan.price,
+      status: 'pending',
+      payMethod,
+      outTradeNo,
+    },
+    orderId,
+    now,
+  )
+  await db.collection('dev_vip_orders').doc(orderId).set({ data: orderData })
 
   const mode = (process.env.WECHAT_PAY_MODE || 'mock').toLowerCase()
   if (mode === 'mock' || !isWechatPayLiveReady()) {

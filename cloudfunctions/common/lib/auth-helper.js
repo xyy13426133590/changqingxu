@@ -1,6 +1,7 @@
 const { db } = require('/opt/db')
 const { USER_COLLECTION } = require('/opt/constants')
 const { generateUUID } = require('/opt/utils/crypto')
+const { prepareSetPayload } = require('/opt/utils/db-write')
 const { getUserById } = require('./users')
 
 async function verifySmsCode(dbCol, phone, code, type) {
@@ -28,25 +29,26 @@ async function verifySmsCode(dbCol, phone, code, type) {
 async function createUser(data) {
   const id = generateUUID()
   const now = new Date()
-  const user = {
-    _id: id,
-    phone: data.phone || '',
-    passwordHash: data.passwordHash || '',
-    wechatOpenid: data.wechatOpenid || '',
-    wechatUnionid: data.wechatUnionid || '',
-    nickname: data.nickname || '',
-    avatar: data.avatar || '',
-    gender: data.gender || 'unknown',
-    status: 'active',
-    hobbies: [],
-    filterSettings: {},
-    isRealName: false,
-    isFaceVerified: false,
-    isVip: false,
-    createdAt: now,
-    updatedAt: now,
-  }
-  await db.collection(USER_COLLECTION).doc(id).set({ data: user })
+  const { data: writeData, record: user } = prepareSetPayload(
+    {
+      phone: data.phone || '',
+      passwordHash: data.passwordHash || '',
+      wechatOpenid: data.wechatOpenid || '',
+      wechatUnionid: data.wechatUnionid || '',
+      nickname: data.nickname || '',
+      avatar: data.avatar || '',
+      gender: data.gender || 'unknown',
+      status: 'active',
+      hobbies: [],
+      filterSettings: {},
+      isRealName: false,
+      isFaceVerified: false,
+      isVip: false,
+    },
+    id,
+    now,
+  )
+  await db.collection(USER_COLLECTION).doc(id).set({ data: writeData })
   return user
 }
 

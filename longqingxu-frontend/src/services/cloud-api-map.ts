@@ -55,6 +55,8 @@ export const CLOUD_API_MAP = {
   },
   moments: {
     listFeed: 'moment-listFeed',
+    listMyPosts: 'moment-listMyPosts',
+    getMyStats: 'moment-getMyStats',
     createPost: 'moment-createPost',
     deletePost: 'moment-deletePost',
     toggleLike: 'moment-toggleLike',

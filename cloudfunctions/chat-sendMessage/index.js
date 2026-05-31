@@ -7,6 +7,7 @@ const { requireAuth } = require('/opt/auth')
 const { assertRequired } = require('/opt/validate')
 const { db } = require('/opt/db')
 const { generateUUID } = require('/opt/utils/crypto')
+const { prepareSetPayload } = require('/opt/utils/db-write')
 const { getConversationById, formatMessageResponse } = require('/opt/lib/conversations')
 
 exports.main = wrapHandler(async (event) => {
@@ -28,19 +29,21 @@ exports.main = wrapHandler(async (event) => {
 
   const now = new Date()
   const id = generateUUID()
-  const message = {
-    _id: id,
-    conversationId,
-    senderId,
-    receiverId,
-    type,
-    content,
-    mediaUrl: mediaUrl || null,
-    mediaDuration: mediaDuration || null,
-    isRead: false,
-    createdAt: now,
-  }
-  await db.collection('dev_messages').doc(id).set({ data: message })
+  const { data, record: message } = prepareSetPayload(
+    {
+      conversationId,
+      senderId,
+      receiverId,
+      type,
+      content,
+      mediaUrl: mediaUrl || null,
+      mediaDuration: mediaDuration || null,
+      isRead: false,
+    },
+    id,
+    now,
+  )
+  await db.collection('dev_messages').doc(id).set({ data })
 
   const isUser1 = conversation.userId1 === senderId
   const convUpdate = {

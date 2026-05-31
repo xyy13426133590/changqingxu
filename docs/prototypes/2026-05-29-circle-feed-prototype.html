@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>长情许 · 圈子动态原型</title>
+<title>长情许 · 圈子动态 + 我的动态原型</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -634,6 +634,154 @@
     border: 1px solid rgba(255,255,255,0.1);
   }
 
+  /* ── 顶栏头像入口 ── */
+  .nav-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2px solid rgba(196,181,253,0.5);
+    object-fit: cover;
+    cursor: pointer;
+    background: linear-gradient(135deg, #f9a8d4, #c084fc);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .nav-bar-right { display: flex; gap: 8px; align-items: center; }
+
+  /* ── 发布成功条 ── */
+  .publish-success-bar {
+    margin: 0 16px 12px;
+    padding: 12px 14px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .publish-success-text { font-size: 13px; color: #6ee7b7; }
+  .publish-success-actions { display: flex; gap: 8px; }
+  .btn-sm-primary {
+    flex: 1; padding: 8px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #8B5CF6, #6366f1);
+    color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .btn-sm-ghost {
+    flex: 1; padding: 8px; border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.75); font-size: 12px; cursor: pointer;
+  }
+
+  /* ── 我的动态页 ── */
+  .my-moments-page {
+    display: flex; flex-direction: column; height: 100%;
+    background: linear-gradient(180deg, #1e1b4b 0%, #0f0f1a 100%);
+  }
+  .sub-nav {
+    height: 48px; padding: 0 12px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  .sub-nav-back { color: #c4b5fd; font-size: 22px; width: 32px; cursor: pointer; }
+  .sub-nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 700; color: #e2e8f0; margin-right: 32px; }
+  .profile-strip {
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  .profile-strip .avatar { width: 48px; height: 48px; }
+  .profile-strip-info { flex: 1; }
+  .profile-strip-name { font-size: 15px; font-weight: 700; color: #f0e8ff; margin-bottom: 4px; }
+  .profile-strip-stats { font-size: 12px; color: rgba(255,255,255,0.55); }
+  .works-tabs {
+    display: flex; padding: 12px 20px 0; gap: 24px; flex-shrink: 0;
+  }
+  .works-tab {
+    font-size: 14px; padding-bottom: 10px;
+    border-bottom: 2px solid transparent;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+  }
+  .works-tab.active {
+    color: #c4b5fd; font-weight: 700;
+    border-bottom-color: #8B5CF6;
+  }
+  .works-tab.disabled { opacity: 0.35; cursor: not-allowed; }
+  .my-feed-list {
+    flex: 1; overflow-y: auto; padding: 12px 16px 88px;
+  }
+  .my-feed-list::-webkit-scrollbar { display: none; }
+  .own-moment-card .author-row { display: none; }
+  .own-moment-card .own-card-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .own-moment-card .own-time { font-size: 11px; color: rgba(255,255,255,0.45); }
+  .own-moment-card .own-menu { color: rgba(255,255,255,0.5); font-size: 18px; padding: 0 4px; }
+  .my-moments-bottom-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 12px 20px 28px;
+    background: linear-gradient(180deg, transparent, rgba(15,15,26,0.95) 30%);
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .my-moments-publish-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #8B5CF6, #6366f1);
+    color: #fff; border-radius: 16px; font-size: 15px; font-weight: 700;
+    text-align: center; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(139,92,246,0.4);
+  }
+  .empty-works {
+    padding: 48px 24px; text-align: center;
+  }
+  .empty-works-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.6; }
+  .empty-works-title { font-size: 16px; font-weight: 600; color: #e2e8f0; margin-bottom: 8px; }
+  .empty-works-desc { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 20px; line-height: 1.5; }
+
+  /* ── 我的 Tab 菜单项示意 ── */
+  .mine-page { display: flex; flex-direction: column; height: 100%; background: linear-gradient(180deg, #2a1545, #0f0f1a); }
+  .mine-header-demo {
+    padding: 24px 20px 16px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .mine-header-demo .avatar { width: 56px; height: 56px; }
+  .mine-menu-demo { padding: 0 20px 100px; display: flex; flex-direction: column; gap: 10px; }
+  .mine-menu-item-demo {
+    background: rgba(42, 26, 74, 0.9);
+    border: 1px solid rgba(255, 200, 220, 0.15);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .mine-menu-left { display: flex; align-items: center; gap: 12px; }
+  .mine-menu-icon { font-size: 18px; }
+  .mine-menu-label { font-size: 14px; color: #f0e8ff; font-weight: 500; }
+  .mine-menu-sub { font-size: 12px; color: #f9a8d4; margin-left: 8px; }
+  .mine-menu-arrow { color: rgba(255,255,255,0.35); }
+
+  /* ── 入口说明图例 ── */
+  .proto-legend {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 8px;
+    padding: 16px 20px;
+    background: rgba(30, 27, 75, 0.6);
+    border: 1px solid rgba(196, 181, 253, 0.25);
+    border-radius: 16px;
+    color: #e2e8f0;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .proto-legend h2 {
+    font-size: 15px; margin-bottom: 10px;
+    background: linear-gradient(135deg, #c4b5fd, #a5b4fc);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .proto-legend ul { margin: 8px 0 0 18px; color: rgba(255,255,255,0.75); }
+  .proto-legend strong { color: #f9a8d4; }
+
   /* ── 响应式 ── */
   @media (max-width: 480px) {
     body { padding: 10px; gap: 20px; }
@@ -642,6 +790,16 @@
 </style>
 </head>
 <body>
+
+<div class="proto-legend">
+  <h2>长情许 · 圈子 + 我的动态（原型 v1.1）</h2>
+  <p>设计说明见 <code>docs/superpowers/specs/2026-05-29-circle-moments-design.md</code> §5.2–5.6。</p>
+  <ul>
+    <li><strong>主入口</strong>：⑤ 我的 Tab → 菜单「我的动态」→ ④ 作品库</li>
+    <li><strong>辅入口</strong>：① 圈子顶栏左侧头像；② 发布成功条「查看我的动态」</li>
+    <li>圈子 Pill 仍为「全站 / 关注 / 同城」，<strong>不</strong>增加「我的」分类 Tab</li>
+  </ul>
+</div>
 
 <!-- ════════════════════════════════════
      屏幕 1：圈子 Feed（登录用户）
@@ -656,11 +814,13 @@
         <div class="status-icons"><span>WiFi</span><span>🔋</span></div>
       </div>
 
-      <!-- 导航栏 -->
+      <!-- 导航栏：登录态左头像 → 我的动态 -->
       <div class="nav-bar">
-        <div style="width:36px"></div>
+        <div class="nav-avatar" title="我的动态">许</div>
         <div class="nav-title">✦ 圈子</div>
-        <div class="nav-btn" title="通知">🔔</div>
+        <div class="nav-bar-right">
+          <div class="nav-btn" title="通知">🔔</div>
+        </div>
       </div>
 
       <!-- 分类 Tab -->
@@ -849,6 +1009,15 @@
 
         <!-- 内容区 -->
         <div class="publish-body">
+          <!-- 发布成功（示意态，实现时 toast 或本页顶部条） -->
+          <div class="publish-success-bar">
+            <div class="publish-success-text">✓ 发布成功</div>
+            <div class="publish-success-actions">
+              <button class="btn-sm-ghost" type="button">返回广场</button>
+              <button class="btn-sm-primary" type="button">查看我的动态</button>
+            </div>
+          </div>
+
           <!-- 文本输入 -->
           <textarea class="text-area" placeholder="分享你的生活故事…" rows="4">今天的夕阳真的太美了，愿意一起看夕阳的人在哪里 🌇</textarea>
 
@@ -1031,7 +1200,7 @@
       </div>
 
       <!-- 登录引导弹窗（默认隐藏） -->
-      <div class="modal-overlay" id="loginModal" style="display:none;">
+      <div class="modal-overlay" id="loginModal" style="display:none;" role="dialog">
         <div class="modal-box">
           <span class="modal-icon">💕</span>
           <div class="modal-title">登录后解锁全部互动</div>
@@ -1040,6 +1209,201 @@
             <button class="btn-primary" onclick="hideLoginModal()">立即登录</button>
             <button class="btn-ghost" onclick="hideLoginModal()">稍后再说</button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     屏幕 4：我的动态（作品库）
+════════════════════════════════════ -->
+<div class="phone-wrap">
+  <div class="screen-label">④ 我的动态 · 作品库（有内容）</div>
+  <div class="phone">
+    <div class="screen my-moments-page">
+      <div class="status-bar" style="background:transparent;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons"><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="sub-nav">
+        <span class="sub-nav-back" title="返回">‹</span>
+        <span class="sub-nav-title">我的动态</span>
+      </div>
+      <div class="profile-strip">
+        <div class="avatar-placeholder" style="background:linear-gradient(135deg,#c084fc,#f472b6);">许</div>
+        <div class="profile-strip-info">
+          <div class="profile-strip-name">许文强</div>
+          <div class="profile-strip-stats">3 条动态 · 128 获赞 · 17 评论</div>
+        </div>
+      </div>
+      <div class="works-tabs">
+        <div class="works-tab active">作品</div>
+        <div class="works-tab disabled" title="二期">喜欢</div>
+      </div>
+      <div class="my-feed-list">
+        <div class="moment-card own-moment-card">
+          <div class="own-card-top">
+            <span class="own-time">2 小时前 · 公开</span>
+            <span class="own-menu" title="删除">⋯</span>
+          </div>
+          <div class="post-content">今天的夕阳真的太美了 🌇</div>
+          <div class="media-grid grid-3">
+            <div class="media-img-cell">🌇</div>
+            <div class="media-img-cell">🌆</div>
+            <div class="media-img-cell">🌃</div>
+          </div>
+          <div class="action-row">
+            <div class="action-btn liked"><span class="icon">❤️</span><span class="count">42</span></div>
+            <div class="action-btn"><span class="icon">💬</span><span>8</span></div>
+          </div>
+        </div>
+        <div class="moment-card own-moment-card">
+          <div class="own-card-top">
+            <span class="own-time">昨天 · 仅登录可见</span>
+            <span class="own-menu">⋯</span>
+          </div>
+          <div class="post-content">周末去爬山啦，下次还想找人一起 ⛰️</div>
+          <div class="action-row">
+            <div class="action-btn"><span class="icon">🤍</span><span class="count">12</span></div>
+            <div class="action-btn"><span class="icon">💬</span><span>3</span></div>
+          </div>
+        </div>
+        <div class="moment-card own-moment-card">
+          <div class="own-card-top">
+            <span class="own-time">3 天前 · 公开</span>
+            <span class="own-menu">⋯</span>
+          </div>
+          <div class="post-content">找一个愿意一起喝咖啡的人 ☕</div>
+          <div class="action-row">
+            <div class="action-btn"><span class="icon">🤍</span><span class="count">74</span></div>
+            <div class="action-btn"><span class="icon">💬</span><span>6</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="my-moments-bottom-bar">
+        <div class="my-moments-publish-btn">＋ 发布动态</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="phone-wrap">
+  <div class="screen-label">④-b 我的动态 · 空状态</div>
+  <div class="phone">
+    <div class="screen my-moments-page">
+      <div class="status-bar" style="background:transparent;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons"><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="sub-nav">
+        <span class="sub-nav-back">‹</span>
+        <span class="sub-nav-title">我的动态</span>
+      </div>
+      <div class="profile-strip">
+        <div class="avatar-placeholder" style="background:linear-gradient(135deg,#c084fc,#f472b6);">许</div>
+        <div class="profile-strip-info">
+          <div class="profile-strip-name">许文强</div>
+          <div class="profile-strip-stats">0 条动态 · 0 获赞 · 0 评论</div>
+        </div>
+      </div>
+      <div class="works-tabs">
+        <div class="works-tab active">作品</div>
+        <div class="works-tab disabled">喜欢</div>
+      </div>
+      <div class="my-feed-list">
+        <div class="empty-works">
+          <div class="empty-works-icon">📷</div>
+          <div class="empty-works-title">还没有发布动态</div>
+          <div class="empty-works-desc">分享生活，更容易被看见</div>
+          <div class="my-moments-publish-btn" style="max-width:200px;margin:0 auto;">去发布</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     屏幕 5：我的 Tab（主入口菜单）
+════════════════════════════════════ -->
+<div class="phone-wrap">
+  <div class="screen-label">⑤ 我的 Tab · 主入口「我的动态」</div>
+  <div class="phone">
+    <div class="screen mine-page">
+      <div class="status-bar" style="background:transparent;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons"><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="mine-header-demo">
+        <div class="avatar-placeholder" style="background:linear-gradient(135deg,#c084fc,#f472b6);">许</div>
+        <div>
+          <div class="profile-strip-name">许文强</div>
+          <div class="profile-strip-stats" style="margin-top:6px;">资料完善度 68%</div>
+        </div>
+      </div>
+      <div class="mine-menu-demo">
+        <div class="mine-menu-item-demo">
+          <div class="mine-menu-left"><span class="mine-menu-icon">✎</span><span class="mine-menu-label">编辑资料</span></div>
+          <span class="mine-menu-arrow">›</span>
+        </div>
+        <div class="mine-menu-item-demo">
+          <div class="mine-menu-left"><span class="mine-menu-icon">🪪</span><span class="mine-menu-label">我的资料卡</span></div>
+          <span class="mine-menu-arrow">›</span>
+        </div>
+        <div class="mine-menu-item-demo" style="border-color:rgba(244,114,182,0.45);box-shadow:0 0 0 1px rgba(244,114,182,0.2);">
+          <div class="mine-menu-left">
+            <span class="mine-menu-icon">📷</span>
+            <span class="mine-menu-label">我的动态</span>
+            <span class="mine-menu-sub">3 条</span>
+          </div>
+          <span class="mine-menu-arrow">›</span>
+        </div>
+        <div class="mine-menu-item-demo">
+          <div class="mine-menu-left"><span class="mine-menu-icon">👑</span><span class="mine-menu-label">会员中心</span></div>
+          <span class="mine-menu-arrow">›</span>
+        </div>
+        <div class="mine-menu-item-demo">
+          <div class="mine-menu-left"><span class="mine-menu-icon">🪪</span><span class="mine-menu-label">实名认证</span></div>
+          <span class="mine-menu-arrow">›</span>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item"><div class="tab-icon">🔍</div><div class="tab-text">发现</div></div>
+        <div class="tab-item"><div class="tab-icon">⚡</div><div class="tab-text">筛选</div></div>
+        <div class="tab-item"><div class="tab-icon">✦</div><div class="tab-text">圈子</div></div>
+        <div class="tab-item"><div class="tab-icon">💬</div><div class="tab-text">消息</div></div>
+        <div class="tab-item active"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     屏幕 6：入口关系示意（线框）
+════════════════════════════════════ -->
+<div class="phone-wrap" style="max-width:420px;">
+  <div class="screen-label">⑥ 入口关系（线框）</div>
+  <div class="phone" style="height:auto;min-height:400px;">
+    <div class="screen" style="padding:24px 20px 32px;">
+      <div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.8;">
+        <div style="margin-bottom:16px;padding:12px;border-radius:12px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);">
+          <strong style="color:#c4b5fd;">主路径</strong><br>
+          我的 Tab → 我的动态 → 作品列表
+        </div>
+        <div style="margin-bottom:16px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);">
+          <strong style="color:#93c5fd;">辅路径 A</strong><br>
+          圈子 → 顶栏头像 → 我的动态
+        </div>
+        <div style="margin-bottom:16px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);">
+          <strong style="color:#93c5fd;">辅路径 B</strong><br>
+          发布成功 → 查看我的动态
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(251,191,36,0.08);border:1px dashed rgba(251,191,36,0.35);">
+          <strong style="color:#fcd34d;">不推荐</strong><br>
+          仅在广场 Feed 偶遇自己的帖（仅作删除入口，非作品库）
         </div>
       </div>
     </div>

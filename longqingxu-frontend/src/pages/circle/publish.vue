@@ -1,20 +1,19 @@
 <template>
   <view class="circle-publish-page">
-    <!-- 状态栏 -->
-    <view :style="{ height: statusBarHeight + 'px' }" />
-
-    <!-- 顶栏 -->
-    <view class="circle-publish-header">
-      <view class="publish-back-btn" @click="goBack">
-        <text>‹</text>
-      </view>
-      <text class="publish-page-title">发布动态</text>
-      <view
-        class="publish-submit-btn"
-        :class="{ disabled: submitting || !canSubmit }"
-        @click="onSubmit"
-      >
-        {{ submitting ? '发布中…' : '发布' }}
+    <!-- 顶栏（与微信胶囊对齐，右侧避让） -->
+    <view :style="capsuleNavOuterStyle">
+      <view class="circle-publish-header" :style="capsuleNavRowStyle">
+        <view class="publish-back-btn" @click="goBack">
+          <text>‹</text>
+        </view>
+        <text class="publish-page-title">发布动态</text>
+        <view
+          class="publish-submit-btn"
+          :class="{ disabled: submitting || !canSubmit }"
+          @click="onSubmit"
+        >
+          {{ submitting ? '发布中…' : '发布' }}
+        </view>
       </view>
     </view>
 
@@ -100,13 +99,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useCircleStore } from '@/stores/circle'
+import { useMyMomentsStore } from '@/stores/my-moments'
 import { apiUploadMomentImage, apiUploadMomentVideo, apiCreatePost } from '@/services/api-moment'
+import { getCapsuleNavOuterStyle, getCapsuleNavRowStyle } from '@/utils/safe-area'
 
 const circleStore = useCircleStore()
+const myMomentsStore = useMyMomentsStore()
 
-const statusBarHeight = ref(0)
+const capsuleNavOuterStyle = computed(() => getCapsuleNavOuterStyle())
+const capsuleNavRowStyle = computed(() => getCapsuleNavRowStyle())
 const submitting = ref(false)
 
 const form = ref<{
@@ -130,11 +133,6 @@ const visibilityOptions = [
 
 const canSubmit = computed(() => {
   return !!form.value.content.trim() || form.value.images.length > 0 || !!form.value.video
-})
-
-onMounted(() => {
-  const sysInfo = uni.getSystemInfoSync()
-  statusBarHeight.value = sysInfo.statusBarHeight || 0
 })
 
 function goBack() {
@@ -200,20 +198,71 @@ function removeVideo() {
 }
 
 function chooseLocation() {
-  // #ifdef MP-WEIXIN
-  wx.chooseLocation({
-    success: (res: any) => {
-      form.value.location = {
-        name: res.name || res.address,
-        latitude: res.latitude,
-        longitude: res.longitude,
+  const applyLocation = (res: UniApp.ChooseLocationSuccess) => {
+    const name = (res.name || res.address || '').trim()
+    if (!name) {
+      uni.showToast({ title: '未获取到位置名称', icon: 'none' })
+      return
+    }
+    form.value.location = {
+      name,
+      latitude: res.latitude,
+      longitude: res.longitude,
+    }
+  }
+
+  uni.getSetting({
+    success: (settingRes) => {
+      const granted = settingRes.authSetting?.['scope.userLocation']
+      const openPicker = () => {
+        uni.chooseLocation({
+          success: applyLocation,
+          fail: (err) => {
+            const msg = err?.errMsg || ''
+            if (msg.includes('cancel')) return
+            if (msg.includes('auth deny') || msg.includes('authorize')) {
+              uni.showModal({
+                title: '需要位置权限',
+                content: '请在设置中开启位置权限后，再选择发布位置',
+                confirmText: '去设置',
+                success: (m) => {
+                  if (m.confirm) uni.openSetting({})
+                },
+              })
+              return
+            }
+            uni.showToast({ title: '选择位置失败，请重试', icon: 'none' })
+          },
+        })
       }
+
+      if (granted === false) {
+        uni.showModal({
+          title: '需要位置权限',
+          content: '用于在动态中展示你选中的地点',
+          confirmText: '去设置',
+          success: (m) => {
+            if (m.confirm) uni.openSetting({})
+          },
+        })
+        return
+      }
+
+      if (granted === true) {
+        openPicker()
+        return
+      }
+
+      uni.authorize({
+        scope: 'scope.userLocation',
+        success: openPicker,
+        fail: openPicker,
+      })
+    },
+    fail: () => {
+      uni.chooseLocation({ success: applyLocation })
     },
   })
-  // #endif
-  // #ifndef MP-WEIXIN
-  uni.showToast({ title: '该功能仅微信小程序支持', icon: 'none' })
-  // #endif
 }
 
 async function onSubmit() {
@@ -242,11 +291,28 @@ async function onSubmit() {
     })
 
     circleStore.prependPost(newPost)
-    uni.showToast({ title: '发布成功', icon: 'success' })
+    myMomentsStore.prependPost(newPost)
 
-    setTimeout(() => uni.navigateBack(), 800)
+    uni.showModal({
+      title: '发布成功 🎉',
+      content: '动态已发布，是否查看我的动态？',
+      confirmText: '我的动态',
+      cancelText: '返回广场',
+      success: (res) => {
+        if (res.confirm) {
+          uni.redirectTo({ url: '/pages/mine/my-moments' })
+        } else {
+          uni.navigateBack()
+        }
+      },
+    })
   } catch (err: any) {
-    uni.showToast({ title: err?.message || '发布失败，请重试', icon: 'none' })
+    const msg = err?.message || '发布失败，请重试'
+    uni.showModal({
+      title: '发布失败',
+      content: msg,
+      showCancel: false,
+    })
   } finally {
     submitting.value = false
   }

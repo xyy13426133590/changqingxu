@@ -340,8 +340,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return;
       discoverStore.dislikeUser(currentUser.value.id);
     }
+    const greetingInFlight = common_vendor.ref(false);
     function handleGreeting() {
       return __async(this, null, function* () {
+        if (greetingInFlight.value)
+          return;
         const peer = currentUser.value;
         if (!(peer == null ? void 0 : peer.id)) {
           common_vendor.index.showToast({ title: "用户信息异常，请刷新推荐", icon: "none" });
@@ -351,6 +354,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           common_vendor.index.navigateTo({ url: "/pages/auth/welcome" });
           return;
         }
+        greetingInFlight.value = true;
         common_vendor.index.showLoading({ mask: true, title: "准备聊天…" });
         try {
           const convId = yield messagesStore.createConversation(
@@ -367,8 +371,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           common_vendor.index.navigateTo({ url: `/pages/messages/chat?conversationId=${convId}` });
         } catch (e) {
           const msg = e instanceof Error ? e.message : "创建会话失败";
-          common_vendor.index.showToast({ title: msg, icon: "none" });
+          common_vendor.index.showModal({ title: "打招呼失败", content: msg, showCancel: false });
         } finally {
+          greetingInFlight.value = false;
           common_vendor.index.hideLoading();
         }
       });
